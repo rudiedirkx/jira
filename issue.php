@@ -7,9 +7,10 @@ $key = $_GET['key'];
 if ( !empty($_POST['comment']) ) {
 	$response = jira_post('issue/' . $key . '/comment', array('body' => $_POST['comment']), $error, $info);
 	echo '<p>error: ' . (int)$error . '</p>';
-	echo '<p><a href="?key=' . $key . '">Back</a></p>';
+	echo '<p><a href="issue.php?key=' . $key . '">Back</a></p>';
 	echo '<pre>';
 	print_r($response);
+	print_r($info);
 	echo '</pre>';
 	exit;
 }
@@ -72,5 +73,5 @@ echo '<p><input type="submit" /></p>';
 echo '</form>';
 echo '</div>';
 
-echo '<pre>';
-print_r($issue);
+// echo '<pre>';
+// print_r($issue);

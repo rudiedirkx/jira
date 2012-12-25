@@ -15,7 +15,7 @@ if ( isset($_POST['status'], $_POST['comment'], $_POST['assignee']) ) {
 
 	$update = array();
 	if ( $comment ) {
-		$update['update']['comment']['add']['body'] = $comment;
+		$update['update']['comment'][0]['add']['body'] = $comment;
 	}
 	if ( $assignee ) {
 		$update['fields']['assignee']['name'] = $assignee;
@@ -27,13 +27,9 @@ if ( isset($_POST['status'], $_POST['comment'], $_POST['assignee']) ) {
 		$update['transition']['id'] = $status;
 	}
 
-echo '<pre>';
-print_r($update);
-echo '</pre>';
-
 	$response = jira_post('issue/' . $key . '/transitions', $update, $error, $info);
 	echo '<p>error: ' . (int)$error . '</p>';
-	echo '<p><a href="?key=' . $key . '">Back</a></p>';
+	echo '<p><a href="issue.php?key=' . $key . '">Back</a></p>';
 	echo '<pre>';
 	print_r($response);
 	print_r($info);
