@@ -70,9 +70,9 @@ function jira_response( $ch, &$error = null, &$info = null ) {
 
 	$info['headers'] = jira_http_headers($header);
 
-	$info['response'] = $info['error'] = '';
+	$info['response'] = $body;
+	$info['error'] = '';
 	if ( $error ) {
-		$info['response'] = $body;
 		$info['error'] = ($json = @json_decode($body)) ? $json : null;
 	}
 

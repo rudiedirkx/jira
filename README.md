@@ -8,7 +8,7 @@ What it should do:
 * [x] List issues via hardcoded query
 * [x] View issue details
 * [x] Add comment
-* [-] Change status (transition)
+* [x] Change status (transition)
 * [ ] Change assignee
 * [ ] Create issue
 

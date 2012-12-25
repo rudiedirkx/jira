@@ -4,7 +4,15 @@ require 'bootstrap.php';
 
 $query = 'project = BR AND status != Closed ORDER BY priority DESC, key DESC';
 
-$issues = jira_get('search', array('maxResults' => 25, 'jql' => $query));
+$issues = jira_get('search', array('maxResults' => 25, 'jql' => $query), $error, $info);
+// var_dump($issues);
+// var_dump($error);
+// var_dump($info);
+if ( $error ) {
+	echo '<pre>';
+	print_r($info);
+	exit;
+}
 
 ?>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
