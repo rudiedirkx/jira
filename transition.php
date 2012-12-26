@@ -1,8 +1,11 @@
 <?php
 
-require 'bootstrap.php';
+require 'inc.bootstrap.php';
+
+do_logincheck();
 
 $key = $_GET['key'];
+
 $summary = $_GET['summary'];
 $action = @$_GET['transition'];
 $assignee = @$_GET['assignee'] ?: '?';
@@ -28,12 +31,17 @@ if ( isset($_POST['status'], $_POST['comment'], $_POST['assignee']) ) {
 	}
 
 	$response = jira_post('issue/' . $key . '/transitions', $update, $error, $info);
-	echo '<p>error: ' . (int)$error . '</p>';
-	echo '<p><a href="issue.php?key=' . $key . '">Back</a></p>';
+
+	if ( !$error ) {
+		return do_redirect('issue', array('key' => $key));
+	}
+
 	echo '<pre>';
+	print_r($update);
+	var_dump($error);
 	print_r($response);
 	print_r($info);
-	echo '</pre>';
+
 	exit;
 }
 
@@ -73,5 +81,5 @@ echo '<p><input type="submit" /></p>';
 echo '</form>';
 echo '</div>';
 
-echo '<pre>';
-print_r($transitions);
+// echo '<pre>';
+// print_r($transitions);

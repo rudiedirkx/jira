@@ -1,5 +1,24 @@
 <?php
 
+function do_redirect( $path, $query = null ) {
+	$fragment = '';
+	if ( is_int($p = strpos($path, '#')) ) {
+		$fragment = substr($path, $p);
+		$path = substr($path, 0, $p);
+	}
+
+	$query = $query ? '?' . http_build_query($query) : '';
+	$location = $path . '.php' . $query . $fragment;
+	header('Location: ' . $location);
+	exit;
+}
+
+function do_logincheck() {
+	if ( !defined('JIRA_URL') ) {
+		exit('<a href="auth.php">Need login</a>');
+	}
+}
+
 function html( $text ) {
 	return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
 }
@@ -21,8 +40,21 @@ function html_options( $options, $selected = null ) {
 	return $html;
 }
 
-function jira_curl() {
+function jira_url( $resource, $query = null ) {
+	if ( preg_match('#^https?://#i', $resource) ) {
+		$url = $resource;
+	}
+	else {
+		$path = '/' == $resource[0] ? '' : JIRA_API_PATH;
+		$url = JIRA_URL . $path . $resource;
+	}
+	$query && $url .= '?' . http_build_query($query);
+	return $url;
+}
+
+function jira_curl( $url ) {
 	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL, $url);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($ch, CURLOPT_HEADER, 1);
 	curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
@@ -30,12 +62,11 @@ function jira_curl() {
 	return $ch;
 }
 
-function jira_post( $url, $data, &$error = null, &$info = null ) {
-	$url = JIRA_URL . $url;
+function jira_post( $resource, $data, &$error = null, &$info = null ) {
+	$url = jira_url($resource);
 	$body = json_encode($data);
 
-	$ch = jira_curl();
-	curl_setopt($ch, CURLOPT_URL, $url);
+	$ch = jira_curl($url);
 	curl_setopt($ch, CURLOPT_POST, true);
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
 	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
@@ -45,14 +76,32 @@ function jira_post( $url, $data, &$error = null, &$info = null ) {
 	return $response;
 }
 
-function jira_get( $url, $query = null, &$error = null, &$info = null ) {
-	$query = $query ? '?' . http_build_query($query) : '';
-	$url = JIRA_URL . $url . $query;
+function jira_get( $resource, $query = null, &$error = null, &$info = null ) {
+	$url = jira_url($resource, $query);
 
-	$ch = jira_curl();
-	curl_setopt($ch, CURLOPT_URL, $url);
+	$ch = jira_curl($url);
 
 	return jira_response($ch, $error, $info);
+}
+
+function jira_put( $resource, $data, &$error = null, &$info = null ) {
+	$url = jira_url($resource);
+	$body = json_encode($data);
+
+	$fp = fopen('php://temp/maxmemory:256000', 'w');
+	fwrite($fp, $body);
+	fseek($fp, 0);
+
+	$ch = jira_curl($url);
+	curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
+	curl_setopt($ch, CURLOPT_PUT, true);
+	curl_setopt($ch, CURLOPT_INFILE, $fp);
+	curl_setopt($ch, CURLOPT_INFILESIZE, strlen($body));
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
+
+	$response = jira_response($ch, $error, $info);
+	$info['request'] = $body;
+	return $response;
 }
 
 function jira_response( $ch, &$error = null, &$info = null ) {
@@ -84,7 +133,7 @@ function jira_http_headers( $header ) {
 	foreach ( explode("\n", $header) AS $line ) {
 		@list($name, $value) = explode(':', $line, 2);
 		if ( ($name = trim($name)) && ($value = trim($value)) ) {
-			$headers[strtolower($name)][] = $value;
+			$headers[strtolower($name)][] = urldecode($value);
 		}
 	}
 	return $headers;
