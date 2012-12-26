@@ -42,7 +42,7 @@ $actions = array();
 foreach ( $transitions AS $transition ) {
 	$actions[$transition->name] = $actionPath . $transition->id;
 }
-$actions['Labels'] = 'labels.php?key=' . $key . '&' . http_build_query(array('labels' => $fields->labels));
+$actions['Labels'] = 'labels.php?key=' . $key . '&id=' . $issue->id . '&' . http_build_query(array('labels' => $fields->labels));
 
 ?>
 <meta name="viewport" content="width=device-width, initial-scale=1" />

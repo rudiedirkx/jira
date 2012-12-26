@@ -17,6 +17,7 @@ $db->schema($schema);
 // Jira API resource prefixes
 define('JIRA_AUTH_PATH', '/auth/1/');
 define('JIRA_API_PATH', '/api/2/');
+define('JIRA_API_1_PATH', '/api/1.0/');
 
 // Current session. This implementation is NOT ACCEPTABLE. See auth.php.
 $user = null;

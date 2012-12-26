@@ -5,6 +5,7 @@ require 'inc.bootstrap.php';
 do_logincheck();
 
 $key = $_GET['key'];
+$id = $_GET['id'];
 
 if ( isset($_POST['labels']) ) {
 	$old_labels = (array)@$_GET['labels'];
@@ -39,6 +40,13 @@ if ( isset($_POST['labels']) ) {
 	exit;
 }
 
+$suggestions = jira_get(JIRA_API_1_PATH . 'labels/' . $id . '/suggest.json', array('query' => ''), $error, $info);
+$labels = (array)@$_GET['labels'];
+foreach ( $suggestions->suggestions AS $label ) {
+	$labels[] = (string)$label->label;
+}
+natcasesort($labels);
+
 echo '<p class="menu"><a href="index.php">&lt; index</a></p>';
 echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> Labels</h1>';
 
@@ -47,3 +55,11 @@ echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> Labels</h1>';
 	<p><input name="labels" value="<?= implode(' ', (array)@$_GET['labels']) ?>" size="60" /></p>
 	<p><input type="submit" /></p>
 </form>
+<?php
+
+echo '<p>[' . implode('] [', $labels) . ']</p>';
+
+// echo '<pre>';
+// print_r($labels);
+// var_dump($error);
+// print_r($info);
