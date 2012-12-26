@@ -8,6 +8,7 @@ return array(
 				'jira_url' => array('type' => 'text', 'null' => false),
 				'jira_user' => array('type' => 'text', 'null' => false),
 				'index_query' => array('type' => 'text'),
+				'index_project' => array('type' => 'text'),
 			),
 			'indexes' => array(
 				'user' => array(

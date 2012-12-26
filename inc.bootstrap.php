@@ -19,6 +19,7 @@ define('JIRA_AUTH_PATH', '/auth/1/');
 define('JIRA_API_PATH', '/api/2/');
 
 // Current session. This implementation is NOT ACCEPTABLE. See auth.php.
+$user = null;
 if ( isset($_COOKIE[session_name()]) ) {
 	session_start();
 
@@ -26,6 +27,8 @@ if ( isset($_COOKIE[session_name()]) ) {
 		define('JIRA_URL', $_SESSION['jira']['url']);
 		define('JIRA_USER', $_SESSION['jira']['user']);
 		define('JIRA_PASS', $_SESSION['jira']['pass']);
+
+		$user = $db->select('users', array('jira_url' => JIRA_URL, 'jira_user' => JIRA_USER))->first();
 	}
 	else {
 		$_SESSION['jira'] = null;

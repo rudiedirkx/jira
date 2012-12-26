@@ -4,16 +4,24 @@ require 'inc.bootstrap.php';
 
 do_logincheck();
 
-$query = 'project = BR AND status != Closed ORDER BY priority DESC, key DESC';
+// GET query
+if ( !empty($_GET['query']) ) {
+	$query = $_GET['query'];
+}
+// User's custom query
+else if ( $user && $user->index_query ) {
+	$query = $user->index_query;
+}
+// Default query
+else {
+	// Project
+	empty($_GET['project']) && $user && $_GET['project'] = $user->index_project;
+	$project = '';
+	if ( !empty($_GET['project']) ) {
+		$project = 'project = "' . $_GET['project'] . '" AND ';
+	}
 
-$issues = jira_get('search', array('maxResults' => 25, 'jql' => $query), $error, $info);
-// var_dump($issues);
-// var_dump($error);
-// var_dump($info);
-if ( $error ) {
-	echo '<pre>';
-	print_r($info);
-	exit;
+	$query = $project . 'status != Closed ORDER BY priority DESC, key DESC';
 }
 
 ?>
@@ -25,7 +33,33 @@ if ( $error ) {
 .short-meta .right { float: right; }
 .label { display: inline-block; background: #D3EAF1; padding: 1px 5px; border-radius: 4px; }
 </style>
+
+<form>
+	<p>
+		Project:
+		<input name="project" value="<?= html(@$_GET['project']) ?>" />
+		<input type="submit" />
+	</p>
+</form>
+
+<form>
+	<p>
+		Query:
+		<input name="query" value="<?= html(@$query) ?>" />
+		<input type="submit" />
+	</p>
+</form>
 <?php
+
+$issues = jira_get('search', array('maxResults' => 25, 'jql' => $query), $error, $info);
+// var_dump($issues);
+// var_dump($error);
+// var_dump($info);
+if ( $error ) {
+	echo '<pre>';
+	print_r($info);
+	exit;
+}
 
 foreach ( $issues->issues AS $issue ) {
 	$fields = $issue->fields;
@@ -40,7 +74,7 @@ foreach ( $issues->issues AS $issue ) {
 	echo '<h2><a href="issue.php?key=' . $issue->key . '">' . $issue->key . ' ' . $fields->summary . '</a></h2>';
 	echo '<p class="short-meta">';
 	echo '	<span class="left">' . $fields->issuetype->name . '</span>';
-	echo '	<span class="center">' . $fields->priority->name . '</span>';
+	echo '	<span class="center">' . ( $fields->priority ? $fields->priority->name : '&nbsp;' ) . '</span>';
 	echo '	<span class="right">' . $status . '</span>';
 	echo '</p>';
 	if ( $fields->labels ) {
@@ -49,5 +83,5 @@ foreach ( $issues->issues AS $issue ) {
 	echo '<hr>';
 }
 
-echo '<pre>';
-print_r($issues);
+// echo '<pre>';
+// print_r($issues);
