@@ -13,6 +13,8 @@ What it should do:
 * [x] Change labels
 * [ ] HTML ENCODING!
 * [ ] Change assignee
+* [ ] Edit comment
+* [ ] Delete comment
 * [ ] Create issue
 * [ ] Enter (and save!) index query
 

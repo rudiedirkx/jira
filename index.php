@@ -4,6 +4,8 @@ require 'inc.bootstrap.php';
 
 do_logincheck();
 
+$perPage = 10;
+
 // GET query
 if ( !empty($_GET['query']) ) {
 	$query = $_GET['query'];
@@ -24,64 +26,94 @@ else {
 	$query = $project . 'status != Closed ORDER BY priority DESC, key DESC';
 }
 
+$page = max(0, (int)@$_GET['page']);
+$issues = jira_get('search', array('maxResults' => $perPage, 'startAt' => $page * $perPage, 'jql' => $query), $error, $info);
+// var_dump($issues);
+// var_dump($error);
+// var_dump($info);
+
+if ( isset($_GET['ajax']) ) {
+	include 'tpl.issues.php';
+	exit;
+}
+
+$filters = jira_get('filter/favourite', null, $error, $info);
+$filterOptions = array();
+foreach ( $filters AS $filter ) {
+	$filterOptions[$filter->jql] = $filter->name;
+}
+
 ?>
 <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
+* { /*margin: 0; padding: 0;*/ box-sizing: border-box; -webkit-box-sizing: border-box; }
+input:not([type="submit"]):not([type="button"]), select { width: 100%; }
+
 .short-meta { text-align: center; }
 .short-meta .left { float: left; }
-.short-meta .right { float: right; }
+.short-meta .right, .dates .right { float: right; }
 .label { display: inline-block; background: #D3EAF1; padding: 1px 5px; border-radius: 4px; }
+
+.tab-links .active { font-weight: bold; }
+.tab-pages .tab-page + .tab-page { display: none; }
+
+#pager { text-align: center; }
 </style>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 
-<form>
-	<p>
-		Project:
-		<input name="project" value="<?= html(@$_GET['project']) ?>" />
-		<input type="submit" />
-	</p>
-</form>
+<nav class="tab-links">
+	<a href="#tab-page-project" class="active">Project</a>
+	<a href="#tab-page-query">Query</a>
+	<a href="#tab-page-filter">Filter</a>
+</nav>
+<div class="tab-pages">
+	<form class="tab-page" id="tab-page-project">
+		<p>
+			<!-- Project: -->
+			<input name="project" value="<?= html(@$_GET['project']) ?>" placeholder="Project" />
+			<input type="submit" />
+		</p>
+	</form>
+	<form class="tab-page" id="tab-page-query">
+		<p>
+			<!-- Query: -->
+			<input name="query" value="<?= html(@$query) ?>" />
+			<input type="submit" />
+		</p>
+	</form>
+	<form class="tab-page" id="tab-page-filter">
+		<p>
+			<!-- Filter: -->
+			<select name="query"><?= html_options($filterOptions, $query, '-- Filter') ?></select>
+			<input type="submit" />
+		</p>
+	</form>
+</div>
 
-<form>
-	<p>
-		Query:
-		<input name="query" value="<?= html(@$query) ?>" />
-		<input type="submit" />
-	</p>
-</form>
+<script>
+$('.tab-links a').on('click', function(e) {
+	e.preventDefault();
+	var $this = $(this),
+		$links = $this.parent(),
+		$pages = $links.next();
+	$pages.children().hide().filter($this.attr('href')).show();
+	$links.children().removeClass('active');
+	$this.addClass('active');
+});
+</script>
+
 <?php
 
-$issues = jira_get('search', array('maxResults' => 25, 'jql' => $query), $error, $info);
-// var_dump($issues);
-// var_dump($error);
-// var_dump($info);
 if ( $error ) {
 	echo '<pre>';
 	print_r($info);
 	exit;
 }
 
-foreach ( $issues->issues AS $issue ) {
-	$fields = $issue->fields;
-
-	$resolution = '';
-	if ( $fields->resolution ) {
-		$resolution = ': ' . $fields->resolution->name;
-	}
-
-	$status = $fields->resolution ? $fields->resolution->name : $fields->status->name;
-
-	echo '<h2><a href="issue.php?key=' . $issue->key . '">' . $issue->key . ' ' . $fields->summary . '</a></h2>';
-	echo '<p class="short-meta">';
-	echo '	<span class="left">' . $fields->issuetype->name . '</span>';
-	echo '	<span class="center">' . ( $fields->priority ? $fields->priority->name : '&nbsp;' ) . '</span>';
-	echo '	<span class="right">' . $status . '</span>';
-	echo '</p>';
-	if ( $fields->labels ) {
-		echo '<p class="labels">Labels: <span class="label">' . implode('</span> <span class="label">', $fields->labels) . '</span></p>';
-	}
-	echo '<hr>';
-}
+echo '<div id="content">';
+include 'tpl.issues.php';
+echo '</div>';
 
 // echo '<pre>';
 // print_r($issues);

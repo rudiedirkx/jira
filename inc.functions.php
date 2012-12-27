@@ -1,5 +1,11 @@
 <?php
 
+function html_q($change, $stringify = true, $source = null) {
+	$source || $source = $_GET;
+	$source = $change + $source;
+	return $stringify ? http_build_query($source) : $source;
+}
+
 function do_redirect( $path, $query = null ) {
 	$fragment = '';
 	if ( is_int($p = strpos($path, '#')) ) {
@@ -31,11 +37,12 @@ function html_links( $links ) {
 	return implode(' | ', $html);
 }
 
-function html_options( $options, $selected = null ) {
+function html_options( $options, $selected = null, $empty = '' ) {
 	$html = '';
+	$empty && $html .= '<option>' . $empty;
 	foreach ( $options AS $value => $label ) {
 		$isSelected = $value == $selected ? ' selected' : '';
-		$html .= '<option value="' . html($value) . '"' . $isSelected . '>' . html($label) . '</option>';
+		$html .= '<option value="' . html($value) . '"' . $isSelected . '>' . html($label);
 	}
 	return $html;
 }
