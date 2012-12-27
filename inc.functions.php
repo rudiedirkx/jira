@@ -59,7 +59,10 @@ function jira_url( $resource, $query = null ) {
 	return $url;
 }
 
-function jira_curl( $url ) {
+function jira_curl( $url, $method = '' ) {
+	empty($GLOBALS['jira_requests']) && $GLOBALS['jira_requests'] = array();
+	$GLOBALS['jira_requests'][] = $method . ' ' . $url;
+
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, $url);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -73,7 +76,7 @@ function jira_post( $resource, $data, &$error = null, &$info = null ) {
 	$url = jira_url($resource);
 	$body = json_encode($data);
 
-	$ch = jira_curl($url);
+	$ch = jira_curl($url, 'POST');
 	curl_setopt($ch, CURLOPT_POST, true);
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
 	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
@@ -86,7 +89,7 @@ function jira_post( $resource, $data, &$error = null, &$info = null ) {
 function jira_get( $resource, $query = null, &$error = null, &$info = null ) {
 	$url = jira_url($resource, $query);
 
-	$ch = jira_curl($url);
+	$ch = jira_curl($url, 'GET');
 
 	return jira_response($ch, $error, $info);
 }
@@ -99,7 +102,7 @@ function jira_put( $resource, $data, &$error = null, &$info = null ) {
 	fwrite($fp, $body);
 	fseek($fp, 0);
 
-	$ch = jira_curl($url);
+	$ch = jira_curl($url, 'PUT');
 	curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
 	curl_setopt($ch, CURLOPT_PUT, true);
 	curl_setopt($ch, CURLOPT_INFILE, $fp);

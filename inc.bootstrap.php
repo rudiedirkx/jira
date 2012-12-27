@@ -14,6 +14,9 @@ $db = db_sqlite::open(array('database' => DB_PATH));
 $schema = require 'inc.schema.php';
 $db->schema($schema);
 
+// User class
+require 'inc.user.php';
+
 // Jira API resource prefixes
 define('JIRA_AUTH_PATH', '/auth/1/');
 define('JIRA_API_PATH', '/api/2/');
@@ -29,7 +32,7 @@ if ( isset($_COOKIE[session_name()]) ) {
 		define('JIRA_USER', $_SESSION['jira']['user']);
 		define('JIRA_PASS', $_SESSION['jira']['pass']);
 
-		$user = $db->select('users', array('jira_url' => JIRA_URL, 'jira_user' => JIRA_USER))->first();
+		$user = User::get();
 	}
 	else {
 		$_SESSION['jira'] = null;

@@ -11,13 +11,13 @@ if ( !empty($_GET['query']) ) {
 	$query = $_GET['query'];
 }
 // User's custom query
-else if ( $user && $user->index_query ) {
+else if ( $user->index_query ) {
 	$query = $user->index_query;
 }
 // Default query
 else {
 	// Project
-	empty($_GET['project']) && $user && $_GET['project'] = $user->index_project;
+	empty($_GET['project']) && $_GET['project'] = $user->index_project;
 	$project = '';
 	if ( !empty($_GET['project']) ) {
 		$project = 'project = "' . $_GET['project'] . '" AND ';
@@ -37,11 +37,7 @@ if ( isset($_GET['ajax']) ) {
 	exit;
 }
 
-$filters = jira_get('filter/favourite', null, $error, $info);
-$filterOptions = array();
-foreach ( $filters AS $filter ) {
-	$filterOptions[$filter->jql] = $filter->name;
-}
+$filterOptions = $user->filter_query_options;
 
 ?>
 <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
@@ -116,4 +112,5 @@ include 'tpl.issues.php';
 echo '</div>';
 
 // echo '<pre>';
+// print_r($jira_requests);
 // print_r($issues);

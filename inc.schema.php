@@ -9,6 +9,7 @@ return array(
 				'jira_user' => array('type' => 'text', 'null' => false),
 				'index_query' => array('type' => 'text'),
 				'index_project' => array('type' => 'text'),
+				'index_filter' => array('unsigned' => true),
 			),
 			'indexes' => array(
 				'user' => array(
@@ -27,6 +28,20 @@ return array(
 				'option' => array(
 					'unique' => true,
 					'columns' => array('user_id', 'name'),
+				),
+			),
+		),
+		'filters' => array(
+			'columns' => array(
+				'user_id' => array('unsigned' => true),
+				'filter_id' => array('unsigned' => true),
+				'name' => array('type' => 'text', 'null' => false),
+				'jql' => array('type' => 'text', 'null' => false),
+			),
+			'indexes' => array(
+				'filter' => array(
+					'unique' => true,
+					'columns' => array('user_id', 'filter_id'),
 				),
 			),
 		),

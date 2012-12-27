@@ -13,9 +13,9 @@ if ( isset($_GET['logout']) ) {
 if ( defined('JIRA_URL') ) {
 	echo '<p>You are:</p>';
 
-	// $user = jira_get('user', array('username' => JIRA_USER), $error, $info);
+	// $account = jira_get('user', array('username' => JIRA_USER), $error, $info);
 	// echo '<pre>';
-	// print_r($user);
+	// print_r($account);
 	// echo '</pre>';
 
 	$session = jira_get(JIRA_AUTH_PATH . 'session', null, $error, $info);
@@ -23,9 +23,9 @@ if ( defined('JIRA_URL') ) {
 	print_r($session);
 	echo '</pre>';
 
-	$user = jira_get($session->self, null, $error, $info);
+	$account = jira_get($session->self, null, $error, $info);
 	echo '<pre>';
-	print_r($user);
+	print_r($account);
 	echo '</pre>';
 
 	exit;
@@ -56,10 +56,11 @@ if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
 		));
 	}
 	catch ( db_exception $ex ) {
-		// Let's assume it failed because the user already exists and not because of
-		// some database error. The rest of the app will keep in mind the global user
-		// might not exist.
+		// Let's assume it failed because the user already exists.
 	}
+
+	$user = User::get();
+	$db->delete('filters', array('user_id' => $user->id));
 
 	// Save URL to cookie for easy access next time
 	setcookie('JIRA_URL', JIRA_URL, strtotime('+1 month'));
