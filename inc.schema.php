@@ -10,6 +10,8 @@ return array(
 				'index_query' => array('type' => 'text'),
 				'index_project' => array('type' => 'text'),
 				'index_filter' => array('unsigned' => true),
+				'last_sync' => array('unsigned' => true),
+				'jira_timezone' => array('type' => 'text'),
 			),
 			'indexes' => array(
 				'user' => array(

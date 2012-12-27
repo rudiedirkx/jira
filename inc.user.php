@@ -2,6 +2,17 @@
 
 class User extends db_generic_record {
 
+	function __construct() {
+		if ( !$this->last_sync || $this->last_sync + FORCE_JIRA_USER_SYNC < time() ) {
+			$this->unsync();
+		}
+	}
+
+	function unsync() {
+		global $db;
+		$db->delete('filters', array('user_id' => $this->id));
+	}
+
 	function get_filters() {
 		global $db;
 		return $db->select('filters', array('user_id' => $this->id))->all();
@@ -24,6 +35,8 @@ class User extends db_generic_record {
 
 			unset($this->filters);
 			$filters = $this->filters;
+
+			$db->update('users', array('last_sync' => time()), array('id' => $this->id));
 		}
 
 		$filterOptions = array();

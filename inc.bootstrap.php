@@ -3,6 +3,9 @@
 // Always. UTF-8. Everywhere. Always.
 header('Content-type: text/html; charset=utf-8');
 
+// Some app constants
+define('FORCE_JIRA_USER_SYNC', 600);
+
 // Context
 require 'env.php';
 require 'inc.functions.php';

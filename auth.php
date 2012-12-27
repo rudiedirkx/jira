@@ -60,7 +60,7 @@ if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
 	}
 
 	$user = User::get();
-	$db->delete('filters', array('user_id' => $user->id));
+	$user->unsync();
 
 	// Save URL to cookie for easy access next time
 	setcookie('JIRA_URL', JIRA_URL, strtotime('+1 month'));

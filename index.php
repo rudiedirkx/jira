@@ -111,6 +111,6 @@ echo '<div id="content">';
 include 'tpl.issues.php';
 echo '</div>';
 
+echo implode('<br>', $jira_requests);
 // echo '<pre>';
-// print_r($jira_requests);
 // print_r($issues);
