@@ -35,6 +35,11 @@ $issue = jira_get('issue/' . $key, array('expand' => 'transitions'));
 $fields = $issue->fields;
 $transitions = $issue->transitions;
 
+$attachments = $fields->attachment;
+usort($attachments, function($a, $b) {
+	return strtotime($a->created) - strtotime($b->created);
+});
+
 $actionPath = 'transition.php?key=' . $key . '&assignee=' . $fields->assignee->name . '&summary=' . urlencode($fields->summary) . '&transition=';
 
 $actions = array();
@@ -49,6 +54,9 @@ $actions['Labels'] = 'labels.php?key=' . $key . '&id=' . $issue->id . '&' . http
 <style>
 textarea { width: 100%; }
 .label { display: inline-block; background: #D3EAF1; padding: 1px 5px; border-radius: 4px; }
+.markup { background: #eee; padding: 10px; }
+table { border-spacing: 0; }
+td { padding: 2px 5px; }
 </style>
 <?php
 
@@ -61,16 +69,32 @@ echo '<p class="menu"><a href="index.php">&lt; index</a></p>';
 echo '<h1>' . $issue->key . ' ' . $fields->summary . '</h1>';
 echo '<p class="menu">' . html_links($actions) . '</p>';
 echo '<p class="meta">';
-echo '[' . $fields->issuetype->name . ' | ' . $fields->priority->name . '] ';
-echo 'by ' . $fields->reporter->displayName . ' | ';
-echo $fields->status->name . $resolution . ' | ';
+echo '[<img src="' . $fields->issuetype->iconUrl . '" alt="' . $fields->issuetype->name . '" /> ' . $fields->issuetype->name . ' | <img src="' . $fields->priority->iconUrl . '" alt="' . $fields->priority->name . '" /> ' . $fields->priority->name . '] ';
+echo 'by ' . $fields->reporter->displayName . ' ';
+echo 'on ' . date(FORMAT_DATETIME, strtotime($fields->created)) . ' | ';
+echo '<strong>' . $fields->status->name . $resolution . '</strong> | ';
 echo 'Assignee: ' . $fields->assignee->displayName . ' | ';
 if ( $fields->labels ) {
 	echo 'Labels: <span class="label">' . implode('</span> <span class="label">', $fields->labels) . '</span>';
 }
 echo '</p>';
 
-echo '<div class="description">' . nl2br(trim($fields->description)) . '</div>';
+echo '<div class="issue-description markup">' . nl2br(trim($fields->description)) . '</div>';
+
+if ( $attachments ) {
+	echo '<h2>' . count($attachments) . ' attachments</h2>';
+	echo '<table border="1">';
+	foreach ( $attachments AS $attachment ) {
+		$created = strtotime($attachment->created);
+
+		echo '<tr>';
+		echo '<td><a target="_blank" href="' . $attachment->content . '">' . $attachment->filename . '</a></td>';
+		echo '<td>' . date(FORMAT_DATETIME, $created) . '</td>';
+		echo '<td>' . $attachment->author->displayName . '</td>';
+		echo '</tr>';
+	}
+	echo '</table>';
+}
 
 $comments = $fields->comment->comments;
 echo '<h2>' . count($comments) . ' comments</h2>';
@@ -78,8 +102,8 @@ echo '<div class="comments">';
 foreach ( $comments AS $comment ) {
 	$created = strtotime($comment->created);
 	echo '<div id="comment-' . $comment->id . '">';
-	echo '<p class="meta">[' . date('d-M-Y H:i', $created) . '] by ' . $comment->author->displayName . '</p>';
-	echo '<div class="description">' . nl2br(trim($comment->body)) . '</div>';
+	echo '<p class="meta">[' . date(FORMAT_DATETIME, $created) . '] by ' . $comment->author->displayName . '</p>';
+	echo '<div class="comment-body markup">' . nl2br(trim($comment->body)) . '</div>';
 	echo '</div>';
 	echo '<hr>';
 }
@@ -93,5 +117,5 @@ echo '<p><input type="submit" /></p>';
 echo '</form>';
 echo '</div>';
 
-echo '<pre>';
-print_r($issue);
+// echo '<pre>';
+// print_r($issue);

@@ -43,7 +43,7 @@ $filterOptions = $user->filter_query_options;
 <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
-* { /*margin: 0; padding: 0;*/ box-sizing: border-box; -webkit-box-sizing: border-box; }
+* { box-sizing: border-box; -webkit-box-sizing: border-box; }
 input:not([type="submit"]):not([type="button"]), select { width: 100%; }
 
 .short-meta { text-align: center; }
@@ -111,6 +111,6 @@ echo '<div id="content">';
 include 'tpl.issues.php';
 echo '</div>';
 
-echo implode('<br>', $jira_requests);
+// echo implode('<br>', $jira_requests);
 // echo '<pre>';
 // print_r($issues);

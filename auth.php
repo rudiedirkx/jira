@@ -81,6 +81,12 @@ if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
 
 ?>
 <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+* { box-sizing: border-box; -webkit-box-sizing: border-box; }
+input:not([type="submit"]):not([type="button"]), select { width: 100%; }
+</style>
+
 <form method="post">
 	<p>Server URL: <input name="url" size="60" value="<?= @$_COOKIE['JIRA_URL'] ?>" placeholder="https://YOUR.jira.com/rest" /></p>
 	<p>Username: <input name="user" /></p>

@@ -17,16 +17,16 @@ foreach ( $issues->issues AS $issue ) {
 
 	echo '<h2><a href="issue.php?key=' . $issue->key . '">' . $issue->key . ' ' . $fields->summary . '</a></h2>';
 	echo '<p class="short-meta">';
-	echo '	<span class="left">' . $fields->issuetype->name . '</span>';
-	echo '	<span class="center">' . ( $fields->priority ? $fields->priority->name : '&nbsp;' ) . '</span>';
-	echo '	<span class="right">' . $status . '</span>';
+	echo '	<span class="left"><img src="' . $fields->issuetype->iconUrl . '" alt="' . $fields->issuetype->name . '" /> ' . $fields->issuetype->name . '</span>';
+	echo '	<span class="center">' . ( $fields->priority ? '<img src="' . $fields->priority->iconUrl . '" alt="' . $fields->priority->name . '" /> ' . $fields->priority->name : '&nbsp;' ) . '</span>';
+	echo '	<span class="right"><strong>' . $status . '</strong></span>';
 	echo '</p>';
 	if ( $fields->labels ) {
 		echo '<p class="labels">Labels: <span class="label">' . implode('</span> <span class="label">', $fields->labels) . '</span></p>';
 	}
 	echo '<p class="dates">';
-	echo '	<span class="left">' . date('d-m-Y H:i', $created) . '</span>';
-	echo '	<span class="right">' . date('d-m-Y H:i', $updated) . '</span>';
+	echo '	<span class="left">' . date(FORMAT_DATETIME, $created) . '</span>';
+	echo '	<span class="right">' . date(FORMAT_DATETIME, $updated) . '</span>';
 	echo '</p>';
 
 	echo '<hr>';

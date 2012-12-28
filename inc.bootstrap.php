@@ -5,6 +5,7 @@ header('Content-type: text/html; charset=utf-8');
 
 // Some app constants
 define('FORCE_JIRA_USER_SYNC', 600);
+define('FORMAT_DATETIME', "d M 'y H:i");
 
 // Context
 require 'env.php';

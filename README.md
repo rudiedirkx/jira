@@ -11,8 +11,10 @@ What it should do:
 * [x] Change status (transition)
 * [x] Log in
 * [x] Change labels
-* [ ] HTML ENCODING!
+* [ ] Centralize CSS & JS!!
+* [ ] HTML ENCODING!!
 * [ ] Change assignee
+* [x] Show attachments
 * [ ] Edit comment
 * [ ] Delete comment
 * [ ] Create issue
