@@ -72,6 +72,7 @@ textarea { width: 100%; }
 .markup { background: #eee; padding: 10px; }
 .active-state { color: #bbb; text-decoration: none; }
 .active-state.active { color: #000; }
+/*.active-state:not(:hover):not(:focus) + label { display: none; }*/
 div.table { width: 100%; overflow: auto; }
 table { border-spacing: 0; }
 td { padding: 2px 5px; white-space: nowrap; }
@@ -98,7 +99,7 @@ echo 'Assignee: ' . $fields->assignee->displayName . ' | ';
 if ( $fields->labels ) {
 	echo 'Labels: <span class="label">' . implode('</span> <span class="label">', $fields->labels) . '</span> | ';
 }
-echo '<a href="issue.php?key=' . $key . '&watch=' . (int)!$watches . '" class="active-state' . $watches . '">★</a> | <a href="issue.php?key=' . $key . '&vote=' . (int)!$voted . '" class="active-state' .  $voted. '">♥</a>';
+echo '<a href="issue.php?key=' . $key . '&watch=' . (int)!$watches . '" class="active-state' . $watches . '">★ (un)watch</a> | <a href="issue.php?key=' . $key . '&vote=' . (int)!$voted . '" class="active-state' .  $voted. '">♥ (un)vote</a>';
 echo '</p>';
 
 echo '<div class="issue-description markup">' . nl2br(trim($fields->description)) . '</div>';
