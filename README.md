@@ -17,8 +17,12 @@ What it should do:
 * [x] Show attachments
 * [x] Edit comment
 * [x] Delete comment
+* [ ] Edit issue summary & description
 * [ ] Create issue
 * [ ] Enter (and save!) index query
+* [ ] Link issues
+* [ ] Log work (only via transitions?)
+* [x] (Un)vote & (un)watch
 
 ## B
 

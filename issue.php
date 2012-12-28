@@ -10,7 +10,7 @@ if ( !empty($_POST['comment']) ) {
 	$response = jira_post('issue/' . $key . '/comment', array('body' => $_POST['comment']), $error, $info);
 
 	if ( !$error ) {
-		return do_redirect('issue#comment-' . $response->id, array('key' => $key));
+		return do_redirect('issue#comment-' . $response->id, compact('key'));
 	}
 
 	echo '<p>error: ' . (int)$error . '</p>';
@@ -22,7 +22,22 @@ if ( !empty($_POST['comment']) ) {
 	exit;
 }
 
-if ( isset($_GET['transitions']) ) {
+else if ( isset($_GET['watch']) ) {
+	$method = !empty($_GET['watch']) ? 'jira_post' : 'jira_delete';
+	$data = !empty($_GET['watch']) ? JIRA_USER : array('username' => JIRA_USER);
+	$response = $method('issue/' . $key . '/watchers', $data, $error, $info);
+
+	return do_redirect('issue', compact('key'));
+}
+
+else if ( isset($_GET['vote']) ) {
+	$method = !empty($_GET['vote']) ? 'jira_post' : 'jira_delete';
+	$response = $method('issue/' . $key . '/votes', null, $error, $info);
+
+	return do_redirect('issue', compact('key'));
+}
+
+else if ( isset($_GET['transitions']) ) {
 	$transitions = jira_get('issue/' . $key . '/transitions', array('expand' => 'transitions.fields'));
 
 	echo '<pre>';
@@ -55,6 +70,8 @@ $actions['Labels'] = 'labels.php?key=' . $key . '&id=' . $issue->id . '&' . http
 textarea { width: 100%; }
 .label { display: inline-block; background: #D3EAF1; padding: 1px 5px; border-radius: 4px; }
 .markup { background: #eee; padding: 10px; }
+.active-state { color: #bbb; text-decoration: none; }
+.active-state.active { color: #000; }
 div.table { width: 100%; overflow: auto; }
 table { border-spacing: 0; }
 td { padding: 2px 5px; white-space: nowrap; }
@@ -66,6 +83,9 @@ if ( $fields->resolution ) {
 	$resolution = ': ' . $fields->resolution->name;
 }
 
+$watches = $fields->watches->isWatching ? ' active' : '';
+$voted = $fields->votes->hasVoted ? ' active' : '';
+
 echo '<p class="menu"><a href="index.php">&lt; index</a></p>';
 echo '<h1>' . $issue->key . ' ' . $fields->summary . '</h1>';
 echo '<p class="menu">' . html_links($actions) . '</p>';
@@ -76,8 +96,9 @@ echo 'on ' . date(FORMAT_DATETIME, strtotime($fields->created)) . ' | ';
 echo '<strong>' . $fields->status->name . $resolution . '</strong> | ';
 echo 'Assignee: ' . $fields->assignee->displayName . ' | ';
 if ( $fields->labels ) {
-	echo 'Labels: <span class="label">' . implode('</span> <span class="label">', $fields->labels) . '</span>';
+	echo 'Labels: <span class="label">' . implode('</span> <span class="label">', $fields->labels) . '</span> | ';
 }
+echo '<a href="issue.php?key=' . $key . '&watch=' . (int)!$watches . '" class="active-state' . $watches . '">★</a> | <a href="issue.php?key=' . $key . '&vote=' . (int)!$voted . '" class="active-state' .  $voted. '">♥</a>';
 echo '</p>';
 
 echo '<div class="issue-description markup">' . nl2br(trim($fields->description)) . '</div>';
