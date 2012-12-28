@@ -58,7 +58,7 @@ if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
 		// Let's assume it failed because the user already exists.
 	}
 
-	$user = User::get();
+	$user = User::load();
 	$user->unsync();
 
 	// Save credentials to cookie

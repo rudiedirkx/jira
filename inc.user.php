@@ -9,20 +9,20 @@ class User extends db_generic_record {
 	}
 
 	function unsync() {
+// echo "unsync & uncache\n";
 		global $db;
+
 		$db->delete('filters', array('user_id' => $this->id));
+		unset($this->filters, $this->filter_query_options);
 	}
 
 	function get_filters() {
+// echo "get filters\n";
 		global $db;
-		return $db->select('filters', array('user_id' => $this->id))->all();
-	}
 
-	function get_filter_query_options() {
-		$filters = $this->filters;
+		$filters = $db->select('filters', array('user_id' => $this->id))->all();
 		if ( !$filters ) {
-			global $db;
-
+// echo "live fetch filters\n";
 			$filters = jira_get('filter/favourite', null, $error, $info);
 			foreach ( $filters AS $filter ) {
 				$db->insert('filters', array(
@@ -34,22 +34,28 @@ class User extends db_generic_record {
 			}
 
 			unset($this->filters);
-			$filters = $this->filters;
-
-			$db->update('users', array('last_sync' => time()), array('id' => $this->id));
+			$filters = $this->get_filters();
 		}
 
+		return $filters;
+	}
+
+	function get_filter_query_options() {
+// echo "get filter options\n";
 		$filterOptions = array();
-		foreach ( $filters AS $filter ) {
+		foreach ( $this->filters AS $filter ) {
 			$filterOptions[$filter->jql] = $filter->name;
 		}
 
 		return $filterOptions;
 	}
 
-	static function get() {
+	static function load() {
 		global $db;
-		return $db->select('users', array('jira_url' => JIRA_URL, 'jira_user' => JIRA_USER), null, 'User')->first();
+
+		$username = JIRA_USER;
+		$url = JIRA_URL;
+		return $db->select('users', array('jira_url' => $url, 'jira_user' => $username), null, 'User')->first();
 	}
 
 }

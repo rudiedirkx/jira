@@ -36,5 +36,5 @@ if ( isset($_COOKIE['JIRA_URL'], $_COOKIE['JIRA_AUTH']) ) {
 	define('JIRA_USER', $username);
 	define('JIRA_AUTH', $auth);
 
-	$user = User::get();
+	$user = User::load();
 }

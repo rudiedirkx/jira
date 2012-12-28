@@ -4,9 +4,11 @@ require 'inc.bootstrap.php';
 
 do_logincheck();
 
-$filters = jira_get('filter/favourite', null, $error, $info);
-
 echo '<pre>';
-print_r($filters);
-var_dump($error);
-print_r($info);
+
+$user->unsync();
+
+print_r($user->filters);
+print_r($user->filter_query_options);
+
+echo implode("\n", $jira_requests) . "\n";
