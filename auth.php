@@ -4,13 +4,12 @@ require 'inc.bootstrap.php';
 
 // Log out
 if ( isset($_GET['logout']) ) {
-	@session_start();
-	$_SESSION['jira'] = null;
+	setcookie('JIRA_AUTH', '', 1);
 	exit('OK');
 }
 
 // Already logged in
-if ( defined('JIRA_URL') ) {
+if ( defined('JIRA_AUTH') ) {
 	echo '<p>You are:</p>';
 
 	// $account = jira_get('user', array('username' => JIRA_USER), $error, $info);
@@ -36,14 +35,14 @@ if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
 	// Test connection
 	define('JIRA_URL', rtrim($_POST['url'], '/'));
 	define('JIRA_USER', $_POST['user']);
-	define('JIRA_PASS', $_POST['pass']);
+	define('JIRA_AUTH', $_POST['user'] . ':' . $_POST['pass']);
 	$session = jira_get(JIRA_AUTH_PATH . 'session', null, $error, $info);
 
 	// Invalid URL
 	if ( $error == 404 ) {
 		exit('Invalid URL?');
 	}
-	// Invalid URL
+	// Invalid credentials
 	else if ( $error || empty($session->name) || $session->name !== JIRA_USER ) {
 		exit('Invalid login?');
 	}
@@ -62,19 +61,12 @@ if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
 	$user = User::get();
 	$user->unsync();
 
-	// Save URL to cookie for easy access next time
-	setcookie('JIRA_URL', JIRA_URL, strtotime('+1 month'));
-
-	// Save basic auth in session
-	// This is NOT ACCEPTABLE because sessions are stored on the filesystem. Acceptable
-	// would be setting a cookie with ENCRYPTED basic auth. Encrypted with a local secret
-	// from env.php.
-	@session_start();
-	$_SESSION['jira'] = array(
-		'url' => JIRA_URL,
-		'user' => JIRA_USER,
-		'pass' => JIRA_PASS,
-	);
+	// Save credentials to cookie
+	$remember = !empty($_POST['remember']);
+	$month = strtotime('+1 month');
+	$time = $remember ? $month : 0;
+	setcookie('JIRA_URL', JIRA_URL, $month);
+	setcookie('JIRA_AUTH', do_encrypt(JIRA_AUTH), $time);
 
 	return do_redirect('index');
 }
@@ -84,12 +76,13 @@ if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
 * { box-sizing: border-box; -webkit-box-sizing: border-box; }
-input:not([type="submit"]):not([type="button"]), select { width: 100%; }
+input:not([type="submit"]):not([type="button"]):not([type="radio"]):not([type="checkbox"]), select { width: 100%; }
 </style>
 
 <form method="post">
 	<p>Server URL: <input name="url" size="60" value="<?= @$_COOKIE['JIRA_URL'] ?>" placeholder="https://YOUR.jira.com/rest" /></p>
 	<p>Username: <input name="user" /></p>
 	<p>Password: <input name="pass" type="password" /></p>
+	<p><label title="Will remember for 1 month or until you log out."><input name="remember" type="checkbox" /> Remember?</label></p>
 	<p><input type="submit" /></p>
 </form>

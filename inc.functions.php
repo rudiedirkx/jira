@@ -1,9 +1,16 @@
 <?php
 
-function html_q($change, $stringify = true, $source = null) {
-	$source || $source = $_GET;
-	$source = $change + $source;
-	return $stringify ? http_build_query($source) : $source;
+function do_encrypt( $data ) {
+	$iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC);
+	$iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
+	return $iv . mcrypt_encrypt(MCRYPT_RIJNDAEL_256, substr(SECRET . SECRET, 0, 24), $data, MCRYPT_MODE_CBC, $iv);
+}
+
+function do_decrypt( $data ) {
+	$iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC);
+	$iv = substr($data, 0, $iv_size);
+	$data = substr($data, $iv_size);
+	return rtrim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, substr(SECRET . SECRET, 0, 24), $data, MCRYPT_MODE_CBC, $iv), "\0");
 }
 
 function do_redirect( $path, $query = null ) {
@@ -20,13 +27,19 @@ function do_redirect( $path, $query = null ) {
 }
 
 function do_logincheck() {
-	if ( !defined('JIRA_URL') ) {
+	if ( !defined('JIRA_AUTH') ) {
 		exit('<a href="auth.php">Need login</a>');
 	}
 }
 
 function html( $text ) {
 	return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+}
+
+function html_q( $change, $stringify = true, $source = null ) {
+	$source || $source = $_GET;
+	$source = $change + $source;
+	return $stringify ? http_build_query($source) : $source;
 }
 
 function html_links( $links ) {
@@ -68,7 +81,7 @@ function jira_curl( $url, $method = '' ) {
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($ch, CURLOPT_HEADER, 1);
 	curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-	curl_setopt($ch, CURLOPT_USERPWD, JIRA_USER . ':' . JIRA_PASS);
+	curl_setopt($ch, CURLOPT_USERPWD, JIRA_AUTH);
 	return $ch;
 }
 
