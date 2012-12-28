@@ -55,8 +55,9 @@ $actions['Labels'] = 'labels.php?key=' . $key . '&id=' . $issue->id . '&' . http
 textarea { width: 100%; }
 .label { display: inline-block; background: #D3EAF1; padding: 1px 5px; border-radius: 4px; }
 .markup { background: #eee; padding: 10px; }
+div.table { width: 100%; overflow: auto; }
 table { border-spacing: 0; }
-td { padding: 2px 5px; }
+td { padding: 2px 5px; white-space: nowrap; }
 </style>
 <?php
 
@@ -83,6 +84,7 @@ echo '<div class="issue-description markup">' . nl2br(trim($fields->description)
 
 if ( $attachments ) {
 	echo '<h2>' . count($attachments) . ' attachments</h2>';
+	echo '<div class="table attachments">';
 	echo '<table border="1">';
 	foreach ( $attachments AS $attachment ) {
 		$created = strtotime($attachment->created);
@@ -94,6 +96,7 @@ if ( $attachments ) {
 		echo '</tr>';
 	}
 	echo '</table>';
+	echo '</div>';
 }
 
 $comments = $fields->comment->comments;
@@ -102,7 +105,11 @@ echo '<div class="comments">';
 foreach ( $comments AS $comment ) {
 	$created = strtotime($comment->created);
 	echo '<div id="comment-' . $comment->id . '">';
-	echo '<p class="meta">[' . date(FORMAT_DATETIME, $created) . '] by ' . $comment->author->displayName . '</p>';
+	echo '<p class="meta">';
+	echo '[' . date(FORMAT_DATETIME, $created) . '] ';
+	echo 'by ' . $comment->author->displayName . ' ';
+	echo '[ <a href="comment.php?key=' . $key . '&id=' . $comment->id . '">e</a> | ';
+	echo '<a href="comment.php?key=' . $key . '&id=' . $comment->id . '&delete=1">x</a> ]</p>';
 	echo '<div class="comment-body markup">' . nl2br(trim($comment->body)) . '</div>';
 	echo '</div>';
 	echo '<hr>';

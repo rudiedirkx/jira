@@ -114,6 +114,15 @@ function jira_put( $resource, $data, &$error = null, &$info = null ) {
 	return $response;
 }
 
+function jira_delete( $resource, $query = null, &$error = null, &$info = null ) {
+	$url = jira_url($resource, $query);
+
+	$ch = jira_curl($url, 'DELETE');
+	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+
+	return jira_response($ch, $error, $info);
+}
+
 function jira_response( $ch, &$error = null, &$info = null ) {
 	$result = curl_exec($ch);
 

@@ -15,8 +15,8 @@ What it should do:
 * [ ] HTML ENCODING!!
 * [ ] Change assignee
 * [x] Show attachments
-* [ ] Edit comment
-* [ ] Delete comment
+* [x] Edit comment
+* [x] Delete comment
 * [ ] Create issue
 * [ ] Enter (and save!) index query
 
