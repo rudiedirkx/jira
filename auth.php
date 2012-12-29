@@ -27,6 +27,9 @@ if ( defined('JIRA_AUTH') ) {
 	print_r($account);
 	echo '</pre>';
 
+	// Update timezone from Jira
+	$db->update('users', array('jira_timezone' => $account->timeZone), array('id' => $user->id));
+
 	exit;
 }
 
@@ -36,14 +39,15 @@ if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
 	define('JIRA_URL', rtrim($_POST['url'], '/'));
 	define('JIRA_USER', $_POST['user']);
 	define('JIRA_AUTH', $_POST['user'] . ':' . $_POST['pass']);
-	$session = jira_get(JIRA_AUTH_PATH . 'session', null, $error, $info);
+	// $session = jira_get(JIRA_AUTH_PATH . 'session', null, $error, $info);
+	$account = jira_get('user', array('username' => JIRA_USER), $error, $info);
 
 	// Invalid URL
 	if ( $error == 404 ) {
 		exit('Invalid URL?');
 	}
 	// Invalid credentials
-	else if ( $error || empty($session->name) || $session->name !== JIRA_USER ) {
+	else if ( $error || empty($account->active) || empty($account->name) || $account->name !== JIRA_USER ) {
 		exit('Invalid login?');
 	}
 
@@ -60,6 +64,7 @@ if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
 
 	$user = User::load();
 	$user->unsync();
+	$db->update('users', array('jira_timezone' => $account->timeZone), array('id' => $user->id));
 
 	// Save credentials to cookie
 	$remember = !empty($_POST['remember']);

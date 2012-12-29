@@ -37,4 +37,7 @@ if ( isset($_COOKIE['JIRA_URL'], $_COOKIE['JIRA_AUTH']) ) {
 	define('JIRA_AUTH', $auth);
 
 	$user = User::load();
+	if ( $user->jira_timezone ) {
+		date_default_timezone_set($user->jira_timezone);
+	}
 }
