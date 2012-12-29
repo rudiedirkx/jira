@@ -47,6 +47,8 @@ foreach ( $suggestions->suggestions AS $label ) {
 }
 natcasesort($labels);
 
+include 'tpl.header.php';
+
 echo '<p class="menu"><a href="index.php">&lt; index</a></p>';
 echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> Labels</h1>';
 
@@ -63,3 +65,5 @@ echo '<p>[' . implode('] [', $labels) . ']</p>';
 // print_r($labels);
 // var_dump($error);
 // print_r($info);
+
+include 'tpl.footer.php';

@@ -54,12 +54,7 @@ foreach ( $transitions->transitions AS $transition ) {
 	$actions[$transition->id] = $transition->name;
 }
 
-?>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<style>
-textarea { width: 100%; }
-</style>
-<?php
+include 'tpl.header.php';
 
 echo '<p class="menu"><a href="index.php">&lt; index</a></p>';
 echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . $summary . '</h1>';
@@ -76,10 +71,12 @@ if ( isset($transitionsById[$action]->fields->resolution) ) {
 	echo '<p>Resolution: <select name="resolution">' . html_options($resolutions, 'Fixed') . '</select></p>';
 }
 echo '<p>Comment:<br><textarea name="comment" rows="8"></textarea></p>';
-echo '<p>Assignee: <input name="assignee" value="" /> (' . $assignee . ')</p>';
+echo '<p>Assignee (' . $assignee . '): <input name="assignee" value="" /></p>';
 echo '<p><input type="submit" /></p>';
 echo '</form>';
 echo '</div>';
 
 // echo '<pre>';
 // print_r($transitions);
+
+include 'tpl.footer.php';

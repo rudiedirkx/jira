@@ -39,6 +39,8 @@ else if ( isset($_GET['delete'], $_POST['confirm']) ) {
 	exit;
 }
 
+include 'tpl.header.php';
+
 echo '<p class="menu"><a href="index.php">&lt; index</a></p>';
 echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> Comment # ' . $id . '</h1>';
 
@@ -55,9 +57,6 @@ if ( isset($_GET['delete']) ) {
 $comment = jira_get('issue/' . $key . '/comment/' . $id, null, $error, $info);
 
 ?>
-<style>
-textarea { width: 100%; }
-</style>
 
 <form method="post">
 	<p><textarea name="comment" rows="8"><?= html($comment->body) ?></textarea></p>
@@ -72,3 +71,5 @@ textarea { width: 100%; }
 // print_r($comment);
 // var_dump($error);
 // print_r($info);
+
+include 'tpl.footer.php';

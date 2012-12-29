@@ -64,20 +64,7 @@ foreach ( $transitions AS $transition ) {
 }
 $actions['Labels'] = 'labels.php?key=' . $key . '&id=' . $issue->id . '&' . http_build_query(array('labels' => $fields->labels));
 
-?>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<style>
-textarea { width: 100%; }
-.label { display: inline-block; background: #D3EAF1; padding: 1px 5px; border-radius: 4px; }
-.markup { background: #eee; padding: 10px; }
-.active-state { color: #bbb; text-decoration: none; }
-.active-state.active { color: #000; }
-/*.active-state:not(:hover):not(:focus) + label { display: none; }*/
-div.table { width: 100%; overflow: auto; }
-table { border-spacing: 0; }
-td { padding: 2px 5px; white-space: nowrap; }
-</style>
-<?php
+include 'tpl.header.php';
 
 $resolution = '';
 if ( $fields->resolution ) {
@@ -148,3 +135,5 @@ echo '</div>';
 
 // echo '<pre>';
 // print_r($issue);
+
+include 'tpl.footer.php';

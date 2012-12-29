@@ -11,7 +11,7 @@ What it should do:
 * [x] Change status (transition)
 * [x] Log in
 * [x] Change labels
-* [ ] Centralize CSS & JS!!
+* [x] Centralize CSS & JS!!
 * [ ] HTML ENCODING!!
 * [ ] Change assignee
 * [x] Show attachments

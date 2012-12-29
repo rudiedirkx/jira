@@ -1,0 +1,71 @@
+
+* {
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+}
+input:not([type="submit"]):not([type="button"]):not([type="radio"]):not([type="checkbox"]),
+select,
+textarea {
+	width: 100%;
+}
+
+/* issue details */
+.short-meta {
+	text-align: center;
+}
+.short-meta .left {
+	float: left;
+}
+.short-meta .right,
+.dates .right {
+	float: right;
+}
+
+/* issue labels */
+.label {
+	display: inline-block;
+	background: #D3EAF1;
+	padding: 1px 5px;
+	border-radius: 4px;
+}
+
+/* markup fields */
+.markup {
+	background: #eee;
+	padding: 10px;
+}
+
+/* togglers (watch/vote) */
+.active-state {
+	color: #bbb;
+	text-decoration: none;
+}
+.active-state.active {
+	color: #000;
+}
+
+/* tables */
+div.table {
+	width: 100%;
+	overflow: auto;
+}
+table {
+	border-spacing: 0;
+}
+td {
+	padding: 2px 5px;
+	white-space: nowrap;
+}
+
+/* tabs */
+.tab-links .active {
+	font-weight: bold;
+}
+.tab-pages .tab-page.hide {
+	display: none;
+}
+
+/* pager */
+#pager {
+	text-align: center;
+}
