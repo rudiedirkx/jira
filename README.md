@@ -12,7 +12,7 @@ What it should do:
 * [x] Log in
 * [x] Change labels
 * [x] Centralize CSS & JS!!
-* [ ] HTML ENCODING!!
+* [x] HTML ENCODING!!
 * [ ] Change assignee
 * [x] Show attachments
 * [x] Edit comment
