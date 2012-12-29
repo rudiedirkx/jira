@@ -7,6 +7,8 @@ do_logincheck();
 $key = $_GET['key'];
 $id = $_GET['id'];
 
+$summary = @$_GET['summary'] ?: '?';
+
 if ( isset($_POST['labels']) ) {
 	$old_labels = (array)@$_GET['labels'];
 	$new_labels = array_filter(explode(' ', $_POST['labels']));
@@ -50,9 +52,11 @@ natcasesort($labels);
 include 'tpl.header.php';
 
 echo '<p class="menu"><a href="index.php">&lt; index</a></p>';
-echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> Labels</h1>';
+echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($summary) . '</h1>';
 
 ?>
+<h2>Labels</h2>
+
 <form method="post">
 	<p><input name="labels" value="<?= implode(' ', (array)@$_GET['labels']) ?>" size="60" /></p>
 	<p><input type="submit" /></p>

@@ -7,6 +7,8 @@ do_logincheck();
 $key = $_GET['key'];
 $id = $_GET['id'];
 
+$summary = $_GET['summary'];
+
 if ( isset($_POST['comment']) ) {
 	$update = array('body' => $_POST['comment']);
 	$response = jira_put('issue/' . $key . '/comment/' . $id, $update, $error, $info);
@@ -42,7 +44,9 @@ else if ( isset($_GET['delete'], $_POST['confirm']) ) {
 include 'tpl.header.php';
 
 echo '<p class="menu"><a href="index.php">&lt; index</a></p>';
-echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> Comment # ' . $id . '</h1>';
+echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($summary) . '</h1>';
+
+echo '<h2>Comment # ' . $id . '</h2>';
 
 if ( isset($_GET['delete']) ) {
 	echo '<p>You SURE you wanna DELETE this comment?</p>';

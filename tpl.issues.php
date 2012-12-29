@@ -7,7 +7,7 @@ foreach ( $issues->issues AS $issue ) {
 
 	$resolution = '';
 	if ( $fields->resolution ) {
-		$resolution = ': ' . $fields->resolution->name;
+		$resolution = ': ' . html($fields->resolution->name);
 	}
 
 	$status = $fields->resolution ? $fields->resolution->name : $fields->status->name;
@@ -15,14 +15,14 @@ foreach ( $issues->issues AS $issue ) {
 	$created = strtotime($fields->created);
 	$updated = strtotime($fields->updated);
 
-	echo '<h2><a href="issue.php?key=' . $issue->key . '">' . $issue->key . ' ' . $fields->summary . '</a></h2>';
+	echo '<h2><a href="issue.php?key=' . $issue->key . '">' . $issue->key . ' ' . html($fields->summary) . '</a></h2>';
 	echo '<p class="short-meta">';
-	echo '	<span class="left"><img src="' . $fields->issuetype->iconUrl . '" alt="' . $fields->issuetype->name . '" /> ' . $fields->issuetype->name . '</span>';
-	echo '	<span class="center">' . ( $fields->priority ? '<img src="' . $fields->priority->iconUrl . '" alt="' . $fields->priority->name . '" /> ' . $fields->priority->name : '&nbsp;' ) . '</span>';
-	echo '	<span class="right"><strong>' . $status . '</strong></span>';
+	echo '	<span class="left"><img src="' . html($fields->issuetype->iconUrl) . '" alt="' . html($fields->issuetype->name) . '" /> ' . html($fields->issuetype->name) . '</span>';
+	echo '	<span class="center">' . ( $fields->priority ? '<img src="' . html($fields->priority->iconUrl) . '" alt="' . html($fields->priority->name) . '" /> ' . html($fields->priority->name) : '&nbsp;' ) . '</span>';
+	echo '	<span class="right"><strong>' . html($status) . '</strong></span>';
 	echo '</p>';
 	if ( $fields->labels ) {
-		echo '<p class="labels">Labels: <span class="label">' . implode('</span> <span class="label">', $fields->labels) . '</span></p>';
+		echo '<p class="labels">Labels: <span class="label">' . implode('</span> <span class="label">', array_map('html', $fields->labels)) . '</span></p>';
 	}
 	echo '<p class="dates">';
 	echo '	<span class="left">' . date(FORMAT_DATETIME, $created) . '</span>';

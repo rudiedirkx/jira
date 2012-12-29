@@ -55,41 +55,41 @@ usort($attachments, function($a, $b) {
 	return strtotime($a->created) - strtotime($b->created);
 });
 
-$actionPath = 'transition.php?key=' . $key . '&assignee=' . $fields->assignee->name . '&summary=' . urlencode($fields->summary) . '&transition=';
+$actionPath = 'transition.php?key=' . $key . '&assignee=' . urlencode($fields->assignee->name) . '&summary=' . urlencode($fields->summary) . '&transition=';
 
 $actions = array();
 // $actions['Assign'] = 'assign.php?key=' . $key . '&assignee=' . $fields->assignee->name;
 foreach ( $transitions AS $transition ) {
 	$actions[$transition->name] = $actionPath . $transition->id;
 }
-$actions['Labels'] = 'labels.php?key=' . $key . '&id=' . $issue->id . '&' . http_build_query(array('labels' => $fields->labels));
+$actions['Labels'] = 'labels.php?key=' . $key . '&id=' . $issue->id . '&summary=' . urlencode($fields->summary) . '&' . http_build_query(array('labels' => $fields->labels));
 
 include 'tpl.header.php';
 
 $resolution = '';
 if ( $fields->resolution ) {
-	$resolution = ': ' . $fields->resolution->name;
+	$resolution = ': ' . html($fields->resolution->name);
 }
 
 $watches = $fields->watches->isWatching ? ' active' : '';
 $voted = $fields->votes->hasVoted ? ' active' : '';
 
 echo '<p class="menu"><a href="index.php">&lt; index</a></p>';
-echo '<h1>' . $issue->key . ' ' . $fields->summary . '</h1>';
+echo '<h1><a href="issue.php?key=' . $issue->key . '">' . $issue->key . '</a> ' . html($fields->summary) . '</h1>';
 echo '<p class="menu">' . html_links($actions) . '</p>';
 echo '<p class="meta">';
-echo '[<img src="' . $fields->issuetype->iconUrl . '" alt="' . $fields->issuetype->name . '" /> ' . $fields->issuetype->name . ' | <img src="' . $fields->priority->iconUrl . '" alt="' . $fields->priority->name . '" /> ' . $fields->priority->name . '] ';
-echo 'by ' . $fields->reporter->displayName . ' ';
+echo '[<img src="' . html($fields->issuetype->iconUrl) . '" alt="' . html($fields->issuetype->name) . '" /> ' . html($fields->issuetype->name) . ' | <img src="' . html($fields->priority->iconUrl) . '" alt="' . html($fields->priority->name) . '" /> ' . html($fields->priority->name) . '] ';
+echo 'by ' . html($fields->reporter->displayName) . ' ';
 echo 'on ' . date(FORMAT_DATETIME, strtotime($fields->created)) . ' | ';
-echo '<strong>' . $fields->status->name . $resolution . '</strong> | ';
-echo 'Assignee: ' . $fields->assignee->displayName . ' | ';
+echo '<strong>' . html($fields->status->name) . $resolution . '</strong> | ';
+echo 'Assignee: ' . html($fields->assignee->displayName) . ' | ';
 if ( $fields->labels ) {
-	echo 'Labels: <span class="label">' . implode('</span> <span class="label">', $fields->labels) . '</span> | ';
+	echo 'Labels: <span class="label">' . implode('</span> <span class="label">', array_map('html', $fields->labels)) . '</span> | ';
 }
 echo '<a href="issue.php?key=' . $key . '&watch=' . (int)!$watches . '" class="active-state' . $watches . '">★ (un)watch</a> | <a href="issue.php?key=' . $key . '&vote=' . (int)!$voted . '" class="active-state' .  $voted. '">♥ (un)vote</a>';
 echo '</p>';
 
-echo '<div class="issue-description markup">' . nl2br(trim($fields->description)) . '</div>';
+echo '<div class="issue-description markup">' . do_markup($fields->description) . '</div>';
 
 if ( $attachments ) {
 	echo '<h2>' . count($attachments) . ' attachments</h2>';
@@ -99,9 +99,9 @@ if ( $attachments ) {
 		$created = strtotime($attachment->created);
 
 		echo '<tr>';
-		echo '<td><a target="_blank" href="' . $attachment->content . '">' . $attachment->filename . '</a></td>';
+		echo '<td><a target="_blank" href="' . html($attachment->content) . '">' . html($attachment->filename) . '</a></td>';
 		echo '<td>' . date(FORMAT_DATETIME, $created) . '</td>';
-		echo '<td>' . $attachment->author->displayName . '</td>';
+		echo '<td>' . html($attachment->author->displayName) . '</td>';
 		echo '</tr>';
 	}
 	echo '</table>';
@@ -116,10 +116,10 @@ foreach ( $comments AS $comment ) {
 	echo '<div id="comment-' . $comment->id . '">';
 	echo '<p class="meta">';
 	echo '[' . date(FORMAT_DATETIME, $created) . '] ';
-	echo 'by ' . $comment->author->displayName . ' ';
-	echo '[ <a href="comment.php?key=' . $key . '&id=' . $comment->id . '">e</a> | ';
-	echo '<a href="comment.php?key=' . $key . '&id=' . $comment->id . '&delete=1">x</a> ]</p>';
-	echo '<div class="comment-body markup">' . nl2br(trim($comment->body)) . '</div>';
+	echo 'by ' . html($comment->author->displayName) . ' ';
+	echo '[ <a href="comment.php?key=' . $key . '&id=' . $comment->id . '&summary=' . urlencode($fields->summary) . '">e</a> | ';
+	echo '<a href="comment.php?key=' . $key . '&id=' . $comment->id . '&summary=' . urlencode($fields->summary) . '&delete=1">x</a> ]</p>';
+	echo '<div class="comment-body markup">' . do_markup($comment->body) . '</div>';
 	echo '</div>';
 	echo '<hr>';
 }

@@ -1,5 +1,9 @@
 <?php
 
+function do_markup( $text ) {
+	return nl2br(html(trim($text)));
+}
+
 function do_encrypt( $data ) {
 	$iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC);
 	$iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
