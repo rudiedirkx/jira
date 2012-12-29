@@ -143,7 +143,12 @@ function jira_delete( $resource, $query = null, &$error = null, &$info = null ) 
 function jira_response( $ch, &$error = null, &$info = null ) {
 	$result = curl_exec($ch);
 
-	@list($header, $body) = explode("\r\n\r\n", $result);
+	@list($header, $body) = explode("\r\n\r\n", $result, 2);
+
+	// OMG HTTP 100 Continue... You suck!
+	if ( is_int(strpos($header, '100 Continue')) ) {
+		@list($header, $body) = explode("\r\n\r\n", $body, 2);
+	}
 
 	$info = curl_getinfo($ch);
 	curl_close($ch);

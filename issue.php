@@ -37,6 +37,33 @@ else if ( isset($_GET['vote']) ) {
 	return do_redirect('issue', compact('key'));
 }
 
+else if ( isset($_POST['summary'], $_POST['description'], $_POST['reporter']) ) {
+	$summary = trim($_POST['summary']);
+	$description = trim($_POST['description']);
+	$reporter = trim($_POST['reporter']);
+
+	$update = array(
+		'summary' => array(array('set' => $summary)),
+		'description' => array(array('set' => $description)),
+	);
+	if ( $reporter ) {
+		$update['reporter'] = array(array('set' => array('name' => $reporter)));
+	}
+	$response = jira_put('issue/' . $key, compact('update'), $error, $info);
+
+	if ( !$error ) {
+		return do_redirect('issue', compact('key'));
+	}
+
+	echo '<pre>';
+	print_r($update);
+	var_dump($error);
+	print_r($response);
+	print_r($info);
+
+	exit;
+}
+
 else if ( isset($_GET['transitions']) ) {
 	$transitions = jira_get('issue/' . $key . '/transitions', array('expand' => 'transitions.fields'));
 
@@ -50,6 +77,8 @@ $issue = jira_get('issue/' . $key, array('expand' => 'transitions'));
 $fields = $issue->fields;
 $transitions = $issue->transitions;
 
+include 'tpl.header.php';
+
 $attachments = $fields->attachment;
 usort($attachments, function($a, $b) {
 	return strtotime($a->created) - strtotime($b->created);
@@ -58,13 +87,12 @@ usort($attachments, function($a, $b) {
 $actionPath = 'transition.php?key=' . $key . '&assignee=' . urlencode($fields->assignee->name) . '&summary=' . urlencode($fields->summary) . '&transition=';
 
 $actions = array();
+$actions['Edit' . ( isset($_GET['edit']) ? ' more' : '' )] = 'issue.php?key=' . $key . '&edit' . ( isset($_GET['edit']) ? '&more' : '' );
 $actions['Assign'] = $actionPath . 'assign';
 foreach ( $transitions AS $transition ) {
 	$actions[$transition->name] = $actionPath . $transition->id;
 }
 $actions['Labels'] = 'labels.php?key=' . $key . '&id=' . $issue->id . '&summary=' . urlencode($fields->summary) . '&' . http_build_query(array('labels' => $fields->labels));
-
-include 'tpl.header.php';
 
 $resolution = '';
 if ( $fields->resolution ) {
@@ -77,6 +105,7 @@ $voted = $fields->votes->hasVoted ? ' active' : '';
 echo '<p class="menu"><a href="index.php">&lt; index</a></p>';
 echo '<h1><a href="issue.php?key=' . $issue->key . '">' . $issue->key . '</a> ' . html($fields->summary) . '</h1>';
 echo '<p class="menu">' . html_links($actions) . '</p>';
+
 echo '<p class="meta">';
 echo '[<img src="' . html($fields->issuetype->iconUrl) . '" alt="' . html($fields->issuetype->name) . '" /> ' . html($fields->issuetype->name) . ' | <img src="' . html($fields->priority->iconUrl) . '" alt="' . html($fields->priority->name) . '" /> ' . html($fields->priority->name) . '] ';
 echo 'by ' . html($fields->reporter->displayName) . ' ';
@@ -88,6 +117,60 @@ if ( $fields->labels ) {
 }
 echo '<a href="issue.php?key=' . $key . '&watch=' . (int)!$watches . '" class="active-state' . $watches . '">★ (un)watch</a> | <a href="issue.php?key=' . $key . '&vote=' . (int)!$voted . '" class="active-state' .  $voted. '">♥ (un)vote</a>';
 echo '</p>';
+
+if ( isset($_GET['edit']) ) {
+	// Summary
+	// Description
+	// Issue type
+	// Priority
+	// Reporter
+
+	function get_project( $projects, $issue ) {
+		$is_project = $issue->fields->project->key;
+		foreach ( $projects AS $project ) {
+			if ( $project->key == $is_project ) {
+				return $project;
+			}
+		}
+	}
+
+	function get_issuetype( $issuetypes, $issue ) {
+		$is_issuetype = $issue->fields->issuetype->id;
+		foreach ( $issuetypes AS $issuetype ) {
+			if ( $issuetype->id == $is_issuetype ) {
+				return $issuetype;
+			}
+		}
+	}
+
+	echo '<form action method="post">';
+	echo '	<p>Summary: <input name="summary" value="' . html($fields->summary) . '" /></p>';
+	echo '	<p>Description: <textarea name="description" rows="8">' . html($fields->description) . '</textarea></p>';
+
+	if ( isset($_GET['more']) ) {
+		$meta = jira_get('issue/' . $key . '/editmeta', array('expand' => 'projects.issuetypes.fields'), $error, $info);
+
+		$issuetypes = array();
+		foreach ( $meta->fields->issuetype->allowedValues AS $issuetype ) {
+			$issuetypes[$issuetype->id] = $issuetype->name;
+		}
+
+		$priorities = array();
+		foreach ( $meta->fields->priority->allowedValues AS $priority ) {
+			$priorities[$priority->id] = $priority->name;
+		}
+
+		echo '	<p>Issue type: <select name="issuetype">' . html_options($issuetypes, $fields->issuetype->id) . '</select></p>';
+		echo '	<p>Priority: <select name="priority">' . html_options($priorities, $fields->priority->id) . '</select></p>';
+	}
+
+	echo '	<p>Reporter (' . $fields->reporter->name . '): <input name="reporter" /></p>';
+	echo '	<p><input type="submit" /></p>';
+	echo '</form>';
+
+	include 'tpl.footer.php';
+	exit;
+}
 
 echo '<div class="issue-description markup">' . do_markup($fields->description) . '</div>';
 

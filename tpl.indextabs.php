@@ -10,15 +10,15 @@ $filterOptions = $user->filter_query_options;
 	<a href="#tab-page-query">Query</a>
 </div>
 <div class="tab-pages">
-	<form method="get" action="index.php" class="tab-page" id="tab-page-filter">
+	<form action class="filter tab-page" id="tab-page-filter">
 		<select name="query"><?= html_options($filterOptions, $query, '-- Filter') ?></select>
 		<input type="submit" />
 	</form>
-	<form method="get" action="index.php" class="tab-page" id="tab-page-project">
+	<form action class="filter tab-page" id="tab-page-project">
 		<input name="project" value="<?= html(@$_GET['project']) ?>" placeholder="Project" />
 		<input type="submit" />
 	</form>
-	<form method="get" action="index.php" class="tab-page" id="tab-page-query">
+	<form action class="filter tab-page" id="tab-page-query">
 		<input name="query" value="<?= html(@$query) ?>" />
 		<input type="submit" />
 	</form>
