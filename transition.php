@@ -16,21 +16,40 @@ if ( isset($_POST['status'], $_POST['comment'], $_POST['assignee']) ) {
 	$comment = trim($_POST['comment']);
 	$assignee = trim($_POST['assignee']);
 
-	$update = array();
-	if ( $comment ) {
-		$update['update']['comment'][0]['add']['body'] = $comment;
-	}
-	if ( $assignee ) {
-		$update['fields']['assignee']['name'] = $assignee;
-	}
-	if ( $resolution ) {
-		$update['fields']['resolution']['name'] = $resolution;
-	}
-	if ( $status ) {
-		$update['transition']['id'] = $status;
-	}
+	// ASSIGN
+	if ( $assignee && $status == 'assign' ) {
+		// Add comment
+		if ( $comment ) {
+			$response = jira_post('issue/' . $key . '/comment', array('body' => $comment), $error, $info);
+		}
+		else {
+			$error = false;
+		}
 
-	$response = jira_post('issue/' . $key . '/transitions', $update, $error, $info);
+		// Only move forward if that worked, since this action requires 2 API calls =(
+		if ( !$error ) {
+			// Change assignee
+			$response = jira_put('issue/' . $key . '/assignee', array('name' => $assignee), $error, $info);
+		}
+	}
+	// TRANSITION
+	else {
+		$update = array();
+		if ( $comment ) {
+			$update['update']['comment'][0]['add']['body'] = $comment;
+		}
+		if ( $assignee ) {
+			$update['fields']['assignee']['name'] = $assignee;
+		}
+		if ( $resolution ) {
+			$update['fields']['resolution']['name'] = $resolution;
+		}
+		if ( $status ) {
+			$update['transition']['id'] = $status;
+		}
+
+		$response = jira_post('issue/' . $key . '/transitions', $update, $error, $info);
+	}
 
 	if ( !$error ) {
 		return do_redirect('issue', array('key' => $key));
@@ -47,8 +66,9 @@ if ( isset($_POST['status'], $_POST['comment'], $_POST['assignee']) ) {
 
 $transitions = jira_get('issue/' . $key . '/transitions', array('expand' => 'transitions.fields'));
 
-$actions = array('' => '-- No change');
-$transitionsById = array();
+$actions = $transitionsById = array();
+$actions[''] = '-- No change';
+$actions['assign'] = 'Assign';
 foreach ( $transitions->transitions AS $transition ) {
 	$transitionsById[$transition->id] = $transition;
 	$actions[$transition->id] = $transition->name;

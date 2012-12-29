@@ -13,7 +13,7 @@ What it should do:
 * [x] Change labels
 * [x] Centralize CSS & JS!!
 * [x] HTML ENCODING!!
-* [ ] Change assignee
+* [x] Change assignee
 * [x] Show attachments
 * [x] Edit comment
 * [x] Delete comment

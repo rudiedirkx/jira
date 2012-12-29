@@ -58,7 +58,7 @@ usort($attachments, function($a, $b) {
 $actionPath = 'transition.php?key=' . $key . '&assignee=' . urlencode($fields->assignee->name) . '&summary=' . urlencode($fields->summary) . '&transition=';
 
 $actions = array();
-// $actions['Assign'] = 'assign.php?key=' . $key . '&assignee=' . $fields->assignee->name;
+$actions['Assign'] = $actionPath . 'assign';
 foreach ( $transitions AS $transition ) {
 	$actions[$transition->name] = $actionPath . $transition->id;
 }
