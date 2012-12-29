@@ -99,23 +99,27 @@ if ( $fields->resolution ) {
 	$resolution = ': ' . html($fields->resolution->name);
 }
 
-$watches = $fields->watches->isWatching ? ' active' : '';
-$voted = $fields->votes->hasVoted ? ' active' : '';
-
 echo '<p class="menu"><a href="index.php">&lt; index</a></p>';
 echo '<h1><a href="issue.php?key=' . $issue->key . '">' . $issue->key . '</a> ' . html($fields->summary) . '</h1>';
 echo '<p class="menu">' . html_links($actions) . '</p>';
 
 echo '<p class="meta">';
-echo '[<img src="' . html($fields->issuetype->iconUrl) . '" alt="' . html($fields->issuetype->name) . '" /> ' . html($fields->issuetype->name) . ' | <img src="' . html($fields->priority->iconUrl) . '" alt="' . html($fields->priority->name) . '" /> ' . html($fields->priority->name) . '] ';
-echo 'by ' . html($fields->reporter->displayName) . ' ';
-echo 'on ' . date(FORMAT_DATETIME, strtotime($fields->created)) . ' | ';
-echo '<strong>' . html($fields->status->name) . $resolution . '</strong> | ';
-echo 'Assignee: ' . html($fields->assignee->displayName) . ' | ';
+echo '	[<img src="' . html($fields->issuetype->iconUrl) . '" alt="' . html($fields->issuetype->name) . '" /> ' . html($fields->issuetype->name) . ' | <img src="' . html($fields->priority->iconUrl) . '" alt="' . html($fields->priority->name) . '" /> ' . html($fields->priority->name) . '] ';
+echo '	by ' . html($fields->reporter->displayName) . ' ';
+echo '	on ' . date(FORMAT_DATETIME, strtotime($fields->created)) . ' | ';
+echo '	<strong>' . html($fields->status->name) . $resolution . '</strong> | ';
+echo '	Assignee: ' . html($fields->assignee->displayName) . ' | ';
 if ( $fields->labels ) {
-	echo 'Labels: <span class="label">' . implode('</span> <span class="label">', array_map('html', $fields->labels)) . '</span> | ';
+	echo '	Labels: <span class="label">' . implode('</span> <span class="label">', array_map('html', $fields->labels)) . '</span> | ';
 }
-echo '<a href="issue.php?key=' . $key . '&watch=' . (int)!$watches . '" class="active-state' . $watches . '">★ (un)watch</a> | <a href="issue.php?key=' . $key . '&vote=' . (int)!$voted . '" class="active-state' .  $voted. '">♥ (un)vote</a>';
+if ( !empty($fields->watches) ) {
+	$watches = $fields->watches->isWatching ? ' active' : '';
+	echo '	<a href="issue.php?key=' . $key . '&watch=' . (int)!$watches . '" class="active-state' . $watches . '">★</a> (watch) | ';
+}
+if ( !empty($fields->votes) ) {
+	$voted = $fields->votes->hasVoted ? ' active' : '';
+	echo '	<a href="issue.php?key=' . $key . '&vote=' . (int)!$voted . '" class="active-state' .  $voted. '">♥</a> (vote)';
+}
 echo '</p>';
 
 if ( isset($_GET['edit']) ) {
