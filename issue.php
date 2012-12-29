@@ -104,7 +104,7 @@ echo '<h1><a href="issue.php?key=' . $issue->key . '">' . $issue->key . '</a> ' 
 echo '<p class="menu">' . html_links($actions) . '</p>';
 
 echo '<p class="meta">';
-echo '	[<img src="' . html($fields->issuetype->iconUrl) . '" alt="' . html($fields->issuetype->name) . '" /> ' . html($fields->issuetype->name) . ' | <img src="' . html($fields->priority->iconUrl) . '" alt="' . html($fields->priority->name) . '" /> ' . html($fields->priority->name) . '] ';
+echo '	[<img class="icon issuetype" src="' . html($fields->issuetype->iconUrl) . '" alt="' . html($fields->issuetype->name) . '" /> ' . html($fields->issuetype->name) . ' | <img class="icon priority" src="' . html($fields->priority->iconUrl) . '" alt="' . html($fields->priority->name) . '" /> ' . html($fields->priority->name) . '] ';
 echo '	by ' . html($fields->reporter->displayName) . ' ';
 echo '	on ' . date(FORMAT_DATETIME, strtotime($fields->created)) . ' | ';
 echo '	<strong>' . html($fields->status->name) . $resolution . '</strong> | ';

@@ -7,13 +7,18 @@ input:not([type="submit"]):not([type="button"]):not([type="radio"]):not([type="c
 select,
 textarea {
 	width: 100%;
-	background: #eee;
+	background: #e0f0ff;
 	border: solid 1px #999;
 	padding: 3px 5px;
 }
 .filter input:not([type="submit"]):not([type="button"]):not([type="radio"]):not([type="checkbox"]),
 .filter select {
 	background: #fff;
+}
+a,
+h1, h1 a,
+h2, h2 a {
+	color: #326ca6;
 }
 
 /* issue details */
@@ -27,18 +32,22 @@ textarea {
 .dates .right {
 	float: right;
 }
+.icon {
+	width: 16px;
+	height: 16px;
+}
 
 /* issue labels */
 .label {
 	display: inline-block;
-	background: #D3EAF1;
+	background: #e0f0ff;
 	padding: 1px 5px;
 	border-radius: 4px;
 }
 
 /* markup fields */
 .markup {
-	background: #eee;
+	background: #e0f0ff;
 	padding: 10px;
 }
 

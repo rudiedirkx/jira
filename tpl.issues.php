@@ -19,8 +19,8 @@ foreach ( $issues->issues AS $issue ) {
 
 	echo '<h2><a href="issue.php?key=' . $issue->key . '">' . $issue->key . ' ' . html($fields->summary) . '</a></h2>';
 	echo '<p class="short-meta">';
-	echo '	<span class="left"><img src="' . html($fields->issuetype->iconUrl) . '" alt="' . html($fields->issuetype->name) . '" /> ' . html($fields->issuetype->name) . '</span>';
-	echo '	<span class="center">' . ( $fields->priority ? '<img src="' . html($fields->priority->iconUrl) . '" alt="' . html($fields->priority->name) . '" /> ' . html($fields->priority->name) : '&nbsp;' ) . '</span>';
+	echo '	<span class="left"><img class="icon issuetype" src="' . html($fields->issuetype->iconUrl) . '" alt="' . html($fields->issuetype->name) . '" /> ' . html($fields->issuetype->name) . '</span>';
+	echo '	<span class="center">' . ( $fields->priority ? '<img class="icon priority" src="' . html($fields->priority->iconUrl) . '" alt="' . html($fields->priority->name) . '" /> ' . html($fields->priority->name) : '&nbsp;' ) . '</span>';
 	echo '	<span class="right"><strong>' . html($status) . '</strong></span>';
 	echo '</p>';
 	if ( $fields->labels ) {
