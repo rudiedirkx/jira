@@ -13,6 +13,7 @@ $filterOptions = $user->filter_query_options;
 	<form action class="filter tab-page" id="tab-page-filter">
 		<select name="query"><?= html_options($filterOptions, $query, '-- Filter') ?></select>
 		<input type="submit" />
+		<a href="filters.php">Your filters</a>
 	</form>
 	<form action class="filter tab-page" id="tab-page-project">
 		<input name="project" value="<?= html(@$_GET['project']) ?>" placeholder="Project" />

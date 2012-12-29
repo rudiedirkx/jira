@@ -40,14 +40,22 @@ class User extends db_generic_record {
 		return $filters;
 	}
 
-	function get_filter_query_options() {
-// echo "get filter options\n";
+	function get_filter_options( $valueField = 'filter_id', $labelField = 'name' ) {
 		$filterOptions = array();
 		foreach ( $this->filters AS $filter ) {
-			$filterOptions[$filter->jql] = $filter->name;
+			$filterOptions[$filter->$valueField] = $filter->$labelField;
 		}
 
 		return $filterOptions;
+	}
+
+	function get_filter_query_options() {
+		return $this->get_filter_options('jql');
+	}
+
+	function save( $updates ) {
+		global $db;
+		return $db->update('users', $updates, array('id' => $this->id));
 	}
 
 	static function load() {

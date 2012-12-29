@@ -1,5 +1,7 @@
 <?php
 
+echo '<h2>Showing ' . count($issues->issues) . ' of ' . $issues->total . ' issues</h2>';
+
 echo '<hr>';
 
 foreach ( $issues->issues AS $issue ) {

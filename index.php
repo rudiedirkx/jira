@@ -14,6 +14,9 @@ if ( !empty($_GET['query']) ) {
 else if ( $user->index_query ) {
 	$query = $user->index_query;
 }
+else if ( $user->index_filter && ($indexFilterQuery = $db->select_one('filters', 'jql', array('user_id' => $user->id, 'filter_id' => $user->index_filter))) ) {
+	$query = $indexFilterQuery;
+}
 // Default query
 else {
 	// Project
