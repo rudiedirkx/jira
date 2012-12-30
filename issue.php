@@ -129,24 +129,6 @@ if ( isset($_GET['edit']) ) {
 	// Priority
 	// Reporter
 
-	function get_project( $projects, $issue ) {
-		$is_project = $issue->fields->project->key;
-		foreach ( $projects AS $project ) {
-			if ( $project->key == $is_project ) {
-				return $project;
-			}
-		}
-	}
-
-	function get_issuetype( $issuetypes, $issue ) {
-		$is_issuetype = $issue->fields->issuetype->id;
-		foreach ( $issuetypes AS $issuetype ) {
-			if ( $issuetype->id == $is_issuetype ) {
-				return $issuetype;
-			}
-		}
-	}
-
 	echo '<form action method="post">';
 	echo '	<p>Summary: <input name="summary" value="' . html($fields->summary) . '" /></p>';
 	echo '	<p>Description: <textarea name="description" rows="8">' . html($fields->description) . '</textarea></p>';

@@ -21,6 +21,19 @@ h2, h2 a {
 	color: #326ca6;
 }
 
+
+
+/* menu */
+.menu > h1,
+.menu > h2 {
+	display: inline-block;
+}
+a.active {
+	font-weight: bold;
+}
+
+
+
 /* issue details */
 .short-meta {
 	text-align: center;
@@ -37,6 +50,8 @@ h2, h2 a {
 	height: 16px;
 }
 
+
+
 /* issue labels */
 .label {
 	display: inline-block;
@@ -45,11 +60,15 @@ h2, h2 a {
 	border-radius: 4px;
 }
 
+
+
 /* markup fields */
 .markup {
 	background: #e0f0ff;
 	padding: 10px;
 }
+
+
 
 /* togglers (watch/vote) */
 .active-state {
@@ -59,6 +78,8 @@ h2, h2 a {
 .active-state.active {
 	color: #000;
 }
+
+
 
 /* tables */
 div.table {
@@ -73,6 +94,8 @@ td {
 	white-space: nowrap;
 }
 
+
+
 /* tabs */
 .tab-links .active {
 	font-weight: bold;
@@ -80,6 +103,8 @@ td {
 .tab-pages .tab-page.hide {
 	display: none;
 }
+
+
 
 /* pager */
 #pager {

@@ -19,8 +19,10 @@ What it should do:
 * [x] Delete comment
 * [x] Edit issue summary & description
 * [x] Choose & use index filter
+
 * [ ] Use SESSION auth (log in once) instead of BASIC auth (every call is a login)
-* [ ] Create issue
+
+* [x] Create issue
 * [ ] Enter (and save!) index query
 * [ ] Link issues
 * [ ] Log work (only via transitions?)

@@ -1,6 +1,9 @@
 <?php
 
-echo '<h2>Showing ' . count($issues->issues) . ' of ' . $issues->total . ' issues</h2>';
+echo '<div class="menu">';
+echo '	<h2 class="pre-menu">Showing ' . count($issues->issues) . ' of ' . $issues->total . ' issues</h2>';
+echo '	(<a href="new.php">new issue</a>)';
+echo '</div>';
 
 echo '<hr>';
 
