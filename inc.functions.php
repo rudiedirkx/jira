@@ -96,7 +96,7 @@ function jira_post( $resource, $data, &$error = null, &$info = null ) {
 	$ch = jira_curl($url, 'POST');
 	curl_setopt($ch, CURLOPT_POST, true);
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
-	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/json', 'User-agent: Jira Mobile'));
 
 	$response = jira_response($ch, $error, $info);
 	$info['request'] = $body;
@@ -107,6 +107,7 @@ function jira_get( $resource, $query = null, &$error = null, &$info = null ) {
 	$url = jira_url($resource, $query);
 
 	$ch = jira_curl($url, 'GET');
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array('User-agent: Jira Mobile'));
 
 	return jira_response($ch, $error, $info);
 }
@@ -124,7 +125,7 @@ function jira_put( $resource, $data, &$error = null, &$info = null ) {
 	curl_setopt($ch, CURLOPT_PUT, true);
 	curl_setopt($ch, CURLOPT_INFILE, $fp);
 	curl_setopt($ch, CURLOPT_INFILESIZE, strlen($body));
-	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/json', 'User-agent: Jira Mobile'));
 
 	$response = jira_response($ch, $error, $info);
 	$info['request'] = $body;
@@ -136,6 +137,7 @@ function jira_delete( $resource, $query = null, &$error = null, &$info = null ) 
 
 	$ch = jira_curl($url, 'DELETE');
 	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array('User-agent: Jira Mobile'));
 
 	return jira_response($ch, $error, $info);
 }
