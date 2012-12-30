@@ -6,10 +6,12 @@ do_logincheck();
 
 if ( isset($_POST['index_filter']) ) {
 	$user->save(array('index_filter' => $_POST['index_filter']));
-	return do_redirect('filters');
+	return do_redirect('index');
 }
 
 $user->unsync();
+
+include 'tpl.header.php';
 
 echo '<p class="menu"><a href="index.php">&lt; index</a></p>';
 echo '<h1>Your favorite filters</h1>';
@@ -22,9 +24,9 @@ echo '<h1>Your favorite filters</h1>';
 <?php
 
 echo '<pre>';
-
 print_r($user->filters);
 print_r($user->filter_options);
 print_r($user->filter_query_options);
+echo '</pre>';
 
-echo implode("\n", $jira_requests) . "\n";
+include 'tpl.footer.php';
