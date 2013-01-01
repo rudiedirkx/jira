@@ -6,35 +6,44 @@ do_logincheck();
 
 $perPage = 10;
 
+// Default query
+$query = 'status != Closed ORDER BY priority DESC, created DESC';
+$querySource = '';
+$filterOptions = $user->filter_query_options;
+
 // GET query
 if ( !empty($_GET['query']) ) {
 	$query = $_GET['query'];
+	$querySource = isset($filterOptions[$query]) ? 'filter:get' : 'query:get';
 }
-// User's custom query
+// GET project
+else if ( !empty($_GET['project']) ) {
+	$query = 'project = "' . $_GET['project'] . '" AND ' . $query;
+	$querySource = 'project:get';
+}
+// User's query
 else if ( $user->index_query ) {
 	$query = $user->index_query;
+	$querySource = 'query:setting';
 }
-else if ( $user->index_filter && ($indexFilterQuery = $db->select_one('filters', 'jql', array('user_id' => $user->id, 'filter_id' => $user->index_filter))) ) {
-	$query = $indexFilterQuery;
+// User's Jira filter
+else if ( $user->index_filter_object ) {
+	$query = $user->index_filter_object->jql;
+	$querySource = 'filter:setting';
 }
-// Default query
-else {
-	// Project
-	empty($_GET['project']) && $_GET['project'] = $user->index_project;
-	$project = '';
-	if ( !empty($_GET['project']) ) {
-		$project = 'project = "' . $_GET['project'] . '" AND ';
-	}
-
-	$query = $project . 'status != Closed ORDER BY priority DESC, key DESC';
+// User's project
+else if ( $user->index_project ) {
+	$query = 'project = "' . $user->index_project . '" AND ' . $query;
+	$querySource = 'project:setting';
 }
 
+list($activeTab) = explode(':', $querySource);
+
+// Execute
 $page = max(0, (int)@$_GET['page']);
 $issues = jira_get('search', array('maxResults' => $perPage, 'startAt' => $page * $perPage, 'jql' => $query), $error, $info);
-// var_dump($issues);
-// var_dump($error);
-// var_dump($info);
 
+// Ajax callback
 if ( isset($_GET['ajax']) ) {
 	include 'tpl.issues.php';
 	exit;

@@ -53,6 +53,18 @@ class User extends db_generic_record {
 		return $this->get_filter_options('jql');
 	}
 
+	function get_index_filter_object() {
+		if ( $this->index_filter ) {
+			global $db;
+			$filter = $db->select('filters', array('user_id' => $this->id, 'filter_id' => $this->index_filter))->first();
+			if ( $filter ) {
+				return $filter;
+			}
+		}
+
+		return false;
+	}
+
 	function save( $updates ) {
 		global $db;
 		return $db->update('users', $updates, array('id' => $this->id));
