@@ -73,7 +73,7 @@ else if ( isset($_GET['transitions']) ) {
 	exit;
 }
 
-$issue = jira_get('issue/' . $key, array('expand' => 'transitions'));
+$issue = jira_get('issue/' . $key, array('expand' => 'transitions,renderedFields'));
 $fields = $issue->fields;
 $transitions = $issue->transitions;
 
@@ -158,7 +158,7 @@ if ( isset($_GET['edit']) ) {
 	exit;
 }
 
-echo '<div class="issue-description markup">' . do_markup($fields->description) . '</div>';
+echo '<div class="issue-description markup">' . $issue->renderedFields->description . '</div>';
 
 if ( $attachments ) {
 	echo '<h2>' . count($attachments) . ' attachments</h2>';

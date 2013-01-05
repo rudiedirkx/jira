@@ -20,6 +20,17 @@ h1, h1 a,
 h2, h2 a {
 	color: #326ca6;
 }
+pre {
+	white-space: pre-wrap;
+}
+blockquote {
+	margin-left: 10px;
+	border-left: solid 20px rgba(0, 0, 0, 0.2);
+	padding-left: 10px;
+}
+textarea {
+	resize: vertical;
+}
 
 
 
