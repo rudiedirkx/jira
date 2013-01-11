@@ -1,5 +1,11 @@
 <?php
 
+function do_logout() {
+	if (isset($_COOKIE['JIRA_AUTH'])) {
+		setcookie('JIRA_AUTH', '', 1);
+	}
+}
+
 function do_markup( $text ) {
 	return nl2br(html(trim($text)));
 }
@@ -7,10 +13,11 @@ function do_markup( $text ) {
 function do_encrypt( $data ) {
 	$iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC);
 	$iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
-	return $iv . mcrypt_encrypt(MCRYPT_RIJNDAEL_256, substr(SECRET . SECRET, 0, 24), $data, MCRYPT_MODE_CBC, $iv);
+	return base64_encode($iv . mcrypt_encrypt(MCRYPT_RIJNDAEL_256, substr(SECRET . SECRET, 0, 24), $data, MCRYPT_MODE_CBC, $iv));
 }
 
 function do_decrypt( $data ) {
+	$data = base64_decode($data);
 	$iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC);
 	$iv = substr($data, 0, $iv_size);
 	$data = substr($data, $iv_size);
@@ -152,11 +159,19 @@ function jira_response( $ch, &$error = null, &$info = null ) {
 		@list($header, $body) = explode("\r\n\r\n", $body, 2);
 	}
 
+	$params = $info;
+
 	$info = curl_getinfo($ch);
 	curl_close($ch);
 
 	$code = $info['http_code'];
 	$success = $code >= 200 && $code < 300;
+	$unauth = $code == 401 || $code == 403;
+
+	if ( $unauth && empty($params['unauth_ok']) ) {
+		do_logout();
+		return do_redirect('index');
+	}
 
 	$error = $success ? false : $code;
 

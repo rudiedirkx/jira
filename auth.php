@@ -4,8 +4,8 @@ require 'inc.bootstrap.php';
 
 // Log out
 if ( isset($_GET['logout']) ) {
-	setcookie('JIRA_AUTH', '', 1);
-	exit('OK');
+	do_logout();
+	return do_redirect('index');
 }
 
 // Already logged in
@@ -39,7 +39,7 @@ if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
 	define('JIRA_URL', rtrim($_POST['url'], '/'));
 	define('JIRA_USER', $_POST['user']);
 	define('JIRA_AUTH', $_POST['user'] . ':' . $_POST['pass']);
-	// $session = jira_get(JIRA_AUTH_PATH . 'session', null, $error, $info);
+	$info = array('unauth_ok' => 1);
 	$account = jira_get('user', array('username' => JIRA_USER), $error, $info);
 
 	// Invalid URL

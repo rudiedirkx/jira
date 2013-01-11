@@ -25,7 +25,7 @@ pre {
 }
 blockquote {
 	margin-left: 10px;
-	border-left: solid 20px rgba(0, 0, 0, 0.2);
+	border-left: solid 20px rgba(50, 108, 166, .3);
 	padding-left: 10px;
 }
 textarea {
