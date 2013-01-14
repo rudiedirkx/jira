@@ -37,14 +37,18 @@ else if ( isset($_GET['vote']) ) {
 	return do_redirect('issue', compact('key'));
 }
 
-else if ( isset($_POST['summary'], $_POST['description'], $_POST['reporter']) ) {
+else if ( isset($_POST['summary'], $_POST['description'], $_POST['reporter'], $_POST['issuetype'], $_POST['priority']) ) {
 	$summary = trim($_POST['summary']);
 	$description = trim($_POST['description']);
 	$reporter = trim($_POST['reporter']);
+	$issuetype = trim($_POST['issuetype']);
+	$priority = trim($_POST['priority']);
 
 	$update = array(
 		'summary' => array(array('set' => $summary)),
 		'description' => array(array('set' => $description)),
+		'issuetype' => array(array('set' => $issuetype)),
+		'priority' => array(array('set' => array('id' => $priority))),
 	);
 	if ( $reporter ) {
 		$update['reporter'] = array(array('set' => array('name' => $reporter)));
@@ -87,7 +91,7 @@ usort($attachments, function($a, $b) {
 $actionPath = 'transition.php?key=' . $key . '&assignee=' . urlencode($fields->assignee->name) . '&summary=' . urlencode($fields->summary) . '&transition=';
 
 $actions = array();
-$actions['Edit' . ( isset($_GET['edit']) ? ' more' : '' )] = 'issue.php?key=' . $key . '&edit' . ( isset($_GET['edit']) ? '&more' : '' );
+$actions['Edit'] = 'issue.php?key=' . $key . '&edit';
 $actions['Assign'] = $actionPath . 'assign';
 foreach ( $transitions AS $transition ) {
 	$actions[$transition->name] = $actionPath . $transition->id;
@@ -129,28 +133,28 @@ if ( isset($_GET['edit']) ) {
 	// Priority
 	// Reporter
 
-	echo '<form action method="post">';
-	echo '	<p>Summary: <input name="summary" value="' . html($fields->summary) . '" /></p>';
-	echo '	<p>Description: <textarea name="description" rows="8">' . html($fields->description) . '</textarea></p>';
+	$meta = jira_get('issue/' . $key . '/editmeta', array('expand' => 'projects.issuetypes.fields'), $error, $info);
 
-	if ( isset($_GET['more']) ) {
-		$meta = jira_get('issue/' . $key . '/editmeta', array('expand' => 'projects.issuetypes.fields'), $error, $info);
-
-		$issuetypes = array();
-		foreach ( $meta->fields->issuetype->allowedValues AS $issuetype ) {
-			$issuetypes[$issuetype->id] = $issuetype->name;
-		}
-
-		$priorities = array();
-		foreach ( $meta->fields->priority->allowedValues AS $priority ) {
-			$priorities[$priority->id] = $priority->name;
-		}
-
-		echo '	<p>Issue type: <select name="issuetype">' . html_options($issuetypes, $fields->issuetype->id) . '</select></p>';
-		echo '	<p>Priority: <select name="priority">' . html_options($priorities, $fields->priority->id) . '</select></p>';
+	$issuetypes = array();
+	foreach ( $meta->fields->issuetype->allowedValues AS $issuetype ) {
+		$issuetypes[$issuetype->id] = $issuetype->name;
 	}
 
+	$priorities = array();
+	foreach ( $meta->fields->priority->allowedValues AS $priority ) {
+		$priorities[$priority->id] = $priority->name;
+	}
+
+	echo '<form action method="post">';
+	echo '	<p>Summary: <input name="summary" value="' . html($fields->summary) . '" /></p>';
+
+	echo '	<p>Description: <textarea name="description" rows="8">' . html($fields->description) . '</textarea></p>';
+
+	echo '	<p>Issue type: <select name="issuetype">' . html_options($issuetypes, $fields->issuetype->id) . '</select></p>';
+	echo '	<p>Priority: <select name="priority">' . html_options($priorities, $fields->priority->id) . '</select></p>';
+
 	echo '	<p>Reporter (' . $fields->reporter->name . '): <input name="reporter" /></p>';
+
 	echo '	<p><input type="submit" /></p>';
 	echo '</form>';
 
