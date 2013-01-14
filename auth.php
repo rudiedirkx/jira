@@ -2,12 +2,6 @@
 
 require 'inc.bootstrap.php';
 
-// Log out
-if ( isset($_GET['logout']) ) {
-	do_logout();
-	return do_redirect('index');
-}
-
 // Already logged in
 if ( defined('JIRA_AUTH') ) {
 	echo '<p>You are:</p>';
