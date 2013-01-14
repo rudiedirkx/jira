@@ -24,7 +24,7 @@ pre {
 	white-space: pre-wrap;
 }
 blockquote {
-	margin-left: 10px;
+	margin-left: 0;
 	border-left: solid 20px rgba(50, 108, 166, .3);
 	padding-left: 10px;
 }
