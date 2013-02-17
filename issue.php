@@ -184,7 +184,7 @@ if ( $attachments ) {
 $comments = $fields->comment->comments;
 echo '<h2>' . count($comments) . ' comments</h2>';
 echo '<div class="comments">';
-foreach ( $comments AS $comment ) {
+foreach ( $comments AS $i => $comment ) {
 	$created = strtotime($comment->created);
 	echo '<div id="comment-' . $comment->id . '">';
 	echo '<p class="meta">';
@@ -192,7 +192,7 @@ foreach ( $comments AS $comment ) {
 	echo 'by ' . html($comment->author->displayName) . ' ';
 	echo '[ <a href="comment.php?key=' . $key . '&id=' . $comment->id . '&summary=' . urlencode($fields->summary) . '">e</a> | ';
 	echo '<a href="comment.php?key=' . $key . '&id=' . $comment->id . '&summary=' . urlencode($fields->summary) . '&delete=1">x</a> ]</p>';
-	echo '<div class="comment-body markup">' . do_markup($comment->body) . '</div>';
+	echo '<div class="comment-body markup">' . $issue->renderedFields->comment->comments[$i]->body . '</div>';
 	echo '</div>';
 	echo '<hr>';
 }
@@ -206,7 +206,7 @@ echo '<p><input type="submit" /></p>';
 echo '</form>';
 echo '</div>';
 
-// echo '<pre>';
-// print_r($issue);
+echo '<pre>';
+print_r($issue);
 
 include 'tpl.footer.php';
