@@ -206,7 +206,7 @@ echo '<p><input type="submit" /></p>';
 echo '</form>';
 echo '</div>';
 
-echo '<pre>';
-print_r($issue);
+// echo '<pre>';
+// print_r($issue);
 
 include 'tpl.footer.php';
