@@ -6,7 +6,42 @@ do_logincheck();
 
 $key = $_GET['key'];
 
-if ( !empty($_POST['comment']) ) {
+if ( isset($_POST['summary'], $_POST['description'], $_POST['reporter'], $_POST['issuetype'], $_POST['priority'], $_POST['comment']) ) {
+	$summary = trim($_POST['summary']);
+	$description = trim($_POST['description']);
+	$reporter = trim($_POST['reporter']);
+	$issuetype = trim($_POST['issuetype']);
+	$priority = trim($_POST['priority']);
+	$comment = trim($_POST['comment']);
+
+	$update = array(
+		'summary' => array(array('set' => $summary)),
+		'description' => array(array('set' => $description)),
+		'issuetype' => array(array('set' => $issuetype)),
+		'priority' => array(array('set' => array('id' => $priority))),
+	);
+	if ( $reporter ) {
+		$update['reporter'] = array(array('set' => array('name' => $reporter)));
+	}
+	if ( $comment ) {
+		$update['comment'] = array(array('add' => array('body' => $comment)));
+	}
+	$response = jira_put('issue/' . $key, compact('update'), $error, $info);
+
+	if ( !$error ) {
+		return do_redirect('issue', compact('key'));
+	}
+
+	echo '<pre>';
+	print_r($update);
+	var_dump($error);
+	print_r($response);
+	print_r($info);
+
+	exit;
+}
+
+else if ( !empty($_POST['comment']) ) {
 	$response = jira_post('issue/' . $key . '/comment', array('body' => $_POST['comment']), $error, $info);
 
 	if ( !$error ) {
@@ -35,37 +70,6 @@ else if ( isset($_GET['vote']) ) {
 	$response = $method('issue/' . $key . '/votes', null, $error, $info);
 
 	return do_redirect('issue', compact('key'));
-}
-
-else if ( isset($_POST['summary'], $_POST['description'], $_POST['reporter'], $_POST['issuetype'], $_POST['priority']) ) {
-	$summary = trim($_POST['summary']);
-	$description = trim($_POST['description']);
-	$reporter = trim($_POST['reporter']);
-	$issuetype = trim($_POST['issuetype']);
-	$priority = trim($_POST['priority']);
-
-	$update = array(
-		'summary' => array(array('set' => $summary)),
-		'description' => array(array('set' => $description)),
-		'issuetype' => array(array('set' => $issuetype)),
-		'priority' => array(array('set' => array('id' => $priority))),
-	);
-	if ( $reporter ) {
-		$update['reporter'] = array(array('set' => array('name' => $reporter)));
-	}
-	$response = jira_put('issue/' . $key, compact('update'), $error, $info);
-
-	if ( !$error ) {
-		return do_redirect('issue', compact('key'));
-	}
-
-	echo '<pre>';
-	print_r($update);
-	var_dump($error);
-	print_r($response);
-	print_r($info);
-
-	exit;
 }
 
 else if ( isset($_GET['transitions']) ) {
@@ -154,6 +158,8 @@ if ( isset($_GET['edit']) ) {
 	echo '	<p>Priority: <select name="priority">' . html_options($priorities, $fields->priority->id) . '</select></p>';
 
 	echo '	<p>Reporter (' . $fields->reporter->name . '): <input name="reporter" /></p>';
+
+	echo '	<p>Add comment: <textarea name="comment" rows="4"></textarea></p>';
 
 	echo '	<p><input type="submit" /></p>';
 	echo '</form>';
