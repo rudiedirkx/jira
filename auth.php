@@ -4,6 +4,8 @@ require 'inc.bootstrap.php';
 
 // Already logged in
 if ( defined('JIRA_AUTH') ) {
+	include 'tpl.header.php';
+
 	echo '<p>You are:</p>';
 
 	// $account = jira_get('user', array('username' => JIRA_USER), $error, $info);
@@ -24,6 +26,7 @@ if ( defined('JIRA_AUTH') ) {
 	// Update timezone from Jira
 	$db->update('users', array('jira_timezone' => $account->timeZone), array('id' => $user->id));
 
+	include 'tpl.footer.php';
 	exit;
 }
 
@@ -61,11 +64,7 @@ if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
 	$db->update('users', array('jira_timezone' => $account->timeZone), array('id' => $user->id));
 
 	// Save credentials to cookie
-	$remember = !empty($_POST['remember']);
-	$month = strtotime('+1 month');
-	$time = $remember ? $month : 0;
-	setcookie('JIRA_URL', JIRA_URL, $month);
-	setcookie('JIRA_AUTH', do_encrypt(JIRA_AUTH), $time);
+	do_login(JIRA_URL, JIRA_AUTH);
 
 	return do_redirect('index');
 }
@@ -78,10 +77,4 @@ if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
 input:not([type="submit"]):not([type="button"]):not([type="radio"]):not([type="checkbox"]), select { width: 100%; }
 </style>
 
-<form method="post">
-	<p>Server URL: <input name="url" size="60" value="<?= @$_COOKIE['JIRA_URL'] ?>" placeholder="https://YOUR.jira.com/rest" /></p>
-	<p>Username: <input name="user" /></p>
-	<p>Password: <input name="pass" type="password" /></p>
-	<p><label title="Will remember for 1 month or until you log out."><input name="remember" type="checkbox" /> Remember?</label></p>
-	<p><input type="submit" /></p>
-</form>
+<? include 'tpl.login.php' ?>

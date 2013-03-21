@@ -1,9 +1,83 @@
 <?php
 
-function do_logout() {
-	if (isset($_COOKIE['JIRA_AUTH'])) {
-		setcookie('JIRA_AUTH', '', 1);
+function get_urls( $accounts = null ) {
+	if ( $accounts ) {
+		return array_map(function($acc) {
+			return $acc->url;
+		}, $accounts);
 	}
+
+	$urls = @$_COOKIE['JIRA_URL'] ? explode(',', $_COOKIE['JIRA_URL']) : array();
+	return $urls;
+}
+
+function get_auths( $accounts = null ) {
+	if ( $accounts ) {
+		return array_map(function($acc) {
+			return $acc->auth;
+		}, $accounts);
+	}
+
+	$auths = @$_COOKIE['JIRA_AUTH'] ? explode(',', $_COOKIE['JIRA_AUTH']) : array();
+	return array_map('do_decrypt', $auths);
+}
+
+function get_accounts() {
+	$urls = get_urls();
+	$auths = get_auths();
+
+	$accounts = array();
+	foreach ( $auths AS $i => $auth ) {
+		list($user) = explode(':', $auth, 2);
+		$accounts[] = (object)array(
+			'url' => $urls[$i],
+			'auth' => $auth,
+			'user' => $user,
+			'active' => !$i,
+		);
+	}
+
+	return $accounts;
+}
+
+function do_logout( $layered = false ) {
+	$accounts = get_accounts();
+
+	// Peel off first layer (active account)
+	if ( $layered && isset($accounts[1]) ) {
+		unset($accounts[0]);
+		do_login('', '', $accounts);
+	}
+	// Log out completely
+	else {
+		// Unset AUTH
+		setcookie('JIRA_AUTH', '', 1);
+		unset($_COOKIE['JIRA_AUTH']);
+
+		// Reset URL
+		if ( $accounts && $_COOKIE['JIRA_URL'] != $accounts[0]->url ) {
+			$month = strtotime('+1 month');
+			$_COOKIE['JIRA_URL'] = $accounts[0]->url;
+			setcookie('JIRA_URL', $_COOKIE['JIRA_URL'], $month);
+		}
+	}
+}
+
+function do_login( $url, $auth, $accounts = null ) {
+	$accounts or $accounts = get_accounts();
+
+	if ($url && $auth) {
+		$accounts[] = (object)compact('url', 'auth');
+	}
+
+	$urls = get_urls($accounts);
+	$auths = array_map('do_encrypt', get_auths($accounts));
+
+	$month = strtotime('+1 month');
+	$_COOKIE['JIRA_URL'] = implode(',', $urls);
+	setcookie('JIRA_URL', $_COOKIE['JIRA_URL'], $month);
+	$_COOKIE['JIRA_AUTH'] = implode(',', $auths);
+	setcookie('JIRA_AUTH', $_COOKIE['JIRA_AUTH'], $month);
 }
 
 function do_markup( $text ) {
@@ -33,6 +107,8 @@ function do_redirect( $path, $query = null ) {
 
 	$query = $query ? '?' . http_build_query($query) : '';
 	$location = $path . '.php' . $query . $fragment;
+// var_dump($location);
+// exit;
 	header('Location: ' . $location);
 	exit;
 }
@@ -164,18 +240,23 @@ function jira_response( $ch, &$error = null, &$info = null ) {
 	$info = curl_getinfo($ch);
 	curl_close($ch);
 
+	$info['headers'] = jira_http_headers($header);
+
 	$code = $info['http_code'];
 	$success = $code >= 200 && $code < 300;
-	$unauth = $code == 401 || $code == 403;
+	$invalid_url = $code == 404 && is_int(strpos($info['content_type'], 'text/html'));
+	$unauth = $code == 401 || $code == 403 || $invalid_url;
 
 	if ( $unauth && empty($params['unauth_ok']) ) {
-		do_logout();
-		return do_redirect('index');
+		global $db;
+		$db->delete('users', array('jira_url' => JIRA_URL, 'jira_user' => JIRA_USER));
+		do_logout(true);
+// print_r($_COOKIE);
+// exit;
+		return do_redirect('accounts');
 	}
 
 	$error = $success ? false : $code;
-
-	$info['headers'] = jira_http_headers($header);
 
 	$info['response'] = $body;
 	$info['error'] = '';

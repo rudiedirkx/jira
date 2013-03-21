@@ -51,7 +51,6 @@ natcasesort($labels);
 
 include 'tpl.header.php';
 
-echo '<p class="menu"><a href="index.php">&lt; index</a></p>';
 echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($summary) . '</h1>';
 
 ?>

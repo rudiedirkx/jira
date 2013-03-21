@@ -107,7 +107,6 @@ if ( $fields->resolution ) {
 	$resolution = ': ' . html($fields->resolution->name);
 }
 
-echo '<p class="menu"><a href="index.php">&lt; index</a></p>';
 echo '<h1><a href="issue.php?key=' . $issue->key . '">' . $issue->key . '</a> ' . html($fields->summary) . '</h1>';
 echo '<p class="menu">' . html_links($actions) . '</p>';
 

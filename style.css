@@ -34,9 +34,18 @@ textarea {
 
 
 
+/* misc tinies */
+.active-account {
+	font-weight: bold;
+}
+
+
+
 /* menu */
-.menu > h1,
-.menu > h2 {
+.top-menu {
+	margin-top: 0;
+}
+.pre-menu {
 	display: inline-block;
 }
 a.active {

@@ -36,7 +36,6 @@ include 'tpl.header.php';
 
 $meta = jira_get('issue/createmeta', array('expand' => 'projects.issuetypes.fields'), $error, $info);
 
-echo '<p class="menu"><a href="index.php">&lt; index</a></p>';
 echo '<h1>Create new issue</h1>';
 
 // Choose project

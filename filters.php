@@ -17,7 +17,6 @@ $user->unsync();
 
 include 'tpl.header.php';
 
-echo '<p class="menu"><a href="index.php">&lt; index</a></p>';
 echo '<h1>Your filters</h1>';
 
 ?>

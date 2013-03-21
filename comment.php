@@ -43,7 +43,6 @@ else if ( isset($_GET['delete'], $_POST['confirm']) ) {
 
 include 'tpl.header.php';
 
-echo '<p class="menu"><a href="index.php">&lt; index</a></p>';
 echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($summary) . '</h1>';
 
 echo '<h2>Comment # ' . $id . '</h2>';

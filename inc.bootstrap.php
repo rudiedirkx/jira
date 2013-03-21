@@ -22,19 +22,20 @@ $db->schema($schema);
 require 'inc.user.php';
 
 // Jira API resource prefixes
-define('JIRA_AUTH_PATH', '/auth/1/');
-define('JIRA_API_PATH', '/api/2/');
-define('JIRA_API_1_PATH', '/api/1.0/');
+define('JIRA_AUTH_PATH', '/rest/auth/1/');
+define('JIRA_API_PATH', '/rest/api/2/');
+define('JIRA_API_1_PATH', '/rest/api/1.0/');
 
 // Current session
 $user = null;
-if ( isset($_COOKIE['JIRA_URL'], $_COOKIE['JIRA_AUTH']) ) {
-	$auth = do_decrypt($_COOKIE['JIRA_AUTH']);
-	list($username) = explode(':', $auth, 2);
+if ( isset($_COOKIE['JIRA_URL'], $_COOKIE['JIRA_AUTH']) && ($accounts = get_accounts()) ) {
+	$account = $accounts[0];
+// print_r($account);
+// print_r($_COOKIE);
 
-	define('JIRA_URL', $_COOKIE['JIRA_URL']);
-	define('JIRA_USER', $username);
-	define('JIRA_AUTH', $auth);
+	define('JIRA_URL', $account->url);
+	define('JIRA_USER', $account->user);
+	define('JIRA_AUTH', $account->auth);
 
 	$user = User::load();
 	if ( $user->jira_timezone ) {
