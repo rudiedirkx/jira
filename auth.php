@@ -77,4 +77,8 @@ if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
 input:not([type="submit"]):not([type="button"]):not([type="radio"]):not([type="checkbox"]), select { width: 100%; }
 </style>
 
+<p>All sensitive data is stored in a cookie ON YOUR COMPUTER. NOT on this server.</p>
+
 <? include 'tpl.login.php' ?>
+
+<p>In case you understand PHP, <a href="https://github.com/rudiedirkx/Jira">read the code on Github</a>. This service/software comes with NO WARRANTY.</p>
