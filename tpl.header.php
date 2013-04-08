@@ -13,9 +13,9 @@
 <body>
 
 <p class="top-menu">
-	<a href="index.php">&lt; index</a> |
+	<?if (!$index):?><a href="index.php">&lt; index</a> | <?endif?>
 	<a href="auth.php">You (<?= $user->jira_user ?>)</a> |
 	<a href="filters.php">Filters</a> |
-	<a href="accounts.php">Accounts</a> |
-	<a href="logout.php">Log out</a>
+	<a href="accounts.php">Accounts</a>
+	<?if ($index):?> | <a href="logout.php">Log out</a> <?endif?>
 </p>

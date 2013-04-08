@@ -42,3 +42,5 @@ if ( isset($_COOKIE['JIRA_URL'], $_COOKIE['JIRA_AUTH']) && ($accounts = get_acco
 		date_default_timezone_set($user->jira_timezone);
 	}
 }
+
+$index = false;

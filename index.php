@@ -49,6 +49,7 @@ if ( isset($_GET['ajax']) ) {
 	exit;
 }
 
+$index = true;
 include 'tpl.header.php';
 
 include 'tpl.indextabs.php';
