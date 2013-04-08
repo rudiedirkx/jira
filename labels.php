@@ -4,12 +4,24 @@ require 'inc.bootstrap.php';
 
 do_logincheck();
 
-$key = $_GET['key'];
-$id = $_GET['id'];
+$key = &$_GET['key'];
+$id = @$_GET['id'];
 
-$summary = @$_GET['summary'] ?: '?';
+// Fetch labels autocomplete
+if ( isset($_GET['label']) ) {
+	$suggestions = jira_get(JIRA_API_1_PATH . 'labels/' . $id . '/suggest.json', array('query' => $_GET['label']), $error, $info);
+	$labels = array_map(function($label) {
+		return $label->label;
+	}, $suggestions->suggestions);
+	natcasesort($labels);
 
-if ( isset($_POST['labels']) ) {
+	header('Content-type: text/json; charset=utf-8');
+	echo json_encode(compact('labels'));
+	exit;
+}
+
+// Update labels
+else if ( isset($_POST['labels']) ) {
 	$old_labels = (array)@$_GET['labels'];
 	$new_labels = array_filter(explode(' ', $_POST['labels']));
 
@@ -42,27 +54,59 @@ if ( isset($_POST['labels']) ) {
 	exit;
 }
 
-$suggestions = jira_get(JIRA_API_1_PATH . 'labels/' . $id . '/suggest.json', array('query' => ''), $error, $info);
-$labels = (array)@$_GET['labels'];
-foreach ( $suggestions->suggestions AS $label ) {
-	$labels[] = (string)$label->label;
-}
-natcasesort($labels);
+$issue = jira_get('issue/' . $key);
+$id = $issue->id;
 
 include 'tpl.header.php';
 
-echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($summary) . '</h1>';
+echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($issue->fields->summary) . '</h1>';
 
 ?>
 <h2>Labels</h2>
 
 <form method="post">
-	<p><input name="labels" value="<?= implode(' ', (array)@$_GET['labels']) ?>" size="60" /></p>
-	<p><input type="submit" /></p>
+	<p><input id="ls" name="labels" value="<?= implode(' ', $issue->fields->labels) ?>" size="60" /></p>
+	<p>(<a id="fl" href="#">fetch</a>) <input type="submit" /></p>
 </form>
+
+<p>Suggestions: <span id="ss"></span></p>
+
+<script>
+$('#ss').on('click', 'a', function(e) {
+	e.preventDefault();
+	var label = $(this).data('label'),
+		$ls = $('#ls'),
+		curLabels = $ls.val();
+
+	// Append
+	if ( curLabels.match(/ $/) ) {
+		curLabels += label + ' ';
+	}
+	// Replace
+	else {
+		curLabels = curLabels.replace(/ \w+$/, ' ' + label + ' ');
+	}
+
+	$ls.val(curLabels);
+});
+
+$('#fl').on('click', function(e) {
+	e.preventDefault();
+	var labels = $('#ls').val().trim().split(/ /g),
+		label = labels[labels.length-1];
+
+	$.get('?id=<?= $id ?>&label=' + label, function(t) {
+		var html = '';
+		t.labels.forEach(function(label) {
+			html += ' [<a data-label="' + label + '" href="#">' + label + '</a>] ';
+		});
+		$('#ss').html(html);
+	});
+});
+</script>
 <?php
 
-echo '<p>[' . implode('] [', $labels) . ']</p>';
+// echo '<p>[' . implode('] [', $labels) . ']</p>';
 
 // echo '<pre>';
 // print_r($labels);

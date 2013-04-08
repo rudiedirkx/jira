@@ -100,7 +100,7 @@ $actions['Assign'] = $actionPath . 'assign';
 foreach ( $transitions AS $transition ) {
 	$actions[$transition->name] = $actionPath . $transition->id;
 }
-$actions['Labels'] = 'labels.php?key=' . $key . '&id=' . $issue->id . '&summary=' . urlencode($fields->summary) . '&' . http_build_query(array('labels' => $fields->labels));
+$actions['Labels'] = 'labels.php?key=' . $key;
 
 $resolution = '';
 if ( $fields->resolution ) {
