@@ -8,15 +8,15 @@ $accounts = get_accounts();
 
 // Add another account
 if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
-	$url = $_POST['url'];
-	$auth = $_POST['user'] . ':' . $_POST['pass'];
+	$url = trim($_POST['url']);
+	$auth = trim($_POST['user']) . ':' . $_POST['pass'];
 	do_login($url, $auth);
 
 	// Save user to local db for preferences
 	try {
 		$db->insert('users', array(
 			'jira_url' => $url,
-			'jira_user' => $_POST['user'],
+			'jira_user' => trim($_POST['user']),
 		));
 	}
 	catch ( db_exception $ex ) {

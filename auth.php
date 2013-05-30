@@ -33,9 +33,9 @@ if ( defined('JIRA_AUTH') ) {
 // Log in
 if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
 	// Test connection
-	define('JIRA_URL', rtrim($_POST['url'], '/'));
-	define('JIRA_USER', $_POST['user']);
-	define('JIRA_AUTH', $_POST['user'] . ':' . $_POST['pass']);
+	define('JIRA_URL', trim($_POST['url'], ' /'));
+	define('JIRA_USER', trim($_POST['user']));
+	define('JIRA_AUTH', trim($_POST['user']) . ':' . $_POST['pass']);
 	$info = array('unauth_ok' => 1);
 	$account = jira_get('user', array('username' => JIRA_USER), $error, $info);
 
