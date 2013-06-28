@@ -46,10 +46,11 @@ foreach ( $issues->issues AS $issue ) {
 </p>
 
 <script>
-$('#pager').find('a').on('click', function(e) {
+$('pager').getElements('a').on('click', function(e) {
 	e.preventDefault();
-	$.get(this.href + '&ajax=1', function(t) {
-		$('#content').html(t);
+	$.get(this.href + '&ajax=1', function(e) {
+		var t = this.responseText;
+		$('content').html(t);
 	});
 });
 </script>

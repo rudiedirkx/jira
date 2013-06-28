@@ -21,18 +21,17 @@
 </div>
 
 <script>
-var activeTab = '<?= $activeTab ?>', $tabLink;
-var tabLinks = $('.tab-links a').on('click', function(e) {
+var activeTab = '<?= $activeTab ?>', tabLink;
+var tabLinks = $$('.tab-links a').on('click', function(e) {
 	e.preventDefault();
-	var $this = $(this),
-		$links = $this.parent(),
-		$pages = $links.next();
-	$pages.children().addClass('hide').filter($this.attr('href')).removeClass('hide');
-	$links.children().removeClass('active');
-	$this.addClass('active');
+	var links = this.getParent(),
+		pages = links.getNext();
+	pages.getChildren().addClass('hide').filter(this.attr('href')).removeClass('hide');
+	links.getChildren().removeClass('active');
+	this.addClass('active');
 });
-if ( !activeTab || !($tabLink = $('.tab-links a[href="#tab-page-' + activeTab + '"]')).length ) {
-	$tabLink = tabLinks.first();
+if ( !activeTab || !(tabLink = $('.tab-links a[href="#tab-page-' + activeTab + '"]', 1)) ) {
+	tabLink = tabLinks[0];
 }
-$tabLink.trigger('click');
+tabLink.fire('click');
 </script>

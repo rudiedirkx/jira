@@ -72,11 +72,11 @@ echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($issue-
 <p>Suggestions: <span id="ss"></span></p>
 
 <script>
-$('#ss').on('click', 'a', function(e) {
+$('ss').on('click', 'a', function(e) {
 	e.preventDefault();
-	var label = $(this).data('label'),
-		$ls = $('#ls'),
-		curLabels = $ls.val();
+	var label = this.data('label'),
+		ls = $('ls'),
+		curLabels = ls.value;
 
 	// Append
 	if ( curLabels.match(/ $/) ) {
@@ -84,23 +84,23 @@ $('#ss').on('click', 'a', function(e) {
 	}
 	// Replace
 	else {
-		curLabels = curLabels.replace(/ \w+$/, ' ' + label + ' ');
+		curLabels = (' ' + curLabels).replace(/ \w+$/, ' ' + label).trim() + ' ';
 	}
 
-	$ls.val(curLabels);
+	ls.value = curLabels;
 });
 
-$('#fl').on('click', function(e) {
+$('fl').on('click', function(e) {
 	e.preventDefault();
-	var labels = $('#ls').val().trim().split(/ /g),
+	var labels = $('ls').value.trim().split(/ /g),
 		label = labels[labels.length-1];
 
-	$.get('?id=<?= $id ?>&label=' + label, function(t) {
+	$.get('?id=<?= $id ?>&label=' + label, null, {type: 'json'}).on('done', function(e, rsp) {
 		var html = '';
-		t.labels.forEach(function(label) {
+		rsp.labels.forEach(function(label) {
 			html += ' [<a data-label="' + label + '" href="#">' + label + '</a>] ';
 		});
-		$('#ss').html(html);
+		$('ss').setHTML(html);
 	});
 });
 </script>
