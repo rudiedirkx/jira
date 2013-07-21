@@ -44,13 +44,3 @@ foreach ( $issues->issues AS $issue ) {
 	<span><?= $page+1 ?> / <?= ceil($issues->total/$perPage) ?> (<?= $issues->total ?>)</span> |
 	<a href="?<?= html_q(array('page' => $page+1)) ?>">next &gt;</a>
 </p>
-
-<script>
-$('pager').getElements('a').on('click', function(e) {
-	e.preventDefault();
-	$.get(this.href + '&ajax=1', function(e) {
-		var t = this.responseText;
-		$('content').html(t);
-	});
-});
-</script>

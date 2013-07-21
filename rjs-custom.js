@@ -6,6 +6,9 @@
 	var html = D.documentElement,
 		head = html.getElementsByTagName('head')[0];
 
+	JSON.encode = JSON.stringify;
+	JSON.decode = JSON.parse;
+
 	var domReadyAttached = false,
 		domIsReady = false;
 
@@ -35,6 +38,35 @@
 	function $is_a(obj, type) {
 		return window[type] && obj instanceof window[type];
 	}
+
+	function $serialize(o, prefix) {
+		var q = [];
+		$each(o, function(v, k) {
+			var name = prefix ? prefix + '[' + k + ']' : k,
+			v = o[k];
+			if ( typeof v == 'object' ) {
+				q.push($serialize(v, name));
+			}
+			else {
+				q.push(name + '=' + encodeURIComponent(v));
+			}
+		});
+		return q.join('&');
+	}
+
+	function $copy(obj) {
+		return JSON.parse(JSON.stringify(obj));
+	}
+
+	function $merge(base) {
+		for ( var i=1, L=arguments.length; i<L; i++ ) {
+			$each(arguments[i], function(value, name) {
+				base[name] = value;
+			});
+		}
+		return base;
+	}
+
 
 	function $each(source, callback, context) {
 		if ( $arrayish(source) ) {
@@ -82,30 +114,36 @@
 	}
 
 	$extend(Array, {
+		invoke: function(method, args) {
+			var results = [];
+			this.forEach(function(el) {
+				results.push( el[method].apply(el, args) );
+			});
+			return results;
+		},
+
 		contains: function(obj) {
 			return this.indexOf(obj) != -1;
 		},
 
 		unique: function() {
 			var els = [];
-			$each(this, function(el) {
+			this.forEach(function(el) {
 				els.contains(el) || els.push(el);
 			});
 			return els;
 		},
 
-		each: function(callback, context) {
-			return $each(this, callback, context);
-		},
+		each: Array.prototype.forEach,
 
 		first: function() {
-			return this[0] || null;
+			return this[0];
 		},
 		last: function() {
-			return this[this.length-1] || null;
+			return this[this.length-1];
 		}
 	});
-	Array.defaultFilterCallback = function(item, i, list) {
+	Array.defaultFilterCallback = function(item) {
 		return !!item;
 	};
 
@@ -129,7 +167,65 @@
 		join = [].join,
 		pop = [].join;
 
+	typeof Date.now == 'function' || (Date.now = function() {
+		return +new Date;
+	});
 
+	if (!('classList' in html)) {
+		W.DOMTokenList = function DOMTokenList(el) {
+			this._el = el;
+			el.$classList = this;
+			this._reinit();
+		}
+		$extend(W.DOMTokenList, {
+			_reinit: function() {
+				this.length = 0;
+
+				var classes = this._el.className.trim();
+				classes = classes ? classes.split(/\s+/g) : [];
+				for ( var i=0, L=classes.length; i<L; i++ ) {
+					push.call(this, classes[i]);
+				}
+
+				return this;
+			},
+			set: function() {
+				this._el.className = join.call(this, ' ');
+			},
+			add: function(token) {
+				push.call(this, token);
+				this.set();
+			},
+			contains: function(token) {
+				return indexOf.call(this, token) !== -1;
+			},
+			item: function(index) {
+				return this[index] || null;
+			},
+			remove: function(token) {
+				var i = indexOf.call(this, token);
+				if ( i != -1 ) {
+					splice.call(this, i, 1);
+					this.set();
+				}
+			},
+			toggle: function(token) {
+				if ( this.contains(token) ) {
+					return !!this.remove(token);
+				}
+
+				return !this.add(token);
+			}
+		});
+
+		$getter(Element, 'classList', function() {
+			return this.$classList ? this.$classList._reinit() : new W.DOMTokenList(this);
+		});
+	}
+
+	function $loadJS(src) {
+		return document.el('script', {src: src, type: 'text/javascript'}).inject(head);
+	}
 
 	function Elements(source, selector) {
 		this.length = 0;
@@ -219,7 +315,7 @@
 		this.clientX = e.clientX;
 		this.clientY = e.clientY;
 
-		this.touches = e.touches;
+		this.touches = e.touches ? $array(e.touches) : null;
 
 		if ( this.touches && this.touches[0] ) {
 			this.pageX = this.touches[0].pageX;
@@ -233,42 +329,24 @@
 			this.pageXY = new Coords2D(this.clientX, this.clientY).add(W.getScroll());
 		}
 
-		this.data = e.clipboardData;
+		this.data = e.dataTransfer || e.clipboardData;
 		this.time = e.timeStamp || e.timestamp || e.time || Date.now();
 
 		this.total = e.total || e.totalSize;
 		this.loaded = e.loaded || e.position;
 	}
 	$extend(AnyEvent, {
-		summary: function(prefix) {
-			prefix || (prefix = '');
-			var summary = [];
-			$each(this, function(value, name) {
-				var original = value;
-				if ( original && $is_a(original, 'Coords2D') ) {
-					value = original.join();
-				}
-				else if ( original && typeof original == 'object' ) {
-					value = $class(value);
-					if ( original instanceof Event || name == 'touches' || typeof name == 'number' ) {
-						value += ":\n" + AnyEvent.prototype.summary.call(original, prefix + '  ');
-					}
-				}
-				summary.push(prefix + name + ' => ' + value);
-			});
-			return summary.join("\n");
-		},
 
 		preventDefault: function(e) {
 			if ( e = this.originalEvent ) {
-				e.preventDefault && e.preventDefault();
-				e.returnValue = false;
+				e.preventDefault();
+				this.defaultPrevented = true;
 			}
 		},
 		stopPropagation: function(e) {
 			if ( e = this.originalEvent ) {
-				e.stopPropagation && e.stopPropagation();
-				e.cancelBubble = true;
+				e.stopPropagation();
+				this.propagationStopped = true;
 			}
 		},
 
@@ -303,15 +381,6 @@
 			type: 'onmousewheel' in W ? 'mousewheel' : 'mousescroll'
 		},
 
-		directchange: {
-			type: 'keyup',
-			filter: function(e) {
-				var lastValue = this.__lastDCValue == null ? this.defaultValue : this.__lastDCValue,
-					currentValue = this.value;
-				this.__lastDCValue = currentValue;
-				return lastValue == null || lastValue != currentValue;
-			}
-		}
 	};
 
 	'onmouseenter' in html && delete Event.Custom.mouseenter;
@@ -333,33 +402,13 @@
 		this.time = Date.now();
 	}
 	$extend(Eventable, {
-		"$cache": function(name, value, defaultValue) {
-			this.$$cache || (this.$$cache = {});
-			this.$$cache[name] || (this.$$cache[name] = defaultValue || {});
-
-			if ( value != null ) {
-				this.$$cache[name] = value;
-			}
-
-			return this.$$cache[name];
-		},
-
-		_addEventListener: function(eventType, callback) {
-			if ( this.addEventListener ) {
-				this.addEventListener(eventType, callback);
-			}
-			return this;
-		},
-
-		_removeEventListener: function(eventType, callback) {
-			if ( this.removeEventListener ) {
-				this.removeEventListener(eventType, callback);
-			}
-			return this;
-		},
-
 		on: function(eventType, matches, callback) {
 			callback || (callback = matches) && (matches = null);
+
+			var options = {
+				bubbles: !!matches,
+				subject: this
+			};
 
 			var baseType = eventType,
 				customEvent = false;
@@ -371,7 +420,7 @@
 			function onCallback(e, arg2) {
 				e && !(e instanceof AnyEvent) && (e = new AnyEvent(e));
 
-				var subject = this;
+				var subject = options.subject;
 				if ( e && e.target && matches ) {
 					if ( !(subject = e.target.selfOrFirstAncestor(matches)) ) {
 						return;
@@ -389,39 +438,39 @@
 			}
 
 			if ( customEvent && customEvent.before ) {
-				if ( customEvent.before.call(this) === false ) {
-					return;
+				if ( customEvent.before.call(this, options) === false ) {
+					return this;
 				}
 			}
 
-			var events = this.$cache('events');
+			var events = options.subject.$events || (options.subject.$events = {});
 			events[eventType] || (events[eventType] = []);
-			events[eventType].push({type: baseType, original: callback, callback: onCallback});
+			events[eventType].push({type: baseType, original: callback, callback: onCallback, bubbles: options.bubbles});
 
-			return this._addEventListener(baseType, onCallback);
+			options.subject.addEventListener && options.subject.addEventListener(baseType, onCallback, options.bubbles);
+			return this;
 		},
 
 		off: function(eventType, callback) {
-			var events = this.$cache('events');
-			if ( events[eventType] ) {
-				var changed = false;
-				$each(events[eventType], function(listener, i) {
+			if ( this.$events && this.$events[eventType] ) {
+				var events = this.$events[eventType],
+					changed = false;
+				$each(events, function(listener, i) {
 					if ( !callback || callback == listener.original ) {
 						changed = true;
-						delete events[eventType][i];
-						this._removeEventListener(listener.type, listener.callback);
+						delete events[i];
+						this.removeEventListener && this.removeEventListener(listener.type, listener.callback, listener.bubbles);
 					}
 				}, this);
-				changed && (events[eventType] = events[eventType].filter(Array.defaultFilterCallback));
+				changed && (this.$events[eventType] = events.filter(Array.defaultFilterCallback));
 			}
 			return this;
 		},
 
 		fire: function(eventType, e, arg2) {
-			var events = this.$cache('events');
-			if ( events[eventType] ) {
+			if ( this.$events && this.$events[eventType] ) {
 				e || (e = new AnyEvent(eventType));
-				$each(events[eventType], function(listener) {
+				$each(this.$events[eventType], function(listener) {
 					listener.callback.call(this, e, arg2);
 				}, this);
 			}
@@ -442,7 +491,7 @@
 	$extend([W, D, Element, XMLHttpRequest], Eventable.prototype);
 	W.XMLHttpRequestUpload && $extend([XMLHttpRequestUpload], Eventable.prototype);
 
-	$extend([Element, Text], {
+	$extend(Node, {
 		firstAncestor: function(selector) {
 			var el = this;
 			while ( (el = el.parentNode) && el != D ) {
@@ -487,6 +536,10 @@
 				return this.insertBefore(el, next);
 			}
 			return this.appendChild(el);
+		},
+
+		nodeIndex: function() {
+			return indexOf.call(this.parentNode.childNodes, this);
 		}
 	});
 
@@ -498,15 +551,6 @@
 		}
 	});
 
-	Element.attr2method = {
-		html: function(value) {
-			return value == null ? this.getHTML() : this.setHTML(value);
-		},
-
-		text: function(value) {
-			return value == null ? this.getText() : this.setText(value);
-		}
-	};
 
 	var EP = Element.prototype;
 	$extend(Element, {
@@ -514,10 +558,44 @@
 			return $$(selector).contains(this);
 		},
 
+		getValue: function() {
+			if ( !this.disabled ) {
+				if ( this.nodeName == 'SELECT' && this.multiple ) {
+					return [].filter.call(this.options, function(option) {
+						return option.selected;
+					});
+				}
+				else if ( this.type == 'radio' || this.type == 'checkbox' && !this.checked ) {
+					return;
+				}
+				return this.value;
+			}
+		},
+
+		toQueryString: function() {
+			var els = this.getElements('input[name], select[name], textarea[name]'),
+				query = [];
+			els.forEach(function(el) {
+				var value = el.getValue();
+				if ( value instanceof Array ) {
+					value.forEach(function(val) {
+						query.push(el.name + '=' + encodeURIComponent(val));
+					});
+				}
+				else if ( value != null ) {
+					query.push(el.name + '=' + encodeURIComponent(value));
+				}
+			});
+			return query.join('&');
+		},
+
 		selfOrFirstAncestor: function(selector) {
 			return this.is(selector) ? this : this.firstAncestor(selector);
 		},
 
+		contains: Element.prototype.contains || function(child) {
+			return this.getElements('*').contains(child);
+		},
 
 		getChildren: function(selector) {
 			return new Elements(this.children || this.childNodes, selector);
@@ -542,9 +620,6 @@
 			prefix == null && (prefix = '');
 			if ( value === undefined ) {
 				if ( typeof name == 'string' ) {
-					if ( Element.attr2method[prefix + name] ) {
-						return Element.attr2method[prefix + name].call(this, value, prefix);
-					}
 
 					return this.getAttribute(prefix + name);
 				}
@@ -554,9 +629,6 @@
 						this.removeAttribute(prefix + name);
 					}
 					else {
-						if ( Element.attr2method[prefix + name] ) {
-							return Element.attr2method[prefix + name].call(this, value, prefix);
-						}
 
 						this.setAttribute(prefix + name, value);
 					}
@@ -570,9 +642,6 @@
 					value = value.call(this, this.getAttribute(prefix + name));
 				}
 
-				if ( Element.attr2method[prefix + name] ) {
-					return Element.attr2method[prefix + name].call(this, value, prefix);
-				}
 
 				this.setAttribute(prefix + name, value);
 			}
@@ -649,11 +718,6 @@
 			return this;
 		},
 
-		hover: function(matches, over, out) {
-			matches || (out = over) && (over = matches) && (matches = null);
-			return this.on('mouseenter', over).on('mouseleave', out);
-		},
-
 		getStyle: function(property) {
 			return getComputedStyle(this).getPropertyValue(property);
 		},
@@ -701,6 +765,10 @@
 			return this;
 		},
 
+		elementIndex: function() {
+			return this.parentNode.getChildren().indexOf(this);
+		},
+
 		getPosition: function() {
 			var bcr = this.getBoundingClientRect();
 			return new Coords2D(bcr.left, bcr.top).add(W.getScroll());
@@ -733,23 +801,12 @@
 		}
 	};
 
-	function onDomReady() {
-		var rs = D.readyState;
-		if ( !domIsReady && (rs == 'complete' || rs == 'interactive') ) {
-			domIsReady = true;
-			D.fire('ready');
-		}
-	}
-
 	function attachDomReady() {
 		domReadyAttached = true;
 
-		if ( D.addEventListener ) {
-			D.addEventListener('DOMContentLoaded', onDomReady, false);
-		}
-		else if ( D.attachEvent ) {
-			D.attachEvent('onreadystatechange', onDomReady);
-		}
+		D.on('DOMContentLoaded', function(e) {
+			this.fire('ready');
+		});
 	}
 
 	function $(id, selector) {
@@ -774,12 +831,16 @@
 	}
 
 	function XHR(url, options) {
-		options || (options = {});
-		options.method = (options.method ? options.method : 'GET').toUpperCase();
-		options.async != null || (options.async = true);
-		options.send != null || (options.send = true);
-		options.data != null || (options.data = null);
-		options.url = url;
+		options = $merge({}, {
+			method: 'GET',
+			async: true,
+			send: true,
+			data: null,
+			url: url,
+			requester: 'XMLHttpRequest',
+			execScripts: true
+		}, options || {});
+		options.method = options.method.toUpperCase();
 
 		var xhr = new XMLHttpRequest;
 		xhr.open(options.method, options.url, options.async, options.username, options.password);
@@ -787,16 +848,37 @@
 		xhr.on('readystatechange', function(e) {
 			if ( this.readyState == 4 ) {
 				var success = this.status == 200,
-					eventType = success ? 'success' : 'error';
+					eventType = success ? 'success' : 'error',
+					t = this.responseText;
 
 				try {
-					this.responseJSON = JSON.parse(this.responseText);
+					this.responseJSON = (t[0] == '[' || t[0] == '{') && JSON.parse(t);
 				}
 				catch (ex) {}
-				var response = this.responseJSON || this.responseXML || this.responseText;
+				var response = this.responseJSON || this.responseXML || t;
+
+				if ( this.options.execScripts ) {
+					var scripts = [];
+					if ( typeof response == 'string' ) {
+						var regex = /<script[^>]*>([\s\S]*?)<\/script>/i,
+							script;
+						while ( script = response.match(regex) ) {
+							response = response.replace(regex, '');
+							if ( script = script[1].trim() ) {
+								scripts.push(script);
+							}
+						}
+					}
+				}
 
 				this.fire(eventType, e, response);
 				this.fire('done', e, response);
+
+				if ( this.options.execScripts && scripts.length ) {
+					scripts.forEach(function(code) {
+						eval(code);
+					});
+				}
 
 				this.globalFire('xhr', eventType, e, response);
 				this.globalFire('xhr', 'done', e, response);
@@ -809,12 +891,23 @@
 			}
 		}
 		if ( options.send ) {
+			options.requester && xhr.setRequestHeader('X-Requested-With', options.requester);
+
 			xhr.globalFire('xhr', 'start');
 			xhr.fire('start');
-			xhr.send(options.data);
+
+			options.async ? setTimeout(function() { xhr.send(options.data); }, 1) : xhr.send(options.data);
 		}
 		return xhr;
 	}
+
+	Event.Custom.progress = {
+		before: function(options) {
+			if ( this instanceof XMLHttpRequest && this.upload ) {
+				options.subject = this.upload;
+			}
+		}
+	};
 
 	function shortXHR(method) {
 		return function(url, data, options) {
@@ -833,6 +926,9 @@
 	W.$array = $array;
 	W.$class = $class;
 	W.$is_a = $is_a;
+	W.$serialize = $serialize;
+	W.$copy = $copy;
+	W.$merge = $merge;
 	W.$each = $each;
 	W.$extend = $extend;
 	W.$getter = $getter;
@@ -851,6 +947,8 @@
 	W.$.xhr = XHR;
 	W.$.get = shortXHR('get');
 	W.$.post = shortXHR('post');
+
+	W.$.js = $loadJS;
 
 
 })(this, this.document);

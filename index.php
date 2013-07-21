@@ -64,6 +64,29 @@ echo '<div id="content">';
 include 'tpl.issues.php';
 echo '</div>';
 
+?>
+<script>
+bindPagerEventListeners();
+
+function bindPagerEventListeners() {
+	$('pager').getElements('a').on('click', function(e) {
+		e.preventDefault();
+
+		document.body.addClass('loading');
+		$.get(this.href + '&ajax=1').on('done', function(e, t) {
+			var $content = $('content').setHTML(t);
+			bindPagerEventListeners();
+
+			setTimeout(function() {
+				$content.scrollIntoView();
+				document.body.removeClass('loading');
+			}, 100);
+		});
+	});
+}
+</script>
+<?php
+
 // echo implode('<br>', $jira_requests);
 // echo '<pre>';
 // print_r($issues);

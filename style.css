@@ -3,6 +3,17 @@
 	box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 }
+html, body {
+	min-height: 100%;
+	margin: 0;
+	padding: 0;
+}
+html {
+	height: 100%;
+}
+body {
+	border: dotted 10px white;
+}
 input:not([type="submit"]):not([type="button"]):not([type="radio"]):not([type="checkbox"]),
 select,
 textarea {
@@ -129,4 +140,27 @@ td {
 /* pager */
 #pager {
 	text-align: center;
+}
+
+
+
+/* body loading animation */
+body.loading {
+	border-color: #326ca6;
+
+	-webkit-animation-name: loadingborder;
+	-webkit-animation-duration: 1s;
+	-webkit-animation-iteration-count: infinite;
+}
+
+@-webkit-keyframes loadingborder {
+	0% {
+		border-color: #326ca6;
+	}
+	50% {
+		border-color: #fff;
+	}
+	100% {
+		border-color: #326ca6;
+	}
 }
