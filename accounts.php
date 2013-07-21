@@ -58,6 +58,9 @@ else if ( isset($_GET['unlink']) ) {
 	return do_redirect('accounts');
 }
 
+// Reset cookies
+do_login('', '');
+
 include 'tpl.header.php';
 
 ?>

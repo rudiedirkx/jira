@@ -56,9 +56,9 @@ function do_logout( $layered = false ) {
 
 		// Reset URL
 		if ( $accounts && $_COOKIE['JIRA_URL'] != $accounts[0]->url ) {
-			$month = strtotime('+1 month');
+			$expire = strtotime('+6 months');
 			$_COOKIE['JIRA_URL'] = $accounts[0]->url;
-			setcookie('JIRA_URL', $_COOKIE['JIRA_URL'], $month);
+			setcookie('JIRA_URL', $_COOKIE['JIRA_URL'], $expire);
 		}
 	}
 }
@@ -73,11 +73,11 @@ function do_login( $url, $auth, $accounts = null ) {
 	$urls = get_urls($accounts);
 	$auths = array_map('do_encrypt', get_auths($accounts));
 
-	$month = strtotime('+1 month');
+	$expire = strtotime('+6 months');
 	$_COOKIE['JIRA_URL'] = implode(',', $urls);
-	setcookie('JIRA_URL', $_COOKIE['JIRA_URL'], $month);
+	setcookie('JIRA_URL', $_COOKIE['JIRA_URL'], $expire);
 	$_COOKIE['JIRA_AUTH'] = implode(',', $auths);
-	setcookie('JIRA_AUTH', $_COOKIE['JIRA_AUTH'], $month);
+	setcookie('JIRA_AUTH', $_COOKIE['JIRA_AUTH'], $expire);
 }
 
 function do_markup( $text ) {
