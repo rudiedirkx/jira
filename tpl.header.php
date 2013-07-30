@@ -12,10 +12,13 @@
 
 <body>
 
-<p class="top-menu">
-	<?if (!$index):?><a href="index.php">&lt; index</a> | <?endif?>
-	<a href="auth.php">You (<?= $user->jira_user ?>)</a> |
-	<a href="filters.php">Filters</a> |
-	<a href="accounts.php">Accounts</a>
-	<?if ($index):?> | <a href="logout.php">Log out</a> <?endif?>
-</p>
+	<div class="ver-loader"></div>
+	<div class="hor-loader"></div>
+
+	<p class="top-menu">
+		<?if (!$index):?><a href="index.php">&lt; index</a> | <?endif?>
+		<a href="auth.php">You (<?= $user->jira_user ?>)</a> |
+		<a href="filters.php">Filters</a> |
+		<a href="accounts.php">Accounts</a>
+		<?if ($index):?> | <a href="logout.php">Log out</a> <?endif?>
+	</p>
