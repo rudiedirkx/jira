@@ -13,12 +13,12 @@ $filterOptions = $user->filter_query_options;
 
 // GET query
 if ( !empty($_GET['query']) ) {
-	$query = $_GET['query'];
+	$query = trim($_GET['query']);
 	$querySource = isset($filterOptions[$query]) ? 'filter:get' : 'query:get';
 }
 // GET project
 else if ( !empty($_GET['project']) ) {
-	$query = 'project = "' . $_GET['project'] . '" AND ' . $query;
+	$query = 'project = "' . trim($_GET['project']) . '" AND ' . $query;
 	$querySource = 'project:get';
 }
 // User's query

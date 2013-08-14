@@ -96,7 +96,7 @@ usort($attachments, function($a, $b) {
 
 include 'tpl.header.php';
 
-$actionPath = 'transition.php?key=' . $key . '&assignee=' . urlencode($fields->assignee->name) . '&summary=' . urlencode($fields->summary) . '&transition=';
+$actionPath = 'transition.php?key=' . $key . '&assignee=' . urlencode(@$fields->assignee->name) . '&summary=' . urlencode($fields->summary) . '&transition=';
 
 $actions = array();
 $actions['Edit'] = 'issue.php?key=' . $key . '&edit';
@@ -123,7 +123,7 @@ echo '	[<img class="icon issuetype" src="' . html($fields->issuetype->iconUrl) .
 echo '	by ' . html($fields->reporter->displayName) . ' ';
 echo '	on ' . date(FORMAT_DATETIME, strtotime($fields->created)) . ' | ';
 echo '	<strong>' . html($fields->status->name) . $resolution . '</strong> | ';
-echo '	Assignee: ' . html($fields->assignee->displayName) . ' | ';
+echo '	Assignee: ' . ( html(@$fields->assignee->displayName) ?: '<em>None</em>' ) . ' | ';
 if ( $fields->labels ) {
 	echo '	Labels: <span class="label">' . implode('</span> <span class="label">', array_map('html', $fields->labels)) . '</span> | ';
 }
