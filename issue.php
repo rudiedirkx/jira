@@ -82,15 +82,19 @@ else if ( isset($_GET['transitions']) ) {
 }
 
 $issue = jira_get('issue/' . $key, array('expand' => 'transitions,renderedFields'));
+// print_r($issue);
 $fields = $issue->fields;
 $transitions = $issue->transitions;
-
-include 'tpl.header.php';
-
+$subtasks = !empty($fields->subtasks) ? $fields->subtasks : array();
+$parent = @$fields->parent;
 $attachments = $fields->attachment;
+$comments = $fields->comment->comments;
+
 usort($attachments, function($a, $b) {
 	return strtotime($a->created) - strtotime($b->created);
 });
+
+include 'tpl.header.php';
 
 $actionPath = 'transition.php?key=' . $key . '&assignee=' . urlencode($fields->assignee->name) . '&summary=' . urlencode($fields->summary) . '&transition=';
 
@@ -107,7 +111,11 @@ if ( $fields->resolution ) {
 	$resolution = ': ' . html($fields->resolution->name);
 }
 
-echo '<h1><a href="issue.php?key=' . $issue->key . '">' . $issue->key . '</a> ' . html($fields->summary) . '</h1>';
+$h1Class = $parent ? ' class="with-parent-issue"' : '';
+if ( $parent ) {
+	echo '<p class="parent-issue">&gt; <a href="issue.php?key=' . $parent->key . '">' . $parent->key . '</a> ' . html($parent->fields->summary) . '</p>';
+}
+echo '<h1' . $h1Class . '><a href="issue.php?key=' . $issue->key . '">' . $issue->key . '</a> ' . html($fields->summary) . '</h1>';
 echo '<p class="menu">' . html_links($actions) . '</p>';
 
 echo '<p class="meta">';
@@ -167,7 +175,16 @@ if ( isset($_GET['edit']) ) {
 	exit;
 }
 
-echo '<div class="issue-description markup">' . $issue->renderedFields->description . '</div>';
+echo '<div class="issue-description markup">' . ( trim($issue->renderedFields->description) ?: '<em>No description</em>' ) . '</div>';
+
+if ( $subtasks ) {
+	echo '<h2>' . count($subtasks) . ' sub tasks</h2>';
+	echo '<ol>';
+	foreach ( $subtasks as $task ) {
+		echo '<li><a href="issue.php?key=' . $task->key . '">' . $task->key . '</a> <img src="' . $task->fields->status->iconUrl . '" alt="' . html($task->fields->status->name) . '" /> ' . html($task->fields->summary) . '</li>';
+	}
+	echo '</ol>';
+}
 
 if ( $attachments ) {
 	echo '<h2>' . count($attachments) . ' attachments</h2>';
@@ -186,17 +203,17 @@ if ( $attachments ) {
 	echo '</div>';
 }
 
-$comments = $fields->comment->comments;
 echo '<h2>' . count($comments) . ' comments</h2>';
 echo '<div class="comments">';
 foreach ( $comments AS $i => $comment ) {
 	$created = strtotime($comment->created);
 	echo '<div id="comment-' . $comment->id . '">';
 	echo '<p class="meta">';
-	echo '[' . date(FORMAT_DATETIME, $created) . '] ';
-	echo 'by ' . html($comment->author->displayName) . ' ';
-	echo '[ <a href="comment.php?key=' . $key . '&id=' . $comment->id . '&summary=' . urlencode($fields->summary) . '">e</a> | ';
-	echo '<a href="comment.php?key=' . $key . '&id=' . $comment->id . '&summary=' . urlencode($fields->summary) . '&delete=1">x</a> ]</p>';
+	echo '  [' . date(FORMAT_DATETIME, $created) . ']';
+	echo '  by <strong>' . html($comment->author->displayName) . '</strong>';
+	echo '  [ <a href="comment.php?key=' . $key . '&id=' . $comment->id . '&summary=' . urlencode($fields->summary) . '">e</a> |';
+	echo '  <a href="comment.php?key=' . $key . '&id=' . $comment->id . '&summary=' . urlencode($fields->summary) . '&delete=1">x</a> ]';
+	echo '</p>';
 	echo '<div class="comment-body markup">' . $issue->renderedFields->comment->comments[$i]->body . '</div>';
 	echo '</div>';
 	echo '<hr>';

@@ -13,6 +13,7 @@ html {
 }
 body {
 	padding: 10px;
+	line-height: 1.4;
 }
 input:not([type="submit"]):not([type="button"]):not([type="radio"]):not([type="checkbox"]),
 select,
@@ -25,6 +26,12 @@ textarea {
 .filter input:not([type="submit"]):not([type="button"]):not([type="radio"]):not([type="checkbox"]),
 .filter select {
 	background: #fff;
+}
+h1, h2 {
+	line-height: 1.1;
+}
+h1, h2, p {
+	margin: 12px 0;
 }
 a,
 h1, h1 a,
@@ -41,6 +48,9 @@ blockquote {
 }
 textarea {
 	resize: vertical;
+}
+ul, ol {
+	padding-left: 29px;
 }
 
 
@@ -66,6 +76,13 @@ a.active {
 
 
 /* issue details */
+h1.with-parent-issue {
+	margin-top: 0;
+}
+.parent-issue {
+	color: #326ca6;
+	margin-bottom: 0;
+}
 .short-meta {
 	text-align: center;
 }
