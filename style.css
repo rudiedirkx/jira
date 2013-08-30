@@ -114,6 +114,7 @@ h1.with-parent-issue {
 .markup {
 	background: #e0f0ff;
 	padding: 10px;
+	word-wrap: break-word;
 }
 
 
