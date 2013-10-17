@@ -175,7 +175,7 @@ if ( isset($_GET['edit']) ) {
 	exit;
 }
 
-echo '<div class="issue-description markup">' . ( trim($issue->renderedFields->description) ?: '<em>No description</em>' ) . '</div>';
+echo '<div class="issue-description markup">' . ( do_remarkup($issue->renderedFields->description) ?: '<em>No description</em>' ) . '</div>';
 
 if ( $subtasks ) {
 	echo '<h2>' . count($subtasks) . ' sub tasks</h2>';
@@ -214,7 +214,7 @@ foreach ( $comments AS $i => $comment ) {
 	echo '  [ <a href="comment.php?key=' . $key . '&id=' . $comment->id . '&summary=' . urlencode($fields->summary) . '">e</a> |';
 	echo '  <a href="comment.php?key=' . $key . '&id=' . $comment->id . '&summary=' . urlencode($fields->summary) . '&delete=1">x</a> ]';
 	echo '</p>';
-	echo '<div class="comment-body markup">' . $issue->renderedFields->comment->comments[$i]->body . '</div>';
+	echo '<div class="comment-body markup">' . do_remarkup($issue->renderedFields->comment->comments[$i]->body) . '</div>';
 	echo '</div>';
 	echo '<hr>';
 }
