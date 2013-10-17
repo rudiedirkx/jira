@@ -20,7 +20,7 @@ class User extends db_generic_record {
 // echo "get filters\n";
 		global $db;
 
-		$filters = $db->select('filters', array('user_id' => $this->id))->all();
+		$filters = $db->select('filters', 'user_id = ? ORDER BY name ASC', array($this->id))->all();
 		if ( !$filters ) {
 // echo "live fetch filters\n";
 			$filters = jira_get('filter/favourite', null, $error, $info);
