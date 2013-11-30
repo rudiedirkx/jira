@@ -13,12 +13,29 @@ if ( isset($_POST['index_filter'], $_POST['index_query'], $_POST['index_project'
 	return do_redirect('index');
 }
 
-else if ( !empty($_POST['new_name']) && !empty($_POST['new_jql']) ) {
-	$response = jira_post('filter', array(
-		'name' => trim($_POST['new_name']),
-		'jql' => trim($_POST['new_jql']),
-		'favourite' => 1,
-	), $error, $info);
+else if ( isset($_POST['id'], $_POST['name'], $_POST['jql']) ) {
+	$id = $_POST['id'];
+	$name = $_POST['name'];
+	$jql = $_POST['jql'];
+
+	if ( !$jql || ( !$id && !$name ) ) {
+		exit('Missing input');
+	}
+
+	// Update
+	if ( $id ) {
+		$response = jira_put('filter/' . $id, array(
+			'jql' => trim($jql),
+		), $error, $info);
+	}
+	// Insert
+	else {
+		$response = jira_post('filter', array(
+			'name' => trim($name),
+			'jql' => trim($jql),
+			'favourite' => 1,
+		), $error, $info);
+	}
 
 	if ( !$error ) {
 		return do_redirect('filters');
@@ -51,19 +68,32 @@ echo '<h1>Your filters</h1>';
 	<p><input type="submit" /></p>
 </form>
 
-<h2>Create filter</h2>
+<h2>Add / edit filter</h2>
 
 <form action method="post">
-	<p>Name: <input name="new_name" /></p>
-	<p>Query: <input name="new_jql" /></p>
+	<p>Filter: <select name="id"><option>-- NEW<?= html_options($user->filter_options) ?></select></p>
+	<p>Name: <input name="name" /></p>
+	<p>Query: <input name="jql" /></p>
 
 	<p><input type="submit" /></p>
 </form>
+
+<script>
+(function() {
+	var filters = <?= json_encode($user->filter_options_jql) ?>,
+		$select = $('select[name="id"]', 1),
+		$textfield = $('input[name="jql"]', 1);
+	$select.on('change', function(e) {
+		$textfield.value = filters[this.value] || '';
+	});
+})();
+</script>
 <?php
 
 echo '<pre>';
 print_r($user->filters);
 print_r($user->filter_options);
+print_r($user->filter_options_jql);
 print_r($user->filter_query_options);
 echo '</pre>';
 

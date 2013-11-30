@@ -49,6 +49,10 @@ class User extends db_generic_record {
 		return $filterOptions;
 	}
 
+	function get_filter_options_jql() {
+		return $this->get_filter_options('filter_id', 'jql');
+	}
+
 	function get_filter_query_options() {
 		return $this->get_filter_options('jql');
 	}
