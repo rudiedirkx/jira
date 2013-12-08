@@ -57,6 +57,13 @@ else if ( !empty($_POST['comment']) ) {
 	exit;
 }
 
+else if ( isset($_GET['delete_attachment']) ) {
+	$id = $_GET['delete_attachment'];
+	$response = jira_delete('attachment/' . $id, null, $error, $info);
+
+	return do_redirect('issue', compact('key'));
+}
+
 else if ( isset($_GET['watch']) ) {
 	$method = !empty($_GET['watch']) ? 'jira_post' : 'jira_delete';
 	$data = !empty($_GET['watch']) ? JIRA_USER : array('username' => JIRA_USER);
@@ -106,8 +113,8 @@ foreach ( $transitions AS $transition ) {
 	$actions[$transition->name] = $actionPath . $transition->id;
 }
 $actions['Labels'] = 'labels.php?key=' . $key;
-
 $actions['Log work'] = 'logwork.php?key=' . $key . '&summary=' . urlencode($fields->summary);
+$actions['Upload'] = 'upload.php?key=' . $key . '&summary=' . urlencode($fields->summary);
 
 $resolution = '';
 if ( $fields->resolution ) {
@@ -200,6 +207,7 @@ if ( $attachments ) {
 		echo '<td><a target="_blank" href="' . html($attachment->content) . '">' . html($attachment->filename) . '</a></td>';
 		echo '<td>' . date(FORMAT_DATETIME, $created) . '</td>';
 		echo '<td>' . html($attachment->author->displayName) . '</td>';
+		echo '<td><a data-confirm="You sure? Gone is really, really gone. We can\'t restore attachments." href="?key=' . $key . '&delete_attachment=' . $attachment->id . '">x</a></td>';
 		echo '</tr>';
 	}
 	echo '</table>';

@@ -195,6 +195,19 @@ function jira_post( $resource, $data, &$error = null, &$info = null ) {
 	return $response;
 }
 
+function jira_upload( $resource, $data, &$error = null, &$info = null ) {
+	$url = jira_url($resource);
+
+	$ch = jira_curl($url, 'POST');
+	curl_setopt($ch, CURLOPT_POST, true);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-Atlassian-Token: nocheck', 'User-agent: Jira Mobile'));
+
+	$response = jira_response($ch, $error, $info);
+	$info['request'] = $data;
+	return $response;
+}
+
 function jira_get( $resource, $query = null, &$error = null, &$info = null ) {
 	$url = jira_url($resource, $query);
 
@@ -254,14 +267,12 @@ function jira_response( $ch, &$error = null, &$info = null ) {
 	$code = $info['http_code'];
 	$success = $code >= 200 && $code < 300;
 	$invalid_url = $code == 404 && is_int(strpos($info['content_type'], 'text/html'));
-	$unauth = $code == 401 || $code == 403 || $invalid_url;
+	$unauth = $code == 401 || $code == 403 /*|| $invalid_url*/;
 
 	if ( $unauth && empty($params['unauth_ok']) ) {
 		global $db;
 		$db->delete('users', array('jira_url' => JIRA_URL, 'jira_user' => JIRA_USER));
 		do_logout(true);
-// print_r($_COOKIE);
-// exit;
 		return do_redirect('accounts');
 	}
 
