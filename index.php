@@ -11,8 +11,13 @@ $query = 'status != Closed ORDER BY priority DESC, created DESC';
 $querySource = '';
 $filterOptions = $user->filter_query_options;
 
+// GET search
+if ( !empty($_GET['search']) ) {
+	$query = "text ~ '" . addslashes($_GET['search']) . "' ORDER BY updated DESC";
+	$querySource = 'search';
+}
 // GET query
-if ( !empty($_GET['query']) ) {
+else if ( !empty($_GET['query']) ) {
 	$query = trim($_GET['query']);
 	$querySource = isset($filterOptions[$query]) ? 'filter:get' : 'query:get';
 }
