@@ -88,6 +88,7 @@ $transitions = $issue->transitions;
 $subtasks = !empty($fields->subtasks) ? $fields->subtasks : array();
 $parent = @$fields->parent;
 $attachments = $fields->attachment;
+$worklogs = $fields->worklog->worklogs;
 $comments = $fields->comment->comments;
 
 usort($attachments, function($a, $b) {
@@ -197,6 +198,24 @@ if ( $attachments ) {
 		echo '<td><a target="_blank" href="' . html($attachment->content) . '">' . html($attachment->filename) . '</a></td>';
 		echo '<td>' . date(FORMAT_DATETIME, $created) . '</td>';
 		echo '<td>' . html($attachment->author->displayName) . '</td>';
+		echo '</tr>';
+	}
+	echo '</table>';
+	echo '</div>';
+}
+
+if ( $worklogs ) {
+	echo '<h2 class="pre-menu">' . count($worklogs) . ' worklogs</h2>';
+	echo '<div class="table worklogs">';
+	echo '<table border="1">';
+	foreach ( $worklogs AS $worklog ) {
+		$started = strtotime($worklog->started);
+
+		echo '<tr>';
+		echo '<td>' . date(FORMAT_DATE, $started) . '</td>';
+		echo '<td>' . $worklog->timeSpent . '</td>';
+		echo '<td>' . html($worklog->author->displayName) . '</td>';
+		echo '<td>' . html(@$worklog->comment ?: '') . '</td>';
 		echo '</tr>';
 	}
 	echo '</table>';
