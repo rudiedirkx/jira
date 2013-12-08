@@ -107,6 +107,8 @@ foreach ( $transitions AS $transition ) {
 }
 $actions['Labels'] = 'labels.php?key=' . $key;
 
+$actions['Log work'] = 'logwork.php?key=' . $key . '&summary=' . urlencode($fields->summary);
+
 $resolution = '';
 if ( $fields->resolution ) {
 	$resolution = ': ' . html($fields->resolution->name);
@@ -205,7 +207,7 @@ if ( $attachments ) {
 }
 
 if ( $worklogs ) {
-	echo '<h2 class="pre-menu">' . count($worklogs) . ' worklogs</h2>';
+	echo '<h2 class="pre-menu">' . count($worklogs) . ' worklogs</h2> (<a href="' . $actions['Log work'] . '">add</a>)';
 	echo '<div class="table worklogs">';
 	echo '<table border="1">';
 	foreach ( $worklogs AS $worklog ) {
