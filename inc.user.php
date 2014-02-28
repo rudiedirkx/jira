@@ -8,12 +8,35 @@ class User extends db_generic_record {
 		}
 	}
 
+	function get_custom_fields() {
+		$fields = jira_get('field');
+		return array_values(array_filter($fields, function($f) {
+			return @$f->custom;
+		}));
+	}
+
+	function get_custom_field_ids() {
+		if ( !$this->cache__custom_field_ids ) {
+			$fields = array();
+			foreach ($this->custom_fields as $field) {
+				$fields[mb_strtolower($field->name)] = $field->id;
+			}
+			$this->cache__custom_field_ids = serialize($fields);
+			$this->save(array('cache__custom_field_ids' => $this->cache__custom_field_ids));
+		}
+
+		return unserialize($this->cache__custom_field_ids);
+	}
+
 	function unsync() {
 // echo "unsync & uncache\n";
 		global $db;
 
 		$db->delete('filters', array('user_id' => $this->id));
 		unset($this->filters, $this->filter_query_options);
+
+		$this->save(array('cache__custom_field_ids' => $this->cache__custom_field_ids = ''));
+		unset($this->filters, $this->filter_query_options, $this->custom_fields, $this->custom_field_ids);
 	}
 
 	function get_filters() {

@@ -98,6 +98,8 @@ $attachments = $fields->attachment;
 $worklogs = $fields->worklog->worklogs;
 $comments = $fields->comment->comments;
 
+$fieldsmeta = $user->custom_field_ids;
+
 usort($attachments, function($a, $b) {
 	return strtotime($a->created) - strtotime($b->created);
 });
@@ -125,7 +127,8 @@ $h1Class = $parent ? ' class="with-parent-issue"' : '';
 if ( $parent ) {
 	echo '<p class="parent-issue">&gt; <a href="issue.php?key=' . $parent->key . '">' . $parent->key . '</a> ' . html($parent->fields->summary) . '</p>';
 }
-echo '<h1' . $h1Class . '><a href="issue.php?key=' . $issue->key . '">' . $issue->key . '</a> ' . html($fields->summary) . '</h1>';
+$storypoints = @$fieldsmeta['story points'] && @$fields->{$fieldsmeta['story points']} ? ' (' . @$fields->{$fieldsmeta['story points']} . ' pt)' : '';
+echo '<h1' . $h1Class . '><a href="issue.php?key=' . $issue->key . '">' . $issue->key . '</a> ' . html($fields->summary) . $storypoints . '</h1>';
 echo '<p class="menu">' . html_links($actions) . '</p>';
 
 echo '<p class="meta">';

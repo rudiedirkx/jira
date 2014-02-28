@@ -7,25 +7,23 @@ if ( defined('JIRA_AUTH') ) {
 	include 'tpl.header.php';
 
 	echo '<p>You are:</p>';
+	echo '<pre>';
 
 	// $account = jira_get('user', array('username' => JIRA_USER), $error, $info);
-	// echo '<pre>';
 	// print_r($account);
-	// echo '</pre>';
 
 	$session = jira_get(JIRA_AUTH_PATH . 'session', null, $error, $info);
-	echo '<pre>';
 	print_r($session);
-	echo '</pre>';
 
 	$account = jira_get($session->self, null, $error, $info);
-	echo '<pre>';
 	print_r($account);
-	echo '</pre>';
+
+	print_r($user);
 
 	// Update timezone from Jira
-	$db->update('users', array('jira_timezone' => $account->timeZone), array('id' => $user->id));
+	$user->save(array('jira_timezone' => $account->timeZone));
 
+	echo '</pre>';
 	include 'tpl.footer.php';
 	exit;
 }

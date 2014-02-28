@@ -1,5 +1,7 @@
 <?php
 
+$fieldsmeta = $user->custom_field_ids;
+
 echo '<div class="menu">';
 echo '	<h2 class="pre-menu">Showing ' . count($issues->issues) . ' of ' . $issues->total . '</h2>';
 echo '	(<a href="new.php">create</a>)';
@@ -20,7 +22,9 @@ foreach ( $issues->issues AS $issue ) {
 	$created = strtotime($fields->created);
 	$updated = strtotime($fields->updated);
 
-	echo '<h2><a href="issue.php?key=' . $issue->key . '">' . $issue->key . ' ' . html($fields->summary) . '</a></h2>';
+	$storypoints = @$fieldsmeta['story points'] && @$fields->{$fieldsmeta['story points']} ? ' (' . @$fields->{$fieldsmeta['story points']} . ' pt)' : '';
+
+	echo '<h2><a href="issue.php?key=' . $issue->key . '">' . $issue->key . ' ' . html($fields->summary) . '</a>' . $storypoints . '</h2>';
 	echo '<p class="short-meta">';
 	echo '	<span class="left"><img class="icon issuetype" src="' . html($fields->issuetype->iconUrl) . '" alt="' . html($fields->issuetype->name) . '" /> ' . html($fields->issuetype->name) . '</span>';
 	echo '	<span class="center">' . ( $fields->priority ? '<img class="icon priority" src="' . html($fields->priority->iconUrl) . '" alt="' . html($fields->priority->name) . '" /> ' . html($fields->priority->name) : '&nbsp;' ) . '</span>';
