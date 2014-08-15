@@ -131,6 +131,7 @@ foreach ( $transitions AS $transition ) {
 $actions['Labels'] = 'labels.php?key=' . $key;
 $actions['Log work'] = 'logwork.php?key=' . $key . '&summary=' . urlencode($fields->summary);
 $actions['Upload'] = 'upload.php?key=' . $key . '&summary=' . urlencode($fields->summary);
+$actions['➔ View in Jira'] = JIRA_URL . '/browse/' . $key;
 
 $resolution = '';
 if ( $fields->resolution ) {
@@ -279,7 +280,6 @@ echo '<p><input type="submit" /></p>';
 echo '</form>';
 echo '</div>';
 
-// echo '<pre>';
-// print_r($issue);
+// echo '<pre>' . print_r($issue, 1) . '</pre>';
 
 include 'tpl.footer.php';
