@@ -71,6 +71,13 @@ else if ( isset($_GET['delete_worklog']) ) {
 	return do_redirect('issue', compact('key'));
 }
 
+else if ( isset($_GET['delete_comment']) ) {
+	$id = $_GET['delete_comment'];
+	$response = jira_delete('issue/' . $key . '/comment/' . $id, null, $error, $info);
+
+	return do_redirect('issue', compact('key'));
+}
+
 else if ( isset($_GET['watch']) ) {
 	$method = !empty($_GET['watch']) ? 'jira_post' : 'jira_delete';
 	$data = !empty($_GET['watch']) ? JIRA_USER : array('username' => JIRA_USER);
@@ -238,7 +245,7 @@ if ( $worklogs ) {
 		echo '<td>' . html(@$worklog->comment ?: '') . '</td>';
 		echo '<td>';
 		echo '  <a href="logwork.php?key=' . $key . '&summary=' . urlencode($fields->summary) . '&id=' . $worklog->id . '">e</a> |';
-		echo '  <a data-confirm="Delete this worklog forever and ever?" href="?key=' . $key . '&delete_worklog=' . $worklog->id . '">x</a>';
+		echo '  <a data-confirm="DELETE this WORKLOG forever and ever?" href="?key=' . $key . '&delete_worklog=' . $worklog->id . '">x</a>';
 		echo '</td>';
 		echo '</tr>';
 	}
@@ -256,7 +263,7 @@ foreach ( $comments AS $i => $comment ) {
 	echo '  [' . date(FORMAT_DATETIME, $created) . ']';
 	echo '  by <strong>' . html($comment->author->displayName) . '</strong>';
 	echo '  [ <a href="comment.php?key=' . $key . '&id=' . $comment->id . '&summary=' . urlencode($fields->summary) . '">e</a> |';
-	echo '  <a href="comment.php?key=' . $key . '&id=' . $comment->id . '&summary=' . urlencode($fields->summary) . '&delete=1">x</a> ]';
+	echo '  <a data-confirm="DELETE this COMMENT for ever and ever?" href="?key=' . $key . '&delete_comment=' . $comment->id . '">x</a> ]';
 	echo '</p>';
 	echo '<div class="comment-body markup">' . do_remarkup($issue->renderedFields->comment->comments[$i]->body) . '</div>';
 	echo '</div>';

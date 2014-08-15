@@ -26,38 +26,13 @@ if ( isset($_POST['comment']) ) {
 	exit;
 }
 
-else if ( isset($_GET['delete'], $_POST['confirm']) ) {
-	$response = jira_delete('issue/' . $key . '/comment/' . $id, null, $error, $info);
-
-	if ( !$error ) {
-		return do_redirect('issue', array('key' => $key));
-	}
-
-	echo '<pre>';
-	var_dump($error);
-	print_r($response);
-	print_r($info);
-
-	exit;
-}
-
 include 'tpl.header.php';
+
+$comment = jira_get('issue/' . $key . '/comment/' . $id, null, $error, $info);
 
 echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($summary) . '</h1>';
 
 echo '<h2>Comment # ' . $id . '</h2>';
-
-if ( isset($_GET['delete']) ) {
-	echo '<p>You SURE you wanna DELETE this comment?</p>';
-	echo '<form method="post"><p>';
-	echo '<input type="hidden" name="confirm" value="1" />';
-	echo '<input type="submit" value="YES, delete it" /> ';
-	echo '<a href="javascript:history.go(-1);void(0);">Nooooo</a>';
-	echo '</p></form>';
-	exit;
-}
-
-$comment = jira_get('issue/' . $key . '/comment/' . $id, null, $error, $info);
 
 ?>
 
@@ -65,7 +40,8 @@ $comment = jira_get('issue/' . $key . '/comment/' . $id, null, $error, $info);
 	<p><textarea name="comment" rows="8"><?= html($comment->body) ?></textarea></p>
 	<p>
 		<input type="submit" />
-		<a href="comment.php?key=<?= $key ?>&id=<?= $id ?>&delete=1">delete</a>
+		or
+		<a data-confirm="DELETE this COMMENT for ever and ever?" href="issue.php?key=<?= $key ?>&delete_comment=<?= $id ?>">delete</a>
 	</p>
 </form>
 <?php
