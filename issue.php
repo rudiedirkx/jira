@@ -64,6 +64,13 @@ else if ( isset($_GET['delete_attachment']) ) {
 	return do_redirect('issue', compact('key'));
 }
 
+else if ( isset($_GET['delete_worklog']) ) {
+	$id = $_GET['delete_worklog'];
+	$response = jira_delete('issue/' . $key . '/worklog/' . $id, null, $error, $info);
+
+	return do_redirect('issue', compact('key'));
+}
+
 else if ( isset($_GET['watch']) ) {
 	$method = !empty($_GET['watch']) ? 'jira_post' : 'jira_delete';
 	$data = !empty($_GET['watch']) ? JIRA_USER : array('username' => JIRA_USER);
@@ -225,13 +232,18 @@ if ( $worklogs ) {
 		$started = strtotime($worklog->started);
 
 		echo '<tr>';
-		echo '<td>' . date(FORMAT_DATE, $started) . '</td>';
+		echo '<td>' . date(FORMAT_DATETIME, $started) . '</td>';
 		echo '<td>' . $worklog->timeSpent . '</td>';
 		echo '<td>' . html($worklog->author->displayName) . '</td>';
 		echo '<td>' . html(@$worklog->comment ?: '') . '</td>';
+		echo '<td>';
+		echo '  <a href="logwork.php?key=' . $key . '&summary=' . urlencode($fields->summary) . '&id=' . $worklog->id . '">e</a> |';
+		echo '  <a data-confirm="Delete this worklog forever and ever?" href="?key=' . $key . '&delete_worklog=' . $worklog->id . '">x</a>';
+		echo '</td>';
 		echo '</tr>';
 	}
 	echo '</table>';
+	// echo '<pre>' . print_r($worklogs, 1) . '</pre>';
 	echo '</div>';
 }
 
