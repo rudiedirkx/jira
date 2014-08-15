@@ -215,7 +215,7 @@ if ( $subtasks ) {
 }
 
 if ( $attachments ) {
-	echo '<h2>' . count($attachments) . ' attachments</h2>';
+	echo '<h2 class="pre-menu">' . count($attachments) . ' attachments</h2> (<a href="' . $actions['Upload'] . '">add</a>)';
 	echo '<div class="table attachments">';
 	echo '<table border="1">';
 	foreach ( $attachments AS $attachment ) {
