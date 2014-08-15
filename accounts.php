@@ -8,7 +8,7 @@ $accounts = get_accounts();
 
 // Add another account
 if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
-	$url = trim($_POST['url']);
+	$url = trim($_POST['url'], ' /');
 	$auth = trim($_POST['user']) . ':' . $_POST['pass'];
 	do_login($url, $auth);
 

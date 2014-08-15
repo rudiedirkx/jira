@@ -46,8 +46,21 @@ class User extends db_generic_record {
 		$filters = $db->select('filters', 'user_id = ? ORDER BY name ASC', array($this->id))->all();
 		if ( !$filters ) {
 // echo "live fetch filters\n";
-			$filters = jira_get('filter/favourite', null, $error, $info);
-			foreach ( $filters AS $filter ) {
+			$jira_filters = jira_get('filter/favourite', null, $error, $info);
+
+			// Error, no need to prettify
+			if ( $error ) {
+				var_dump($error, $info);
+				exit;
+			}
+
+			// No error, but no filters, so return early
+			if ( !$jira_filters ) {
+				return array();
+			}
+
+			// Save filters in local db
+			foreach ( $jira_filters AS $filter ) {
 				$db->insert('filters', array(
 					'user_id' => $this->id,
 					'filter_id' => $filter->id,
@@ -56,6 +69,7 @@ class User extends db_generic_record {
 				));
 			}
 
+			// Re-fetch local filters and save into ->filters via __get magic
 			unset($this->filters);
 			$filters = $this->get_filters();
 		}

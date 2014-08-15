@@ -182,6 +182,8 @@ function jira_curl( $url, $method = '' ) {
 }
 
 function jira_post( $resource, $data, &$error = null, &$info = null ) {
+	$_start = microtime(1);
+
 	$url = jira_url($resource);
 	$body = json_encode($data);
 
@@ -192,10 +194,16 @@ function jira_post( $resource, $data, &$error = null, &$info = null ) {
 
 	$response = jira_response($ch, $error, $info);
 	$info['request'] = $body;
+
+	$_time = microtime(1) - $_start;
+	jira_log('POST', $resource, $_time, $info);
+
 	return $response;
 }
 
 function jira_upload( $resource, $data, &$error = null, &$info = null ) {
+	$_start = microtime(1);
+
 	$url = jira_url($resource);
 
 	$ch = jira_curl($url, 'POST');
@@ -205,19 +213,32 @@ function jira_upload( $resource, $data, &$error = null, &$info = null ) {
 
 	$response = jira_response($ch, $error, $info);
 	$info['request'] = $data;
+
+	$_time = microtime(1) - $_start;
+	jira_log('POST', $resource, $_time, $info);
+
 	return $response;
 }
 
 function jira_get( $resource, $query = null, &$error = null, &$info = null ) {
+	$_start = microtime(1);
+
 	$url = jira_url($resource, $query);
 
 	$ch = jira_curl($url, 'GET');
 	curl_setopt($ch, CURLOPT_HTTPHEADER, array('User-agent: Jira Mobile'));
 
-	return jira_response($ch, $error, $info);
+	$response = jira_response($ch, $error, $info);
+
+	$_time = microtime(1) - $_start;
+	jira_log('GET', $resource, $_time, $info);
+
+	return $response;
 }
 
 function jira_put( $resource, $data, &$error = null, &$info = null ) {
+	$_start = microtime(1);
+
 	$url = jira_url($resource);
 	$body = json_encode($data);
 
@@ -234,17 +255,28 @@ function jira_put( $resource, $data, &$error = null, &$info = null ) {
 
 	$response = jira_response($ch, $error, $info);
 	$info['request'] = $body;
+
+	$_time = microtime(1) - $_start;
+	jira_log('GET', $resource, $_time, $info);
+
 	return $response;
 }
 
 function jira_delete( $resource, $query = null, &$error = null, &$info = null ) {
+	$_start = microtime(1);
+
 	$url = jira_url($resource, $query);
 
 	$ch = jira_curl($url, 'DELETE');
 	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
 	curl_setopt($ch, CURLOPT_HTTPHEADER, array('User-agent: Jira Mobile'));
 
-	return jira_response($ch, $error, $info);
+	$response = jira_response($ch, $error, $info);
+
+	$_time = microtime(1) - $_start;
+	jira_log('GET', $resource, $_time, $info);
+
+	return $response;
 }
 
 function jira_response( $ch, &$error = null, &$info = null ) {
@@ -284,7 +316,7 @@ function jira_response( $ch, &$error = null, &$info = null ) {
 		$info['error'] = ($json = @json_decode($body)) ? $json : null;
 	}
 
-	return $success ? json_decode($body) : false;
+	return $success ? @json_decode($body) : false;
 }
 
 function jira_http_headers( $header ) {
@@ -296,4 +328,17 @@ function jira_http_headers( $header ) {
 		}
 	}
 	return $headers;
+}
+
+function jira_log( $method, $resource, $time, $info = null ) {
+	if ( !defined('DEBUG') || !DEBUG ) return;
+
+	static $fh;
+	if ( !$fh ) {
+		$fh = fopen(dirname(DB_PATH) . '/jira.log', 'a');
+		fwrite($fh, "\n==\n");
+	}
+
+	$log = number_format($time, 4) . ' ' . strtoupper($method) . ' ' . $resource;
+	fwrite($fh, $log . "\n");
 }
