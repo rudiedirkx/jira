@@ -24,9 +24,11 @@ else if ( isset($_POST['id'], $_POST['name'], $_POST['jql']) ) {
 
 	// Update
 	if ( $id ) {
-		$response = jira_put('filter/' . $id, array(
+		$update = array(
 			'jql' => trim($jql),
-		), $error, $info);
+		);
+		$name and $update += compact('name');
+		$response = jira_put('filter/' . $id, $update, $error, $info);
 	}
 	// Insert
 	else {
