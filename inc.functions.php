@@ -151,7 +151,7 @@ function html_options( $options, $selected = null, $empty = '' ) {
 	$empty && $html .= '<option>' . $empty;
 	foreach ( $options AS $value => $label ) {
 		$isSelected = $value == $selected ? ' selected' : '';
-		$html .= '<option value="' . html($value) . '"' . $isSelected . '>' . html($label);
+		$html .= '<option value="' . html($value) . '"' . $isSelected . '>' . html($label) . '</option>';
 	}
 	return $html;
 }

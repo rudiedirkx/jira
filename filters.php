@@ -71,7 +71,7 @@ echo '<h1>Your filters</h1>';
 <h2>Add / edit filter</h2>
 
 <form action method="post">
-	<p>Filter: <select name="id"><option>-- NEW<?= html_options($user->filter_options) ?></select></p>
+	<p>Filter: <select name="id"><option value="">-- NEW</option><?= html_options($user->filter_options) ?></select></p>
 	<p>Name: <input name="name" /></p>
 	<p>Query: <input name="jql" /></p>
 
