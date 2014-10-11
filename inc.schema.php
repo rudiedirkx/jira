@@ -48,6 +48,16 @@ return array(
 				),
 			),
 		),
+		'variables' => array(
+			'columns' => array(
+				'id' => array('pk' => true),
+				'user_id' => array('unsigned' => true),
+				'name' => array('type' => 'text', 'null' => false),
+				'regex' => array('type' => 'text', 'null' => false),
+				'replacement' => array('type' => 'text', 'null' => false),
+				'value' => array('type' => 'text', 'null' => false, 'default' => 0),
+			),
+		),
 	),
 );
 

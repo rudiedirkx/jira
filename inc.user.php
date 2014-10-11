@@ -8,6 +8,11 @@ class User extends db_generic_record {
 		}
 	}
 
+	function get_variables() {
+		global $db;
+		return $db->select('variables', array('user_id' => $this->id))->all();
+	}
+
 	function get_custom_fields() {
 		$fields = jira_get('field');
 		return array_values(array_filter($fields, function($f) {
@@ -90,14 +95,28 @@ class User extends db_generic_record {
 		return $this->get_filter_options('filter_id', 'jql');
 	}
 
+	function _applyVariables( $variables ) {
+		$vars = $this->variables;
+		return array_map(function($jql) use ($vars) {
+			foreach ( $vars as $var ) {
+				$jql = preg_replace('#' . $var->regex . '#', str_replace('XXX', $var->value, $var->replacement), $jql);
+			}
+			return $jql;
+		}, $variables);
+	}
+
 	function get_filter_query_options() {
-		return $this->get_filter_options('jql');
+		return array_flip($this->_applyVariables($this->get_filter_options('name', 'jql')));
 	}
 
 	function get_index_filter_object() {
 		if ( $this->index_filter ) {
 			global $db;
 			$filter = $db->select('filters', array('user_id' => $this->id, 'filter_id' => $this->index_filter))->first();
+
+			$realJQL = $this->_applyVariables(array($filter->jql));
+			$filter->jql = $realJQL[0];
+
 			if ( $filter ) {
 				return $filter;
 			}

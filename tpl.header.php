@@ -19,6 +19,7 @@
 		<?if (!$index):?><a href="index.php">&lt; index</a> | <?endif?>
 		<a href="auth.php">You (<?= $user->jira_user ?>)</a> |
 		<a href="filters.php">Filters</a> |
-		<a href="accounts.php">Accounts</a>
-		<?if ($index):?> | <a href="logout.php">Log out</a> <?endif?>
+		<a href="accounts.php">Accounts</a> |
+		<a href="variables.php">Vars</a>
+		<?if ($index):?> | <a href="logout.php">Log out</a><?endif?>
 	</p>
