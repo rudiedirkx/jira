@@ -184,7 +184,7 @@ if ( isset($_GET['edit']) ) {
 		$priorities[$priority->id] = $priority->name;
 	}
 
-	echo '<form action method="post">';
+	echo '<form autocomplete="off" action method="post">';
 	echo '	<p>Summary: <input name="summary" value="' . html($fields->summary) . '" /></p>';
 
 	echo '	<p>Description: <textarea name="description" rows="8">' . html($fields->description) . '</textarea></p>';
@@ -274,7 +274,7 @@ echo '</div>';
 
 echo '<div class="post-comment">';
 echo '<h2>New comment</h2>';
-echo '<form method="post">';
+echo '<form autocomplete="off" method="post">';
 echo '<p><textarea name="comment" rows="8"></textarea></p>';
 echo '<p><input type="submit" /></p>';
 echo '</form>';

@@ -46,7 +46,7 @@ echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($summar
 ?>
 <h2><?= $worklog ? 'Edit worklog # ' . $worklog->id : 'Log work' ?></h2>
 
-<form method="post">
+<form autocomplete="off" method="post">
 	<p>Time spent: <input name="spent" placeholder="&quot;30m&quot; for 30 minutes, &quot;2h&quot; for 2 hours, etc" value="<?= html(@$worklog->timeSpent) ?>" /></p>
 	<p>Date started: <input type="datetime" name="date" value="<?= $worklog ? $worklog->started : date('Y-m-d\TH:i:s.000O') ?>" /></p>
 	<p>Description: <input name="description" value="<?= html(@$worklog->comment) ?>" /></p>

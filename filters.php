@@ -60,7 +60,7 @@ include 'tpl.header.php';
 echo '<h1>Your filters</h1>';
 
 ?>
-<form action method="post">
+<form autocomplete="off" action method="post">
 	<p>Used if present, in order:</p>
 
 	<p>1. Index filter: <select name="index_filter"><option>-- None<?= html_options($user->filter_options, $user->index_filter) ?></select></p>
@@ -72,7 +72,7 @@ echo '<h1>Your filters</h1>';
 
 <h2>Add / edit filter</h2>
 
-<form action method="post">
+<form autocomplete="off" action method="post">
 	<p>Filter: <select name="id"><option value="">-- NEW</option><?= html_options($user->filter_options) ?></select></p>
 	<p>Name: <input name="name" /></p>
 	<p>Query: <input name="jql" /></p>

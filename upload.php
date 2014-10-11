@@ -44,7 +44,7 @@ echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($summar
 ?>
 <h2>Upload attachment</h2>
 
-<form action method="post" enctype="multipart/form-data">
+<form autocomplete="off" action method="post" enctype="multipart/form-data">
 	<p>File: <input type="file" name="file" /></p>
 	<p>Comment: <input name="comment" /></p>
 	<p><input type="submit" /></p>

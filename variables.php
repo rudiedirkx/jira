@@ -36,7 +36,7 @@ body:not(.show-editables) .editable { display: none; }
 
 <h1>Your variables</h1>
 
-<form action method="post">
+<form autocomplete="off" action method="post">
 	<table border=1>
 		<thead>
 			<tr>
@@ -65,7 +65,7 @@ body:not(.show-editables) .editable { display: none; }
 
 <h2>Add variable</h2>
 
-<form action method="post">
+<form autocomplete="off" action method="post">
 	<p>Name: <input name="name" placeholder="Sprint #" /></p>
 	<p>Regex: <input name="regex" placeholder="sprint = \d+" /></p>
 	<p>Replacement: <input name="replacement" placeholder="sprint = XXX" /></p>

@@ -64,7 +64,7 @@ echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($issue-
 ?>
 <h2>Labels</h2>
 
-<form method="post">
+<form autocomplete="off" method="post">
 	<p><input id="ls" name="labels" value="<?= implode(' ', $issue->fields->labels) ?>" size="60" /></p>
 	<p>(<a id="fl" href="#">fetch</a>) <input type="submit" /></p>
 </form>

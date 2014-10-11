@@ -80,7 +80,7 @@ echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($summar
 
 echo '<div class="post-comment">';
 echo '<h2>Transition</h2>';
-echo '<form method="post">';
+echo '<form autocomplete="off" method="post">';
 echo '<p>Action: <select name="status">' . html_options($actions, $action) . '</select></p>';
 if ( isset($transitionsById[$action]->fields->resolution) ) {
 	$resolutions = array();

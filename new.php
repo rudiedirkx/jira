@@ -70,7 +70,7 @@ if ( !empty($_GET['project']) && ($project = get_project($meta->projects, $_GET[
 		$defaultPriority = $priorityKeys[ ceil((count($priorities)-1)/2) ];
 
 		?>
-<form action method="post">
+<form autocomplete="off" action method="post">
 	<p>Summary: <input name="summary" /></p>
 	<p>Description: <textarea name="description" rows="8"></textarea></p>
 	<p>Priority: <select name="priority"><?= html_options($priorities, $defaultPriority) ?></select></p>
