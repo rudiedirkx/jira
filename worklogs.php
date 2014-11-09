@@ -20,29 +20,32 @@ echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($summar
 
 echo '<h2 class="pre-menu">' . count($worklogs) . ' worklogs</h2> (<a href="logwork.php?key=' . $key . '&summary=' . urlencode($summary) . '">add</a>)';
 
-echo '<div class="table worklogs">';
-echo '<table border="1">';
+$table = '';
+$table .= '<div class="table worklogs">';
+$table .= '<table border="1">';
 $minutes = 0;
 foreach ( $worklogs AS $worklog ) {
 	$minutes += $worklog->timeSpentSeconds / 60;
 	$started = strtotime($worklog->started);
 
-	echo '<tr>';
-	echo '<td>' . date(FORMAT_DATETIME, $started) . '</td>';
-	echo '<td>' . $worklog->timeSpent . '</td>';
-	echo '<td>' . html($worklog->author->displayName) . '</td>';
-	echo '<td>' . html(@$worklog->comment ?: '') . '</td>';
-	echo '<td>';
-	echo '  <a href="logwork.php?key=' . $key . '&summary=' . urlencode($summary) . '&id=' . $worklog->id . '">e</a> |';
-	echo '  <a data-confirm="DELETE this WORKLOG forever and ever?" href="?key=' . $key . '&delete_worklog=' . $worklog->id . '">x</a>';
-	echo '</td>';
-	echo '</tr>';
+	$table .= '<tr>';
+	$table .= '<td>' . date(FORMAT_DATETIME, $started) . '</td>';
+	$table .= '<td>' . $worklog->timeSpent . '</td>';
+	$table .= '<td>' . html($worklog->author->displayName) . '</td>';
+	$table .= '<td>' . html(@$worklog->comment ?: '') . '</td>';
+	$table .= '<td>';
+	$table .= '  <a href="logwork.php?key=' . $key . '&summary=' . urlencode($summary) . '&id=' . $worklog->id . '">e</a> |';
+	$table .= '  <a data-confirm="DELETE this WORKLOG forever and ever?" href="?key=' . $key . '&delete_worklog=' . $worklog->id . '">x</a>';
+	$table .= '</td>';
+	$table .= '</tr>';
 }
-echo '</table>';
-echo '</div>';
+$table .= '</table>';
+$table .= '</div>';
 
 $hours = floor($minutes / 60);
 $minutes -= $hours * 60;
 echo '<p>' . $hours . 'h ' . $minutes . 'm spent on this issue.</p>';
+
+echo $table;
 
 include 'tpl.footer.php';

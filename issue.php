@@ -238,35 +238,13 @@ if ( $attachments ) {
 if ( $worklogs ) {
 	echo '<h2 class="pre-menu">' . $fields->worklog->total . ' worklogs</h2> (<a href="' . $actions['Log work'] . '">add</a>)';
 
-	if ( $fields->worklog->total > 10 ) {
-		$minutes = 0;
-		foreach ($worklogs as $worklog) {
-			$minutes += $worklog->timeSpentSeconds / 60;
-		}
-
-		$more = $fields->worklog->total > count($worklogs) ? '<strong>More</strong> than ' : '';
-		echo '<p>' . $more . round($minutes / 60, 1) . ' hours spent. <a href="worklogs.php?key=' . $key . '&subtasks=' . implode(',', $subkeys) . '&summary=' . urlencode($fields->summary) . '">See ALL worklogs, incl subtasks.</a></p>';
+	$minutes = 0;
+	foreach ($worklogs as $worklog) {
+		$minutes += $worklog->timeSpentSeconds / 60;
 	}
-	else {
-		echo '<div class="table worklogs">';
-		echo '<table border="1">';
-		foreach ( $worklogs AS $worklog ) {
-			$started = strtotime($worklog->started);
 
-			echo '<tr>';
-			echo '<td>' . date(FORMAT_DATETIME, $started) . '</td>';
-			echo '<td>' . $worklog->timeSpent . '</td>';
-			echo '<td>' . html($worklog->author->displayName) . '</td>';
-			echo '<td>' . html(@$worklog->comment ?: '') . '</td>';
-			echo '<td>';
-			echo '  <a href="logwork.php?key=' . $key . '&summary=' . urlencode($fields->summary) . '&id=' . $worklog->id . '">e</a> |';
-			echo '  <a data-confirm="DELETE this WORKLOG forever and ever?" href="?key=' . $key . '&delete_worklog=' . $worklog->id . '">x</a>';
-			echo '</td>';
-			echo '</tr>';
-		}
-		echo '</table>';
-		echo '</div>';
-	}
+	$more = $fields->worklog->total > count($worklogs) ? '<strong>More</strong> than ' : '';
+	echo '<p>At least ' . round($minutes / 60, 1) . ' hours spent. <a href="worklogs.php?key=' . $key . '&subtasks=' . implode(',', $subkeys) . '&summary=' . urlencode($fields->summary) . '">See ALL worklogs, incl subtasks.</a></p>';
 }
 
 echo '<h2>' . count($comments) . ' comments</h2>';
