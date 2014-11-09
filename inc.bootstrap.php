@@ -7,6 +7,7 @@ header('Content-type: text/html; charset=utf-8');
 define('FORCE_JIRA_USER_SYNC', 600);
 define('FORMAT_DATETIME', "d M 'y H:i");
 define('FORMAT_DATE', "d M 'y");
+define('WORKLOG_DATETIME', 'Y-m-d\\TH:i:s.000O');
 
 // Context
 require 'env.php';

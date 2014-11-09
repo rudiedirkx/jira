@@ -13,7 +13,7 @@ $summary = @$_GET['summary'];
 if ( isset($_POST['spent'], $_POST['date'], $_POST['description']) ) {
 	$data = array(
 		'timeSpent' => $_POST['spent'],
-		'started' => $_POST['date'],
+		'started' => date(WORKLOG_DATETIME, strtotime($_POST['date'])),
 		'comment' => $_POST['description'],
 	);
 
@@ -29,7 +29,7 @@ if ( isset($_POST['spent'], $_POST['date'], $_POST['description']) ) {
 	}
 
 	echo '<pre>';
-	print_r($insert);
+	print_r($data);
 	var_dump($error);
 	print_r($response);
 	print_r($info);
@@ -48,7 +48,7 @@ echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($summar
 
 <form autocomplete="off" method="post">
 	<p>Time spent: <input name="spent" placeholder="&quot;30m&quot; for 30 minutes, &quot;2h&quot; for 2 hours, etc" value="<?= html(@$worklog->timeSpent) ?>" /></p>
-	<p>Date started: <input type="datetime" name="date" value="<?= $worklog ? $worklog->started : date('Y-m-d\TH:i:s.000O') ?>" /></p>
+	<p>Date started: <input name="date" value="<?= date('Y-m-d H:i:s', $worklog ? strtotime($worklog->started) : time()) ?>" /></p>
 	<p>Description: <input name="description" value="<?= html(@$worklog->comment) ?>" /></p>
 	<p><input type="submit" /></p>
 </form>
