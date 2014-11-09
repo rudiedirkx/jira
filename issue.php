@@ -243,8 +243,16 @@ if ( $worklogs ) {
 		$minutes += $worklog->timeSpentSeconds / 60;
 	}
 
-	$more = $fields->worklog->total > count($worklogs) ? '<strong>More</strong> than ' : '';
-	echo '<p>At least ' . round($minutes / 60, 1) . ' hours spent. <a href="worklogs.php?key=' . $key . '&subtasks=' . implode(',', $subkeys) . '&summary=' . urlencode($fields->summary) . '">See ALL worklogs, incl subtasks.</a></p>';
+	// Summarize and link
+	if ( $subtasks || $fields->worklog->total > count($worklogs) ) {
+		$guess = $minutes * $fields->worklog->total / count($worklogs);
+		echo '<p>~ ' . round($guess / 60, 1) . ' hours (<strong>guess</strong>) spent. <a href="worklogs.php?key=' . $key . '&subtasks=' . implode(',', $subkeys) . '&summary=' . urlencode($fields->summary) . '">See ALL worklogs, incl subtasks.</a></p>';
+	}
+	// Show all logs, there's nothing else
+	else {
+		$summary = $fields->summary;
+		include 'tpl.worklogs.php';
+	}
 }
 
 echo '<h2>' . count($comments) . ' comments</h2>';
