@@ -95,9 +95,9 @@ $('fl').on('click', function(e) {
 	var labels = $('ls').value.trim().split(/ /g),
 		label = labels[labels.length-1];
 
-	$.get('?id=<?= $id ?>&label=' + label, null, {type: 'json'}).on('done', function(e, rsp) {
+	$.get('?id=<?= $id ?>&label=' + label).on('done', function(e, rsp) {
 		var html = '';
-		rsp.labels.forEach(function(label) {
+		r.each(rsp.labels, function(label) {
 			html += ' [<a data-label="' + label + '" href="#">' + label + '</a>] ';
 		});
 		$('ss').setHTML(html);
