@@ -4,7 +4,7 @@ require 'inc.bootstrap.php';
 
 do_logincheck();
 
-$perPage = 10;
+$perPage = $user->config('index_page_size');
 
 // Default query
 $query = 'status != Closed ORDER BY priority DESC, created DESC';

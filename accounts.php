@@ -58,6 +58,21 @@ else if ( isset($_GET['unlink']) ) {
 	return do_redirect('accounts');
 }
 
+// Save user config/options
+else if ( isset($_POST['config']) ) {
+	foreach ($_POST['config'] as $name => $value) {
+		if ( isset(User::$_config[$name]) ) {
+			$db->replace('options', array(
+				'user_id' => $user->id,
+				'name' => $name,
+				'value' => $value,
+			));
+		}
+	}
+
+	return do_redirect('accounts');
+}
+
 // Reset cookies
 do_login('', '');
 
@@ -78,6 +93,20 @@ include 'tpl.header.php';
 		</li>
 	<?endforeach?>
 </ul>
+
+<h2>Config for <span style="display: inline-block"><?= html($user->jira_id) ?></span></h2>
+
+<form method="post">
+	<table>
+		<? foreach (User::$_config as $name => $info): ?>
+			<tr>
+				<th><?= html($info['label']) ?></th>
+				<td><input type="<?= $info['type'] ?>" name="config[<?= $name ?>]" value="<?= html($user->config($name)) ?>" style="width: <?= $info['size'] ?>em" /></td>
+			</tr>
+		<? endforeach ?>
+	</table>
+	<p><button>Save</button></p>
+</form>
 
 <h2>Add account</h2>
 

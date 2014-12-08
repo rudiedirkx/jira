@@ -2,10 +2,42 @@
 
 class User extends db_generic_record {
 
+	public static $_config = array(
+		'index_page_size' => array(
+			'label' => 'Index page size',
+			'default' => 10,
+			'size' => 4,
+			'type' => 'number',
+		),
+	);
+
 	function __construct() {
 		if ( !$this->last_sync || $this->last_sync + FORCE_JIRA_USER_SYNC < time() ) {
 			// $this->unsync();
 		}
+	}
+
+	function config( $name, $alt = null ) {
+		if ( func_num_args() == 1 ) {
+			$alt = $this::$_config[$name]['default'];
+		}
+
+		$config = $this->config;
+		return isset($config[$name]) ? $config[$name] : $alt;
+	}
+
+	function get_config() {
+		global $db;
+		return $db->select_fields('options', 'name, value', array('user_id' => $this->id));
+	}
+
+	function get_jira_domain() {
+		$url = parse_url($this->jira_url);
+		return $url['host'];
+	}
+
+	function get_jira_id() {
+		return $this->jira_user . '@' . $this->jira_domain;
 	}
 
 	function get_variables() {
