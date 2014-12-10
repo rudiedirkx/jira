@@ -223,9 +223,11 @@ if ( $attachments ) {
 	echo '<table border="1">';
 	foreach ( $attachments AS $attachment ) {
 		$created = strtotime($attachment->created);
+		$size = $attachment->size > 1.2e6 ? number_format($attachment->size / 1e6, 2) . ' MB' : number_format($attachment->size / 1e3, 0, '.', '') . ' kB';
 
 		echo '<tr>';
-		echo '<td><a target="_blank" href="' . html($attachment->content) . '">' . html($attachment->filename) . '</a></td>';
+		echo '<td><a target="_blank" href="attachment.php?id=' . $attachment->id . '">' . html($attachment->filename) . '</a></td>';
+		echo '<td align="right">' . $size . '</td>';
 		echo '<td>' . date(FORMAT_DATETIME, $created) . '</td>';
 		echo '<td>' . html($attachment->author->displayName) . '</td>';
 		echo '<td><a data-confirm="You sure? Gone is really, really gone. We can\'t restore attachments." href="?key=' . $key . '&delete_attachment=' . $attachment->id . '">x</a></td>';
