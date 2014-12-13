@@ -94,6 +94,8 @@ include 'tpl.header.php';
 	<?endforeach?>
 </ul>
 
+<p><a href="logout.php">Log out all accounts</a></p>
+
 <h2>Config for <span style="display: inline-block"><?= html($user->jira_id) ?></span></h2>
 
 <form method="post">

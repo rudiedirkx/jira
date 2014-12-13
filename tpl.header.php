@@ -20,6 +20,7 @@
 		<a href="auth.php">You (<?= $user->jira_user ?>)</a> |
 		<a href="filters.php">Filters</a> |
 		<a href="accounts.php">Accounts</a> |
-		<a href="variables.php">Vars</a>
+		<a href="variables.php">Vars</a> |
+		<a href="tempo.php">Tempo</a>
 		<?if ($index):?> | <a href="logout.php">Log out</a><?endif?>
 	</p>
