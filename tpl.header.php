@@ -22,5 +22,6 @@
 		<a href="accounts.php">Accounts</a> |
 		<a href="variables.php">Vars</a> |
 		<a href="tempo.php">Tempo</a>
+		<?if ($user->config('agile_view_id')):?> | <a href="agile.php">Agile</a><?endif?>
 		<?if ($index):?> | <a href="logout.php">Log out</a><?endif?>
 	</p>

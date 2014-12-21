@@ -8,10 +8,10 @@ $tempo = jira_get('/rest/tempo-timesheets/1/user/issues/ASS', array(
 	'username' => JIRA_USER,
 ), $error, $info);
 
-if ($error) {
+if ( $error ) {
 	include 'tpl.header.php';
 
-	if ($error == 404) {
+	if ( $error == 404 ) {
 		echo '<p>No <strong>Tempo</strong> in this house...</p>';
 	}
 	else {

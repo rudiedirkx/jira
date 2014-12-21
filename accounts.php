@@ -102,8 +102,19 @@ include 'tpl.header.php';
 	<table>
 		<? foreach (User::$_config as $name => $info): ?>
 			<tr>
-				<th><?= html($info['label']) ?></th>
-				<td><input type="<?= $info['type'] ?>" name="config[<?= $name ?>]" value="<?= html($user->config($name)) ?>" style="width: <?= $info['size'] ?>em" /></td>
+				<th align="right">
+					<?= html($info['label']) ?>
+					<?if ($info['required']):?> <span class="required">*</span><?endif?>
+				</th>
+				<td>
+					<input
+						type="<?= $info['type'] ?>"
+						name="config[<?= $name ?>]"
+						value="<?= html($user->config($name)) ?>"
+						style="width: <?= $info['size'] ?>em"
+						<?if ($info['required']):?>required<?endif?>
+					/>
+				</td>
 			</tr>
 		<? endforeach ?>
 	</table>

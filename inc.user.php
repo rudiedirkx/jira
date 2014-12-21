@@ -8,6 +8,14 @@ class User extends db_generic_record {
 			'default' => 10,
 			'size' => 4,
 			'type' => 'number',
+			'required' => true,
+		),
+		'agile_view_id' => array(
+			'label' => 'Agile view/board ID',
+			'default' => '',
+			'size' => 4,
+			'type' => 'number',
+			'required' => false,
 		),
 	);
 
