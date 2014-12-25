@@ -32,12 +32,13 @@ define('JIRA_API_1_PATH', '/rest/api/1.0/');
 $user = null;
 if ( isset($_COOKIE['JIRA_URL'], $_COOKIE['JIRA_AUTH']) && ($accounts = get_accounts()) ) {
 	$account = $accounts[0];
-// print_r($account);
-// print_r($_COOKIE);
 
 	define('JIRA_URL', $account->url);
 	define('JIRA_USER', $account->user);
 	define('JIRA_AUTH', $account->auth);
+
+	$url = parse_url(JIRA_URL);
+	define('JIRA_ORIGIN', $url['scheme'] . '://' . $url['host']);
 
 	$user = User::load();
 	if ( $user->jira_timezone ) {

@@ -81,11 +81,18 @@ function do_login( $url, $auth, $accounts = null ) {
 }
 
 function do_remarkup( $html ) {
+	$html = trim($html);
+
+	// Links to other issues
 	$regex = preg_quote(JIRA_URL, '#') . '/browse/([A-Z][A-Z\d]+\-\d+)';
 	$html = preg_replace_callback('#' . $regex . '#', function($match) {
 		$key = $match[1];
 		return 'issue.php?key=' . $key;
-	}, trim($html));
+	}, $html);
+
+	// Non-full paths
+	$html = str_replace('="/', '="' . JIRA_ORIGIN . '/', $html);
+
 	return $html;
 }
 
