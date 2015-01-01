@@ -14,10 +14,6 @@ foreach (array_merge(array($key), $subtasks) as $lkey) {
 	$worklogs = array_merge($worklogs, $log->worklogs);
 }
 
-usort($worklogs, function($a, $b) {
-	return strtotime($a->started) - strtotime($b->started);
-});
-
 include 'tpl.header.php';
 
 echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($summary) . '</h1>';
