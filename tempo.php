@@ -54,9 +54,9 @@ uksort($dated, function($a, $b) {
 });
 
 // Sort every date's issues by work time: more first
-foreach ($dated as $date => &$issues) {
-	arsort($issues, SORT_NUMERIC);
-	unset($issues);
+foreach ($dated as $date => &$workedIssues) {
+	arsort($workedIssues, SORT_NUMERIC);
+	unset($workedIssues);
 }
 
 include 'tpl.header.php';
@@ -67,6 +67,7 @@ echo '<h1>Tempo</h1>';
 <style>
 th, td {
 	padding: 3px;
+	white-space: normal;
 }
 th {
 	text-align: left;
@@ -77,12 +78,16 @@ th > .total {
 }
 td.time {
 	text-align: right;
+	vertical-align: top;
+}
+.issue-key.hide-summary + .issue-summary {
+	display: none;
 }
 </style>
 <?php
 
-echo '<table>';
-foreach ($dated as $date => $issues) {
+echo '<table width="100%">';
+foreach ($dated as $date => $workedIssues) {
 	$utc = jiraDateToUTC($date);
 	$prettyDate = date('D ' . FORMAT_DATE, $utc);
 
@@ -92,14 +97,31 @@ foreach ($dated as $date => $issues) {
 	echo '<span class="total">' . $h . 'h' . ( $m ? ' ' . $m . 'm' : '' ) . '</span> ';
 	echo '<span class="date">' . $prettyDate . '</span>';
 	echo '</th></tr>';
-	foreach ($issues as $key => $hours) {
+	foreach ($workedIssues as $key => $hours) {
+		$issue = $issues[$key];
 		$time = $hours >= 1.0 ? $hours . 'h' : round($hours * 60) . 'm';
-		echo '<tr><td class="key">' . $key . '</td><td class="time">' . $time . '</td></tr>';
+
+		echo '<tr>';
+		echo '<td class="key">';
+		echo '<a class="issue-key hide-summary" href="issue.php?key=' . $key . '">' . $key . '</a>';
+		echo '<div class="issue-summary">' . $issue->summary . '</div>';
+		echo '</td>';
+		echo '<td class="time">' . $time . '</td>';
+		echo '</tr>';
 	}
 
 	echo '<tr><td colspan="2"><br></td></tr>';
 }
 echo '</table>';
+
+?>
+<script>
+$$('a.issue-key').on('click', function(e) {
+	e.preventDefault();
+	this.toggleClass('hide-summary');
+});
+</script>
+<?php
 
 include 'tpl.footer.php';
 
