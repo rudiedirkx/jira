@@ -4,6 +4,7 @@ require 'inc.bootstrap.php';
 
 do_logincheck();
 
+// @todo Fetch the last 30 days, not current month (standard)
 $tempo = jira_get('/rest/tempo-timesheets/1/user/issues/ASS', array(
 	'username' => JIRA_USER,
 ), $error, $info);
@@ -27,20 +28,22 @@ if ( $error ) {
 
 // Group by date, index by issue
 $dated = $issues = $totals = array();
-foreach ( $tempo->timesheetLines as $i => $line ) {
-	// Index by issue
-	if ( !isset($issues[$line->key]) ) {
-		$issues[$line->key] = clone $line;
-		unset($issues[$line->key]->workedHours, $issues[$line->key]->date);
-	}
+if (isset($tempo->timesheetLines[0]->key)) {
+	foreach ( $tempo->timesheetLines as $i => $line ) {
+		// Index by issue
+		if ( !isset($issues[$line->key]) ) {
+			$issues[$line->key] = clone $line;
+			unset($issues[$line->key]->workedHours, $issues[$line->key]->date);
+		}
 
-	// Group by date
-	foreach ( $line->workedHours as $di => $seconds ) {
-		if ( $seconds > 0 ) {
-			$date = $line->date[$di];
-			$hours = round($seconds / 3600, 2);
-			$dated[$date][$line->key] = $hours;
-			@$totals[$date] += $hours;
+		// Group by date
+		foreach ( $line->workedHours as $di => $seconds ) {
+			if ( $seconds > 0 ) {
+				$date = $line->date[$di];
+				$hours = round($seconds / 3600, 2);
+				$dated[$date][$line->key] = $hours;
+				@$totals[$date] += $hours;
+			}
 		}
 	}
 }
