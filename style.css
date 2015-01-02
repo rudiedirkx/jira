@@ -18,10 +18,14 @@ body {
 input:not([type="submit"]):not([type="button"]):not([type="radio"]):not([type="checkbox"]),
 select,
 textarea {
-	width: 100%;
 	background: #e0f0ff;
 	border: solid 1px #999;
 	padding: 3px 5px;
+}
+input:not([type="submit"]):not([type="button"]):not([type="radio"]):not([type="checkbox"]):not(.manual-width),
+select:not(.manual-width),
+textarea:not(.manual-width) {
+	width: 100%;
 }
 .filter input:not([type="submit"]):not([type="button"]):not([type="radio"]):not([type="checkbox"]),
 .filter select {

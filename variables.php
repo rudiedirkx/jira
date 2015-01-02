@@ -4,7 +4,12 @@ require 'inc.bootstrap.php';
 
 do_logincheck();
 
-if ( isset($_POST['name'], $_POST['regex'], $_POST['replacement'], $_POST['value']) ) {
+if ( isset($_POST['manual_update']) ) {
+	$user->syncAnyAutoVar($_POST['manual_update']);
+	return do_redirect('variables');
+}
+
+else if ( isset($_POST['name'], $_POST['regex'], $_POST['replacement'], $_POST['value']) ) {
 	$invalid = count(array_filter($_POST)) != count($_POST);
 	if ( !$invalid ) {
 		$db->insert('variables', array(
@@ -44,15 +49,32 @@ body:not(.show-editables) .editable { display: none; }
 				<th class="editable">Regex</th>
 				<th class="editable">Replacement (XXX)</th>
 				<th>Value</th>
+				<th class="editable">Auto update type</th>
 			</tr>
 		</thead>
 		<tbody>
 			<? foreach ($user->variables as $var): ?>
 				<tr>
-					<td><input name="v[<?= $var->id ?>][name]" value="<?= html($var->name) ?>" /></td>
-					<td class="editable"><input name="v[<?= $var->id ?>][regex]" value="<?= html($var->regex) ?>" /></td>
-					<td class="editable"><input name="v[<?= $var->id ?>][replacement]" value="<?= html($var->replacement) ?>" /></td>
-					<td><input name="v[<?= $var->id ?>][value]" value="<?= html($var->value) ?>" /></td>
+					<td>
+						<input name="v[<?= $var->id ?>][name]" value="<?= html($var->name) ?>" size="10" class="manual-width" />
+					</td>
+					<td class="editable">
+						<input name="v[<?= $var->id ?>][regex]" value="<?= html($var->regex) ?>" />
+					</td>
+					<td class="editable">
+						<input name="v[<?= $var->id ?>][replacement]" value="<?= html($var->replacement) ?>" />
+					</td>
+					<td>
+						<input name="v[<?= $var->id ?>][value]" value="<?= html($var->value) ?>" size="6" class="manual-width" />
+						<?if ($var->auto_update_type): ?>
+							<button name="manual_update" value="<?= $var->auto_update_type ?>">&lt;</button>
+						<?endif?>
+					</td>
+					<td class="editable">
+						<select name="v[<?= $var->id ?>][auto_update_type]">
+							<?= html_options(array('sprint' => 'Current sprint'), $var->auto_update_type, 'Custom') ?>
+						</select>
+					</td>
 				</tr>
 			<? endforeach ?>
 		</tbody>
@@ -69,7 +91,6 @@ body:not(.show-editables) .editable { display: none; }
 	<p>Name: <input name="name" placeholder="Sprint #" /></p>
 	<p>Regex: <input name="regex" placeholder="sprint = \d+" /></p>
 	<p>Replacement: <input name="replacement" placeholder="sprint = XXX" /></p>
-	<p>Value: <input name="value" placeholder="15" /></p>
 
 	<p><input type="submit" /></p>
 </form>

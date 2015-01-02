@@ -56,6 +56,8 @@ return array(
 				'regex' => array('type' => 'text', 'null' => false),
 				'replacement' => array('type' => 'text', 'null' => false),
 				'value' => array('type' => 'text', 'null' => false, 'default' => 0),
+				'auto_update_type' => array('type' => 'text', 'null' => false, 'default' => ''),
+				'last_update' => array('unsigned' => true, 'default' => 0),
 			),
 		),
 	),

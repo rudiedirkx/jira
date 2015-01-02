@@ -23,6 +23,74 @@ class User extends db_generic_record {
 		if ( !$this->last_sync || $this->last_sync + FORCE_JIRA_USER_SYNC < time() ) {
 			// $this->unsync();
 		}
+
+		$this->syncOverdueVars();
+	}
+
+	function getActiveSprint( $boardId = null ) {
+		$boardId or $boardId = $this->config('agile_view_id');
+		if ( !$boardId ) {
+			return;
+		}
+
+		$sprints = jira_get('/rest/greenhopper/1.0/sprintquery/' . $boardId, array(), $error, $info);
+		$actives = array_filter($sprints->sprints, function($sprint) {
+			return $sprint->state == 'ACTIVE';
+		});
+		if ( !$actives ) {
+			return;
+		}
+
+		return reset($actives);
+	}
+
+	function getAutoVarSprint() {
+		global $db;
+
+		$sprint = $this->getActiveSprint();
+		if ( $sprint ) {
+			return $sprint->id;
+		}
+	}
+
+	function syncAnyAutoVar( $type, $id = null ) {
+		global $db;
+
+		if ( !$id ) {
+			$id = $db->select_one('variables', 'id', array('user_id' => $this->id, 'auto_update_type' => 'sprint'));
+		}
+
+		$function = 'getAutoVar' . $type;
+		if ( method_exists($this, $function) ) {
+			$value = $this->$function();
+			if ( $value ) {
+				$db->update('variables', array(
+					'value' => $value,
+					'last_update' => time(),
+				), array(
+					'id' => $id,
+				));
+			}
+		}
+	}
+
+	function syncOverdueVars() {
+		foreach ( $this->overdue_vars as $id => $type ) {
+			$this->syncAnyAutoVar($type, $id);
+		}
+	}
+
+	function get_overdue_vars() {
+		global $db;
+		return $db->select_fields('variables', 'id, auto_update_type', '
+			user_id = ? AND
+			auto_update_type <> ? AND
+			last_update < ?
+		', array(
+			$this->id,
+			'',
+			time() - FORCE_AUTO_VARS_SYNC,
+		));
 	}
 
 	function config( $name, $alt = null ) {
