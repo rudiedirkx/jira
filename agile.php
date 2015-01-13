@@ -38,6 +38,7 @@ include 'tpl.header.php';
 }
 .longdata td {
 	border-bottom: solid 1px #ccc;
+	padding: 2px 3px;
 }
 .longdata tr:first-child td {
 	border-top: solid 1px #ccc;
@@ -47,6 +48,15 @@ include 'tpl.header.php';
 }
 .longdata .key {
 	border-left: solid 5px black;
+	overflow: hidden;
+}
+.longdata .key .out {
+	width: 5em;
+	position: relative;
+}
+.longdata .key .in {
+	position: absolute;
+	right: 0;
 }
 .longdata .sp {
 	background-color: #eee;
@@ -63,10 +73,15 @@ echo '<table class="longdata">';
 foreach ($plan->issues as $issue) {
 	if ( in_array($issue->id, $hideIssues) ) continue;
 
+	$priority = '';
+	if (@$issue->priorityUrl) {
+		$priority = '<img src="' . $issue->priorityUrl . '" title="Priority: ' . html($issue->priorityName) . '" alt="' . html($issue->priorityName) . '" />';
+	}
+
 	echo '<tr>';
 	// echo '<td class="type" style="background-color: ' . $issue->color . '; color: ' . $issue->color . '">.</td>';
-	echo '<td class="key" style="border-left-color: ' . $issue->color . '">' . $issue->key . '</td>';
-	echo '<td class="priority"><img src="' . $issue->priorityUrl . '" title="Priority: ' . html($issue->priorityName) . '" alt="' . html($issue->priorityName) . '" /></td>';
+	echo '<td class="key" style="border-left-color: ' . $issue->color . '"><div class="out"><div class="in">' . $issue->key . '</div></div></td>';
+	echo '<td class="priority">' . $priority . '</td>';
 	echo '<td class="summary wrap"><a href="issue.php?key=' . $issue->key . '">' . $issue->summary . '</a></td>';
 	echo '<td class="sp">' . @$issue->estimateStatistic->statFieldValue->value . '</td>';
 	echo '</tr>';
