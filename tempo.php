@@ -117,6 +117,8 @@ echo '</table>';
 ?>
 <script>
 $$('a.issue-key').on('click', function(e) {
+	if ( e.ctrlKey || e.metaKey || e.which == 2) return;
+
 	e.preventDefault();
 	this.toggleClass('hide-summary');
 });

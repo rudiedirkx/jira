@@ -53,14 +53,6 @@ h2, h2 a {
 pre {
 	white-space: pre-wrap;
 }
-.code.panel {
-	border: 1px solid #ccc;
-	background: #f5f5f5;
-}
-.code.panel pre {
-	margin: 0;
-	padding: 10px;
-}
 blockquote {
 	margin-left: 0;
 	border-left: solid 10px rgba(50, 108, 166, .2);
@@ -136,16 +128,34 @@ h1.with-parent-issue {
 	padding: 10px;
 	word-wrap: break-word;
 }
+.markup > p:first-child {
+	margin-top: 0;
+}
+.markup .code.panel,
+.markup tt {
+	border: 0;
+	outline: solid 1px #ccc;
+	background: #f5f5f5;
+}
+.markup .code.panel pre {
+	margin: 0;
+	padding: 5px;
+}
+.markup tt {
+	display: inline-block;
+	padding: 0 2px;
+}
 
 
 
 /* togglers (watch/vote) */
 .active-state {
-	color: #bbb;
+	color: #000;
 	text-decoration: none;
+	opacity: 0.3;
 }
 .active-state.active {
-	color: #000;
+	opacity: 1.0;
 }
 
 

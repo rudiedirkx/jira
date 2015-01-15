@@ -162,12 +162,12 @@ if ( $fields->labels ) {
 	$meta[] = '<span class="label">' . implode('</span> <span class="label">', array_map('html', $fields->labels)) . '</span>';
 }
 if ( !empty($fields->watches) ) {
-	$watches = $fields->watches->isWatching ? ' active' : '';
-	$meta[] = '<a href="issue.php?key=' . $key . '&watch=' . (int)!$watches . '" class="active-state' . $watches . '">★</a> (watch)';
+	$watches = $fields->watches->isWatching ? 'active' : '';
+	$meta[] = '<a href="issue.php?key=' . $key . '&watch=' . (int)!$watches . '" class="active-state ' . $watches . '">★</a> (watch)';
 }
 if ( !empty($fields->votes) ) {
-	$voted = $fields->votes->hasVoted ? ' active' : '';
-	$meta[] = '<a href="issue.php?key=' . $key . '&vote=' . (int)!$voted . '" class="active-state' .  $voted. '">♥</a> (vote)';
+	$voted = $fields->votes->hasVoted ? 'active' : '';
+	$meta[] = '<a href="issue.php?key=' . $key . '&vote=' . (int)!$voted . '" class="active-state ' .  $voted. '">♥</a> (vote)';
 }
 if ( $updated && $updated > $created ) {
 	$meta[] = 'Updated on ' . date(FORMAT_DATETIME, $updated);
