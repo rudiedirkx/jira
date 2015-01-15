@@ -105,6 +105,8 @@ else if ( isset($_GET['transitions']) ) {
 $issue = jira_get('issue/' . $key, array('expand' => 'transitions,renderedFields'));
 // print_r($issue);
 $fields = $issue->fields;
+$created = strtotime($fields->created);
+$updated = strtotime($fields->updated);
 $transitions = $issue->transitions;
 $subtasks = !empty($fields->subtasks) ? $fields->subtasks : array();
 $subkeys = array_map(function($issue) {
@@ -149,23 +151,28 @@ $storypoints = @$fieldsmeta['story points'] && @$fields->{$fieldsmeta['story poi
 echo '<h1' . $h1Class . '><a href="issue.php?key=' . $issue->key . '">' . $issue->key . '</a> ' . html($fields->summary) . $storypoints . '</h1>';
 echo '<p class="menu">' . html_links($actions) . '</p>';
 
+$meta = array();
 echo '<p class="meta">';
-echo '	[<img class="icon issuetype" src="' . html($fields->issuetype->iconUrl) . '" alt="' . html($fields->issuetype->name) . '" /> ' . html($fields->issuetype->name) . ' | <img class="icon priority" src="' . html($fields->priority->iconUrl) . '" alt="' . html($fields->priority->name) . '" /> ' . html($fields->priority->name) . '] ';
-echo '	by ' . html($fields->reporter->displayName) . ' ';
-echo '	on ' . date(FORMAT_DATETIME, strtotime($fields->created)) . ' | ';
-echo '	<strong>' . html($fields->status->name) . $resolution . '</strong> | ';
-echo '	Assignee: ' . ( html(@$fields->assignee->displayName) ?: '<em>None</em>' ) . ' | ';
+$meta[] = '<img class="icon issuetype" src="' . html($fields->issuetype->iconUrl) . '" alt="' . html($fields->issuetype->name) . '" /> ' . html($fields->issuetype->name);
+$meta[] = '<img class="icon priority" src="' . html($fields->priority->iconUrl) . '" alt="' . html($fields->priority->name) . '" /> ' . html($fields->priority->name);
+$meta[] = html($fields->reporter->displayName) . ' (' . date(FORMAT_DATETIME, $created) . ')';
+$meta[] = '<strong>' . html($fields->status->name) . $resolution . '</strong>';
+$meta[] = '<em>' . ( html(@$fields->assignee->displayName) ?: 'No assignee' ) . '</em>';
 if ( $fields->labels ) {
-	echo '	Labels: <span class="label">' . implode('</span> <span class="label">', array_map('html', $fields->labels)) . '</span> | ';
+	$meta[] = '<span class="label">' . implode('</span> <span class="label">', array_map('html', $fields->labels)) . '</span>';
 }
 if ( !empty($fields->watches) ) {
 	$watches = $fields->watches->isWatching ? ' active' : '';
-	echo '	<a href="issue.php?key=' . $key . '&watch=' . (int)!$watches . '" class="active-state' . $watches . '">★</a> (watch) | ';
+	$meta[] = '<a href="issue.php?key=' . $key . '&watch=' . (int)!$watches . '" class="active-state' . $watches . '">★</a> (watch)';
 }
 if ( !empty($fields->votes) ) {
 	$voted = $fields->votes->hasVoted ? ' active' : '';
-	echo '	<a href="issue.php?key=' . $key . '&vote=' . (int)!$voted . '" class="active-state' .  $voted. '">♥</a> (vote)';
+	$meta[] = '<a href="issue.php?key=' . $key . '&vote=' . (int)!$voted . '" class="active-state' .  $voted. '">♥</a> (vote)';
 }
+if ( $updated && $updated > $created ) {
+	$meta[] = 'Updated on ' . date(FORMAT_DATETIME, $updated);
+}
+echo implode(' | ', $meta);
 echo '</p>';
 
 if ( isset($_GET['edit']) ) {

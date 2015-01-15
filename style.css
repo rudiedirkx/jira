@@ -53,6 +53,14 @@ h2, h2 a {
 pre {
 	white-space: pre-wrap;
 }
+.code.panel {
+	border: 1px solid #ccc;
+	background: #f5f5f5;
+}
+.code.panel pre {
+	margin: 0;
+	padding: 10px;
+}
 blockquote {
 	margin-left: 0;
 	border-left: solid 10px rgba(50, 108, 166, .2);
