@@ -163,38 +163,65 @@ function html_options( $options, $selected = null, $empty = '' ) {
 	return $html;
 }
 
-function jira_url( $resource, $query = null ) {
+function jira_test( $url, $user, $pass, &$info = null ) {
+	// Test connection
+	$info = array(
+		'unauth_ok' => 1,
+		'JIRA_URL' => $url,
+		'JIRA_AUTH' => $user . ':' . $pass,
+	);
+	$account = jira_get('user', array('username' => $user), $error, $info);
+	$info['account'] = $account;
+
+	// Invalid URL
+	if ( $error == 404 ) {
+		$info['error2'] = 'Invalid URL (HTTP ' . $error . ')';
+		return false;
+	}
+	// Invalid credentials
+	else if ( $error || empty($account->active) || empty($account->name) || $account->name !== $user ) {
+		$info['error2'] = 'Invalid login (HTTP ' . $error . ')';
+		return false;
+	}
+
+	return true;
+}
+
+function jira_url( $resource, $query = null, $info = null ) {
 	if ( preg_match('#^https?://#i', $resource) ) {
 		$url = $resource;
 	}
 	else {
+		$baseUrl = $info && @$info['JIRA_URL'] ? $info['JIRA_URL'] : JIRA_URL;
 		$path = '/' == $resource[0] ? '' : JIRA_API_PATH;
-		$url = JIRA_URL . $path . $resource;
+		$url = $baseUrl . $path . $resource;
 	}
 	$query && $url .= '?' . http_build_query($query);
 	return $url;
 }
 
-function jira_curl( $url, $method = '' ) {
+function jira_curl( $url, $method = '', $info = null ) {
 	empty($GLOBALS['jira_requests']) && $GLOBALS['jira_requests'] = array();
 	$GLOBALS['jira_requests'][] = $method . ' ' . $url;
+
+	$auth = $info && @$info['JIRA_AUTH'] ? $info['JIRA_AUTH'] : JIRA_AUTH;
 
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, $url);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($ch, CURLOPT_HEADER, 1);
 	curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-	curl_setopt($ch, CURLOPT_USERPWD, JIRA_AUTH);
+	curl_setopt($ch, CURLOPT_USERPWD, $auth);
 	return $ch;
 }
 
 function jira_post( $resource, $data, &$error = null, &$info = null ) {
 	$_start = microtime(1);
 
-	$url = jira_url($resource);
+	$url = jira_url($resource, null, $info);
 	$body = json_encode($data);
 
-	$ch = jira_curl($url, 'POST');
+	$ch = jira_curl($url, 'POST', $info);
 	curl_setopt($ch, CURLOPT_POST, true);
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
 	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/json', 'User-agent: Jira Mobile'));
@@ -211,9 +238,9 @@ function jira_post( $resource, $data, &$error = null, &$info = null ) {
 function jira_upload( $resource, $data, &$error = null, &$info = null ) {
 	$_start = microtime(1);
 
-	$url = jira_url($resource);
+	$url = jira_url($resource, null, $info);
 
-	$ch = jira_curl($url, 'POST');
+	$ch = jira_curl($url, 'POST', $info);
 	curl_setopt($ch, CURLOPT_POST, true);
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 	curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-Atlassian-Token: nocheck', 'User-agent: Jira Mobile'));
@@ -230,9 +257,9 @@ function jira_upload( $resource, $data, &$error = null, &$info = null ) {
 function jira_get( $resource, $query = null, &$error = null, &$info = null ) {
 	$_start = microtime(1);
 
-	$url = jira_url($resource, $query);
+	$url = jira_url($resource, $query, $info);
 
-	$ch = jira_curl($url, 'GET');
+	$ch = jira_curl($url, 'GET', $info);
 	curl_setopt($ch, CURLOPT_HTTPHEADER, array('User-agent: Jira Mobile'));
 
 	$response = jira_response($ch, $error, $info);
@@ -246,14 +273,14 @@ function jira_get( $resource, $query = null, &$error = null, &$info = null ) {
 function jira_put( $resource, $data, &$error = null, &$info = null ) {
 	$_start = microtime(1);
 
-	$url = jira_url($resource);
+	$url = jira_url($resource, null, $info);
 	$body = json_encode($data);
 
 	$fp = fopen('php://temp/maxmemory:256000', 'w');
 	fwrite($fp, $body);
 	fseek($fp, 0);
 
-	$ch = jira_curl($url, 'PUT');
+	$ch = jira_curl($url, 'PUT', $info);
 	curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
 	curl_setopt($ch, CURLOPT_PUT, true);
 	curl_setopt($ch, CURLOPT_INFILE, $fp);
@@ -272,9 +299,9 @@ function jira_put( $resource, $data, &$error = null, &$info = null ) {
 function jira_delete( $resource, $query = null, &$error = null, &$info = null ) {
 	$_start = microtime(1);
 
-	$url = jira_url($resource, $query);
+	$url = jira_url($resource, $query, $info);
 
-	$ch = jira_curl($url, 'DELETE');
+	$ch = jira_curl($url, 'DELETE', $info);
 	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
 	curl_setopt($ch, CURLOPT_HTTPHEADER, array('User-agent: Jira Mobile'));
 

@@ -9,14 +9,20 @@ $accounts = get_accounts();
 // Add another account
 if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
 	$url = trim($_POST['url'], ' /');
-	$auth = trim($_POST['user']) . ':' . $_POST['pass'];
+	$username = trim($_POST['user']);
+	if ( !jira_test($url, $username, $_POST['pass'], $info) ) {
+		exit($info['error2']);
+	}
+
+	// Save credentials to cookie
+	$auth = $username . ':' . $_POST['pass'];
 	do_login($url, $auth);
 
 	// Save user to local db for preferences
 	try {
 		$db->insert('users', array(
 			'jira_url' => $url,
-			'jira_user' => trim($_POST['user']),
+			'jira_user' => $username,
 		));
 	}
 	catch ( db_exception $ex ) {
@@ -83,9 +89,11 @@ include 'tpl.header.php';
 <h1>Accounts</h1>
 
 <ul>
-	<?foreach ($accounts as $i => $account):?>
+	<?foreach ($accounts as $i => $account):
+		$_url = parse_url($account->url);
+		?>
 		<li class="<?if ($account->active):?>active-account<?endif?>">
-			<?= $account->user ?> @ <?= $account->url ?>
+			<?= $account->user ?> @ <?= $_url['host'] ?>
 			<?if (!$account->active):?>
 				(<a href="?switch=<?= $i ?>">switch</a>)
 				(<a href="?unlink=<?= $i ?>">x</a>)

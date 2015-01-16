@@ -31,38 +31,32 @@ if ( defined('JIRA_AUTH') ) {
 // Log in
 if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
 	// Test connection
-	define('JIRA_URL', trim($_POST['url'], ' /'));
-	define('JIRA_USER', trim($_POST['user']));
-	define('JIRA_AUTH', trim($_POST['user']) . ':' . $_POST['pass']);
-	$info = array('unauth_ok' => 1);
-	$account = jira_get('user', array('username' => JIRA_USER), $error, $info);
+	$url = trim($_POST['url'], ' /');
+	$username = trim($_POST['user']);
+	if ( !jira_test($url, $username, $_POST['pass'], $info) ) {
+		exit($info['error2']);
+	}
 
-	// Invalid URL
-	if ( $error == 404 ) {
-		exit('Invalid URL?');
-	}
-	// Invalid credentials
-	else if ( $error || empty($account->active) || empty($account->name) || $account->name !== JIRA_USER ) {
-		exit('Invalid login?');
-	}
+	$account = $info['account'];
 
 	// Save user to local db for preferences
 	try {
 		$db->insert('users', array(
-			'jira_url' => JIRA_URL,
-			'jira_user' => JIRA_USER,
+			'jira_url' => $url,
+			'jira_user' => $username,
 		));
 	}
 	catch ( db_exception $ex ) {
 		// Let's assume it failed because the user already exists.
 	}
 
-	$user = User::load();
+	$user = User::load($url, $username);
 	$user->unsync();
 	$db->update('users', array('jira_timezone' => $account->timeZone), array('id' => $user->id));
 
 	// Save credentials to cookie
-	do_login(JIRA_URL, JIRA_AUTH);
+	$auth = $username . ':' . $_POST['pass'];
+	do_login($url, $auth);
 
 	return do_redirect('index');
 }

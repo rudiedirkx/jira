@@ -238,12 +238,16 @@ class User extends db_generic_record {
 		return $db->update('users', $updates, array('id' => $this->id));
 	}
 
-	static function load() {
+	static function load( $url = null, $username = null ) {
 		global $db;
 
-		$username = JIRA_USER;
-		$url = JIRA_URL;
-		return $db->select('users', array('jira_url' => $url, 'jira_user' => $username), null, 'User')->first();
+		$url or $url = JIRA_URL;
+		$username or $username = JIRA_USER;
+
+		return $db->select('users', array(
+			'jira_url' => $url,
+			'jira_user' => $username,
+		), null, 'User')->first();
 	}
 
 }
