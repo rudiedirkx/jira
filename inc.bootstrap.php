@@ -29,6 +29,9 @@ define('JIRA_AUTH_PATH', '/rest/auth/1/');
 define('JIRA_API_PATH', '/rest/api/2/');
 define('JIRA_API_1_PATH', '/rest/api/1.0/');
 
+// Request constants
+define('IS_AJAX', strtolower(@$_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
+
 // Current session
 $user = null;
 if ( isset($_COOKIE['JIRA_URL'], $_COOKIE['JIRA_AUTH']) && ($accounts = get_accounts()) ) {
@@ -37,6 +40,8 @@ if ( isset($_COOKIE['JIRA_URL'], $_COOKIE['JIRA_AUTH']) && ($accounts = get_acco
 	define('JIRA_URL', $account->url);
 	define('JIRA_USER', $account->user);
 	define('JIRA_AUTH', $account->auth);
+
+	define('XSRF_TOKEN', md5(date('Y-m-d') . ':' . JIRA_URL . ':' . JIRA_AUTH));
 
 	$url = parse_url(JIRA_URL);
 	define('JIRA_ORIGIN', $url['scheme'] . '://' . $url['host']);

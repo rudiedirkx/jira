@@ -58,39 +58,49 @@ else if ( !empty($_POST['comment']) ) {
 }
 
 else if ( isset($_GET['delete_attachment']) ) {
+	do_tokencheck();
+
 	$id = $_GET['delete_attachment'];
 	$response = jira_delete('attachment/' . $id, null, $error, $info);
 
-	return do_redirect('issue', compact('key'));
+	exit(IS_AJAX ? 'OK' : do_redirect('issue', compact('key')));
 }
 
 else if ( isset($_GET['delete_worklog']) ) {
+	do_tokencheck();
+
 	$id = $_GET['delete_worklog'];
 	$response = jira_delete('issue/' . $key . '/worklog/' . $id, null, $error, $info);
 
-	return do_redirect('issue', compact('key'));
+	exit(IS_AJAX ? 'OK' : do_redirect('issue', compact('key')));
 }
 
 else if ( isset($_GET['delete_comment']) ) {
+	do_tokencheck();
+
 	$id = $_GET['delete_comment'];
 	$response = jira_delete('issue/' . $key . '/comment/' . $id, null, $error, $info);
 
-	return do_redirect('issue', compact('key'));
+	exit(IS_AJAX ? 'OK' : do_redirect('issue', compact('key')));
 }
 
 else if ( isset($_GET['watch']) ) {
+	do_tokencheck();
+
 	$method = !empty($_GET['watch']) ? 'jira_post' : 'jira_delete';
 	$data = !empty($_GET['watch']) ? JIRA_USER : array('username' => JIRA_USER);
 	$response = $method('issue/' . $key . '/watchers', $data, $error, $info);
 
-	return do_redirect('issue', compact('key'));
+	exit(IS_AJAX ? 'OK' : do_redirect('issue', compact('key')));
 }
 
 else if ( isset($_GET['vote']) ) {
+	do_tokencheck();
+
 	$method = !empty($_GET['vote']) ? 'jira_post' : 'jira_delete';
 	$response = $method('issue/' . $key . '/votes', null, $error, $info);
 
-	return do_redirect('issue', compact('key'));
+	exit(IS_AJAX ? 'OK' : do_redirect('issue', compact('key')));
 }
 
 else if ( isset($_GET['transitions']) ) {
@@ -163,11 +173,11 @@ if ( $fields->labels ) {
 }
 if ( !empty($fields->watches) ) {
 	$watches = $fields->watches->isWatching ? 'active' : '';
-	$meta[] = '<a href="issue.php?key=' . $key . '&watch=' . (int)!$watches . '" class="active-state ' . $watches . '">★</a> (watch)';
+	$meta[] = '<a href="issue.php?key=' . $key . '&watch=' . (int)!$watches . '&token=' . XSRF_TOKEN . '" class="ajax active-state ' . $watches . '">★</a> (watch)';
 }
 if ( !empty($fields->votes) ) {
 	$voted = $fields->votes->hasVoted ? 'active' : '';
-	$meta[] = '<a href="issue.php?key=' . $key . '&vote=' . (int)!$voted . '" class="active-state ' .  $voted. '">♥</a> (vote)';
+	$meta[] = '<a href="issue.php?key=' . $key . '&vote=' . (int)!$voted . '&token=' . XSRF_TOKEN . '" class="ajax active-state ' .  $voted. '">♥</a> (vote)';
 }
 if ( $updated && $updated > $created ) {
 	$meta[] = 'Updated on ' . date(FORMAT_DATETIME, $updated);
@@ -243,7 +253,7 @@ if ( $attachments ) {
 		echo '<td align="right">' . $size . '</td>';
 		echo '<td>' . date(FORMAT_DATETIME, $created) . '</td>';
 		echo '<td>' . html($attachment->author->displayName) . '</td>';
-		echo '<td><a data-confirm="You sure? Gone is really, really gone. We can\'t restore attachments." href="?key=' . $key . '&delete_attachment=' . $attachment->id . '">x</a></td>';
+		echo '<td><a class="ajax" data-confirm="You sure? Gone is really, really gone. We can\'t restore attachments." href="?key=' . $key . '&delete_attachment=' . $attachment->id . '&token=' . XSRF_TOKEN . '">x</a></td>';
 		echo '</tr>';
 	}
 	echo '</table>';
@@ -283,7 +293,7 @@ foreach ( $comments AS $i => $comment ) {
 	echo '  [' . date(FORMAT_DATETIME, $created) . ']';
 	echo '  by <strong>' . html($comment->author->displayName) . '</strong>';
 	echo '  [ <a href="comment.php?key=' . $key . '&id=' . $comment->id . '&summary=' . urlencode($fields->summary) . '">e</a> |';
-	echo '  <a data-confirm="DELETE this COMMENT for ever and ever?" href="?key=' . $key . '&delete_comment=' . $comment->id . '">x</a> ]';
+	echo '  <a class="ajax" data-confirm="DELETE this COMMENT for ever and ever?" href="?key=' . $key . '&delete_comment=' . $comment->id . '&token=' . XSRF_TOKEN . '">x</a> ]';
 	echo '</p>';
 	echo '<div class="comment-body markup">' . do_remarkup($issue->renderedFields->comment->comments[$i]->body) . '</div>';
 	echo '</div>';

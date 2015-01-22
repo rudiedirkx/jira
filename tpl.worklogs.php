@@ -24,7 +24,7 @@ foreach ( $worklogs AS $worklog ) {
 	$table .= '<td>' . html(@$worklog->comment ?: '') . '</td>';
 	$table .= '<td>';
 	$table .= '  <a href="logwork.php?key=' . $key . '&summary=' . urlencode($summary) . '&id=' . $worklog->id . '">e</a> |';
-	$table .= '  <a data-confirm="DELETE this WORKLOG forever and ever?" href="issue.php?key=' . $key . '&delete_worklog=' . $worklog->id . '">x</a>';
+	$table .= '  <a class="ajax" data-confirm="DELETE this WORKLOG forever and ever?" href="issue.php?key=' . $key . '&delete_worklog=' . $worklog->id . '&token=' . XSRF_TOKEN . '">x</a>';
 	$table .= '</td>';
 	$table .= '</tr>';
 }

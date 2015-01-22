@@ -1,5 +1,11 @@
 <?php
 
+function do_tokencheck() {
+	if ( !defined('XSRF_TOKEN') || (string)@$_GET['token'] !== XSRF_TOKEN ) {
+		exit("Access denied\n");
+	}
+}
+
 function html_icon( $icon, $type = '' ) {
 	$url = @$icon->{$type . 'Url'} ?: $icon->iconUrl;
 	$name = @$icon->{$type . 'Name'} ?: $icon->name;
@@ -144,7 +150,7 @@ function do_redirect( $path, $query = null ) {
 
 function do_logincheck() {
 	if ( !defined('JIRA_AUTH') ) {
-		exit('<a href="auth.php">Need login</a>');
+		exit('<a href="auth.php">Need login</a>' . "\n");
 	}
 }
 

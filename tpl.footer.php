@@ -5,6 +5,19 @@ $$('a[data-confirm]').on('click', function(e) {
 		e.preventDefault();
 	}
 });
+$$('a.ajax:not(.ajaxed)').on('click', function(e) {
+	e.preventDefault();
+	document.body.addClass('loading');
+	$.get(this.href).on('done', function(e, rsp) {
+		if ( rsp.substr(0, 2) == 'OK' ) {
+			location.reload();
+		}
+		else {
+			document.body.removeClass('loading');
+			alert(rsp);
+		}
+	});
+}).addClass('ajaxed');
 </script>
 
 </body>
