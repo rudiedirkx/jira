@@ -269,6 +269,10 @@ if ( $worklogs ) {
 		include 'tpl.worklogs.php';
 	}
 }
+else {
+	echo '<h2 class="pre-menu">? worklogs</h2> (<a href="' . $actions['Log work'] . '">add</a>)';
+	echo '<p><a href="worklogs.php?key=' . $key . '&subtasks=' . implode(',', $subkeys) . '&summary=' . urlencode($fields->summary) . '">See ALL worklogs, incl subtasks.</a></p>';
+}
 
 echo '<h2>' . count($comments) . ' comments</h2>';
 echo '<div class="comments">';
