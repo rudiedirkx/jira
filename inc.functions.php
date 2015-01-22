@@ -1,5 +1,18 @@
 <?php
 
+function html_icon( $icon, $type = '' ) {
+	$url = @$icon->{$type . 'Url'} ?: $icon->iconUrl;
+	$name = @$icon->{$type . 'Name'} ?: $icon->name;
+
+	$html = '';
+	$html .= '<span class="icon-wrapper">';
+	$html .= '<img class="icon ' . $type . '" src="' . $url . '" alt="' . html($name) . '" title="' . html($name) . '" tabindex="-1" />';
+	$html .= '<span class="icon-name">' . html($name) . '</span>';
+	$html .= '</span>';
+
+	return $html;
+}
+
 function get_urls( $accounts = null ) {
 	if ( $accounts ) {
 		return array_map(function($acc) {

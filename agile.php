@@ -75,7 +75,7 @@ foreach ($plan->issues as $issue) {
 
 	$priority = '';
 	if (@$issue->priorityUrl) {
-		$priority = '<img src="' . $issue->priorityUrl . '" title="Priority: ' . html($issue->priorityName) . '" alt="' . html($issue->priorityName) . '" />';
+		$priority = html_icon($issue, 'priority');
 	}
 
 	echo '<tr>';
@@ -88,10 +88,7 @@ foreach ($plan->issues as $issue) {
 }
 echo '</table>';
 
-
-// echo '<pre>';
-// print_r(array_slice($plan->issues, 0, 30));
-// echo '</pre>';
+echo '<pre>' . print_r(array_slice($plan->issues, 0, 30), 1) . '</pre>';
 
 include 'tpl.footer.php';
 

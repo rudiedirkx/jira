@@ -153,10 +153,10 @@ echo '<p class="menu">' . html_links($actions) . '</p>';
 
 $meta = array();
 echo '<p class="meta">';
-$meta[] = '<img class="icon issuetype" src="' . html($fields->issuetype->iconUrl) . '" alt="' . html($fields->issuetype->name) . '" /> ' . html($fields->issuetype->name);
-$meta[] = '<img class="icon priority" src="' . html($fields->priority->iconUrl) . '" alt="' . html($fields->priority->name) . '" /> ' . html($fields->priority->name);
+$meta[] = html_icon($fields->issuetype, 'issuetype') . ' ' . html($fields->issuetype->name);
+$meta[] = html_icon($fields->priority, 'priority') . ' ' . html($fields->priority->name);
 $meta[] = html($fields->reporter->displayName) . ' (' . date(FORMAT_DATETIME, $created) . ')';
-$meta[] = '<strong>' . html($fields->status->name) . $resolution . '</strong>';
+$meta[] = html_icon($fields->status, 'status') . ' <strong>' . html($fields->status->name) . $resolution . '</strong>';
 $meta[] = '<em>' . ( html(@$fields->assignee->displayName) ?: 'No assignee' ) . '</em>';
 if ( $fields->labels ) {
 	$meta[] = '<span class="label">' . implode('</span> <span class="label">', array_map('html', $fields->labels)) . '</span>';
@@ -219,7 +219,13 @@ if ( $subtasks ) {
 	echo '<h2>' . count($subtasks) . ' sub tasks</h2>';
 	echo '<ol>';
 	foreach ( $subtasks as $task ) {
-		echo '<li><a href="issue.php?key=' . $task->key . '">' . $task->key . '</a> <img src="' . $task->fields->status->iconUrl . '" alt="' . html($task->fields->status->name) . '" /> ' . html($task->fields->summary) . '</li>';
+		echo '<li>';
+		echo html_icon($task->fields->issuetype, 'issuetype') . ' ';
+		echo '<a href="issue.php?key=' . $task->key . '">' . $task->key . '</a> ';
+		echo html_icon($task->fields->status, 'status') . ' ';
+		echo html($task->fields->summary) . ' ';
+		// echo '<em>' . ( html(@$task->fields->assignee->displayName) ?: 'No assignee' ) . '</em>';
+		echo '</li>';
 	}
 	echo '</ol>';
 }

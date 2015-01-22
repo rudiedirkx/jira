@@ -105,9 +105,28 @@ h1.with-parent-issue {
 .dates .right {
 	float: right;
 }
+
+.icon-wrapper {
+	position: relative;
+}
 .icon {
 	width: 16px;
 	height: 16px;
+}
+.icon + .icon-name {
+	display: none;
+}
+.icon:active + .icon-name,
+.icon:focus + .icon-name {
+	display: block;
+	position: absolute;
+	left: 21px;
+	top: -5px;
+	padding: 5px 10px;
+	background-color: black;
+	color: white;
+	white-space: nowrap;
+	z-index: 4;
 }
 
 
