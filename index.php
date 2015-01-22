@@ -13,7 +13,7 @@ $filterOptions = $user->filter_query_options;
 
 // GET search
 if ( !empty($_GET['search']) ) {
-	$query = "text ~ '" . addslashes($_GET['search']) . "' ORDER BY updated DESC";
+	$query = "text ~ '" . addslashes(trim($_GET['search'])) . "' ORDER BY updated DESC";
 	$querySource = 'search';
 }
 // GET query
@@ -23,7 +23,7 @@ else if ( !empty($_GET['query']) ) {
 }
 // GET project
 else if ( !empty($_GET['project']) ) {
-	$query = 'project = "' . trim($_GET['project']) . '" AND ' . $query;
+	$query = 'project = "' . addslashes(trim($_GET['project'])) . '" AND ' . $query;
 	$querySource = 'project:get';
 }
 // User's query
