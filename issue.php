@@ -164,7 +164,9 @@ echo '<p class="menu">' . html_links($actions) . '</p>';
 $meta = array();
 echo '<p class="meta">';
 $meta[] = html_icon($fields->issuetype, 'issuetype') . ' ' . html($fields->issuetype->name);
-$meta[] = html_icon($fields->priority, 'priority') . ' ' . html($fields->priority->name);
+if ($fields->priority) {
+	$meta[] = html_icon($fields->priority, 'priority') . ' ' . html($fields->priority->name);
+}
 $meta[] = html($fields->reporter->displayName) . ' (' . date(FORMAT_DATETIME, $created) . ')';
 $meta[] = html_icon($fields->status, 'status') . ' <strong>' . html($fields->status->name) . $resolution . '</strong>';
 $meta[] = '<em>' . ( html(@$fields->assignee->displayName) ?: 'No assignee' ) . '</em>';
@@ -210,7 +212,7 @@ if ( isset($_GET['edit']) ) {
 	echo '	<p>Description: <textarea name="description" rows="8">' . html($fields->description) . '</textarea></p>';
 
 	echo '	<p>Issue type: <select name="issuetype">' . html_options($issuetypes, $fields->issuetype->id) . '</select></p>';
-	echo '	<p>Priority: <select name="priority">' . html_options($priorities, $fields->priority->id) . '</select></p>';
+	echo '	<p>Priority: <select name="priority">' . html_options($priorities, @$fields->priority->id, '?') . '</select></p>';
 
 	echo '	<p>Reporter (' . $fields->reporter->name . '): <input name="reporter" /></p>';
 
