@@ -3,6 +3,8 @@
 $$('a[data-confirm]').on('click', function(e) {
 	if ( !confirm(this.data('confirm')) ) {
 		e.preventDefault();
+		e.stopPropagation();
+		e.stopImmediatePropagation();
 	}
 });
 $$('a.ajax:not(.ajaxed)').on('click', function(e) {

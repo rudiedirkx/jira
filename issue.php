@@ -57,6 +57,15 @@ else if ( !empty($_POST['comment']) ) {
 	exit;
 }
 
+else if ( isset($_GET['delete_link']) ) {
+	do_tokencheck();
+
+	$id = $_GET['delete_link'];
+	$response = jira_delete('issueLink/' . $id, null, $error, $info);
+
+	exit(IS_AJAX ? 'OK' : do_redirect('issue', compact('key')));
+}
+
 else if ( isset($_GET['delete_attachment']) ) {
 	do_tokencheck();
 
@@ -125,6 +134,7 @@ $subkeys = array_map(function($issue) {
 $parent = @$fields->parent;
 $attachments = $fields->attachment;
 $worklogs = $fields->worklog->worklogs;
+$links = $fields->issuelinks;
 $comments = $fields->comment->comments;
 
 $fieldsmeta = $user->custom_field_ids;
@@ -146,6 +156,7 @@ foreach ( $transitions AS $transition ) {
 $actions['Labels'] = 'labels.php?key=' . $key;
 $actions['Log work'] = 'logwork.php?key=' . $key . '&summary=' . urlencode($fields->summary);
 $actions['Upload'] = 'upload.php?key=' . $key . '&summary=' . urlencode($fields->summary);
+$actions['Link'] = 'link.php?key=' . $key . '&summary=' . urlencode($fields->summary);
 $actions['➔ View in Jira'] = JIRA_URL . '/browse/' . $key;
 
 $resolution = '';
@@ -262,6 +273,30 @@ if ( $attachments ) {
 	echo '</div>';
 }
 
+if ( $links ) {
+	echo '<h2 class="pre-menu">' . count($links) . ' links</h2> (<a href="' . $actions['Link'] . '">add</a>)';
+	echo '<div class="table links">';
+	echo '<table border="1">';
+	foreach ( $links AS $i => $link ) {
+		$first = $i == 0;
+
+		$linkedIssue = @$link->outwardIssue ?: $link->inwardIssue;
+		$xward = @$link->outwardIssue ? 'outward' : 'inward';
+		$linkTitle = $link->type->$xward;
+
+		echo '<tr>';
+		if ($first) {
+			echo '<td rowspan="' . count($links) . '">This issue</td>';
+		}
+		echo '<td>' . html($linkTitle) . '</td>';
+		echo '<td>' . html_icon($linkedIssue->fields->issuetype, 'issuetype') . ' <a href="issue.php?key=' . $linkedIssue->key . '">' . $linkedIssue->key . '</a> ' . html_icon($linkedIssue->fields->status, 'status') . ' ' . html($linkedIssue->fields->summary) . '</td>';
+		echo '<td><a class="ajax" data-confirm="Unlink this issue from ' . $linkedIssue->key . '? Re-linking is easy." href="?key=' . $key . '&delete_link=' . $link->id . '&token=' . XSRF_TOKEN . '">x</a></td>';
+		echo '</tr>';
+	}
+	echo '</table>';
+	echo '</div>';
+}
+
 if ( $worklogs ) {
 	echo '<h2 class="pre-menu">' . $fields->worklog->total . ' worklogs</h2> (<a href="' . $actions['Log work'] . '">add</a>)';
 
@@ -286,7 +321,7 @@ else {
 	echo '<p><a href="worklogs.php?key=' . $key . '&subtasks=' . implode(',', $subkeys) . '&summary=' . urlencode($fields->summary) . '">See ALL worklogs, incl subtasks.</a></p>';
 }
 
-echo '<h2>' . count($comments) . ' comments</h2>';
+echo '<h2 class="pre-menu">' . count($comments) . ' comments</h2> (<a href="#new-comment">add</a>)';
 echo '<div class="comments">';
 foreach ( $comments AS $i => $comment ) {
 	$created = strtotime($comment->created);
@@ -303,7 +338,7 @@ foreach ( $comments AS $i => $comment ) {
 }
 echo '</div>';
 
-echo '<div class="post-comment">';
+echo '<div id="new-comment" class="post-comment">';
 echo '<h2>New comment</h2>';
 echo '<form autocomplete="off" method="post">';
 echo '<p><textarea name="comment" rows="8"></textarea></p>';
@@ -311,6 +346,8 @@ echo '<p><input type="submit" /></p>';
 echo '</form>';
 echo '</div>';
 
-// echo '<pre>' . print_r($issue, 1) . '</pre>';
+if ( isset($_GET['debug']) ) {
+	echo '<pre>' . print_r($issue, 1) . '</pre>';
+}
 
 include 'tpl.footer.php';

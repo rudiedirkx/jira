@@ -41,7 +41,7 @@ if ( isset($_COOKIE['JIRA_URL'], $_COOKIE['JIRA_AUTH']) && ($accounts = get_acco
 	define('JIRA_USER', $account->user);
 	define('JIRA_AUTH', $account->auth);
 
-	define('XSRF_TOKEN', md5(date('Y-m-d') . ':' . JIRA_URL . ':' . JIRA_AUTH));
+	define('XSRF_TOKEN', md5(date('Y-m-d H') . ':' . JIRA_URL . ':' . JIRA_AUTH));
 
 	$url = parse_url(JIRA_URL);
 	define('JIRA_ORIGIN', $url['scheme'] . '://' . $url['host']);

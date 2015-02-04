@@ -14,17 +14,18 @@
 	var domReadyAttached = false;
 	var cssDisplays = {};
 	r.arrayish = function(obj) {
-		return obj instanceof Array || ( typeof obj.length == 'number' && typeof obj != 'string' && ( obj[0] !== undefined || obj.length == 0 ) );
+		return obj instanceof Array || ( typeof obj.length == 'number' && typeof obj != 'string' && ( obj[0] !== undefined || obj.length === 0 ) );
 	};
 
 	r.is_a = function(obj, type) {
-		return window[type] && obj instanceof window[type];
+		return W[type] && obj instanceof W[type];
 	};
 	r.merge = function(base) {
+		var merger = function(value, name) {
+			base[name] = value;
+		};
 		for ( var i=1, L=arguments.length; i<L; i++ ) {
-			r.each(arguments[i], function(value, name) {
-				base[name] = value;
-			});
+			r.each(arguments[i], merger);
 		}
 		return base;
 	};
@@ -94,7 +95,7 @@
 			this._el = el;
 			el.$classList = this;
 			this._reinit();
-		}
+		};
 		r.extend(W.DOMTokenList, {
 			_reinit: function() {
 				this.length = 0;
@@ -129,12 +130,16 @@
 					this.set();
 				}
 			},
-			toggle: function(token) {
-				if ( this.contains(token) ) {
-					return !!this.remove(token);
+			toggle: function(token, add) {
+				if ( add == null ) {
+					add = !this.contains(token);
 				}
 
-				return !this.add(token);
+				if ( add ) {
+					return !this.add(token);
+				}
+
+				return !!this.remove(token);
 			}
 		});
 
@@ -144,9 +149,13 @@
 	}
 	function Elements(source, selector) {
 		this.length = 0;
-		source && r.each(source, function(el, i) {
-			el.nodeType === 1 && ( !selector || el.is(selector) ) && this.push(el);
-		}, this);
+		if ( source ) {
+			r.each(source, function(el, i) {
+				if ( el.nodeType === 1 && ( !selector || el.is(selector) ) ) {
+					this.push(el);
+				}
+			}, this);
+		}
 	}
 	r.extend(Elements, {
 		invoke: function(method, args) {
@@ -205,14 +214,22 @@
 		preventDefault: function(e) {
 			if ( e = this.originalEvent ) {
 				e.preventDefault();
-				this.defaultPrevented = true;
 			}
+			this.defaultPrevented = true;
 		},
 		stopPropagation: function(e) {
 			if ( e = this.originalEvent ) {
 				e.stopPropagation();
-				this.propagationStopped = true;
 			}
+			this.propagationStopped = true;
+		},
+		stopImmediatePropagation: function(e) {
+			this.stopPropagation();
+
+			if ( e = this.originalEvent ) {
+				e.stopImmediatePropagation();
+			}
+			this.immediatePropagationStopped = true;
 		}
 
 	});
@@ -226,7 +243,10 @@
 	}
 	r.extend(Eventable, {
 		on: function(eventType, matches, callback) {
-			callback || (callback = matches) && (matches = null);
+			if ( !callback ) {
+				callback = matches;
+				matches = null;
+			}
 
 			var options = {
 				bubbles: !!matches,
@@ -234,14 +254,17 @@
 			};
 
 			var baseType = eventType,
-				customEvent = false;
-			if ( Event.Custom[eventType] ) {
-				customEvent = Event.Custom[eventType];
-				customEvent.type && (baseType = customEvent.type);
+				customEvent;
+			if ( customEvent = Event.Custom[eventType] ) {
+				if ( customEvent.type ) {
+					baseType = customEvent.type;
+				}
 			}
 
-			function onCallback(e, arg2) {
-				e && !(e instanceof AnyEvent) && (e = new AnyEvent(e));
+			var onCallback = function(e, arg2) {
+				if ( e && !(e instanceof AnyEvent) ) {
+					e = new AnyEvent(e);
+				}
 
 				var subject = options.subject;
 				if ( e && e.target && matches ) {
@@ -257,7 +280,7 @@
 				}
 
 				return callback.call(subject, e, arg2);
-			}
+			};
 
 			if ( customEvent && customEvent.before ) {
 				if ( customEvent.before.call(this, options) === false ) {
@@ -267,9 +290,17 @@
 
 			var events = options.subject.$events || (options.subject.$events = {});
 			events[eventType] || (events[eventType] = []);
-			events[eventType].push({type: baseType, original: callback, callback: onCallback, bubbles: options.bubbles});
+			events[eventType].push({
+				type: baseType,
+				original: callback,
+				callback: onCallback,
+				bubbles: options.bubbles
+			});
 
-			options.subject.addEventListener && options.subject.addEventListener(baseType, onCallback, options.bubbles);
+			if ( options.subject.addEventListener ) {
+				options.subject.addEventListener(baseType, onCallback, options.bubbles);
+			}
+
 			return this;
 		},
 		off: function(eventType, callback) {
@@ -280,25 +311,37 @@
 					if ( !callback || callback == listener.original ) {
 						changed = true;
 						delete events[i];
-						this.removeEventListener && this.removeEventListener(listener.type, listener.callback, listener.bubbles);
+						if ( this.removeEventListener ) {
+							this.removeEventListener(listener.type, listener.callback, listener.bubbles);
+						}
 					}
 				}, this);
-				changed && (this.$events[eventType] = events.filter(Array.defaultFilterCallback));
+				if ( changed ) {
+					this.$events[eventType] = events.filter(Array.defaultFilterCallback);
+				}
 			}
 			return this;
 		},
 		fire: function(eventType, e, arg2) {
 			if ( this.$events && this.$events[eventType] ) {
-				e || (e = new AnyEvent(eventType));
+				if ( !e ) {
+					e = new AnyEvent(eventType);
+				}
+				var immediatePropagationStopped = false;
 				r.each(this.$events[eventType], function(listener) {
-					listener.callback.call(this, e, arg2);
+					if ( !immediatePropagationStopped ) {
+						listener.callback.call(this, e, arg2);
+						immediatePropagationStopped |= e.immediatePropagationStopped;
+					}
 				}, this);
 			}
 			return this;
 		}
 	});
 	r.extend([W, D, Element, XMLHttpRequest], Eventable.prototype);
-	W.XMLHttpRequestUpload && r.extend([XMLHttpRequestUpload], Eventable.prototype);
+	if ( W.XMLHttpRequestUpload ) {
+		r.extend([W.XMLHttpRequestUpload], Eventable.prototype);
+	}
 	r.extend(Node, {
 		ancestor: function(selector) {
 			var el = this;
@@ -333,7 +376,7 @@
 			return this.parentNode;
 		},
 		insertAfter: function(el, ref) {
-			var next = ref.nextSibling; 
+			var next = ref.nextSibling;
 			if ( next ) {
 				return this.insertBefore(el, next);
 			}
@@ -341,10 +384,12 @@
 		}
 	});
 
-	r.extend(document, {
-		el: function(tag, attrs) {
-			var el = this.createElement(tag);
-			attrs && el.attr(attrs);
+	r.extend(D, {
+		el: function(tagName, attrs) {
+			var el = this.createElement(tagName);
+			if ( attrs ) {
+				el.attr(attrs);
+			}
 			return el;
 		}
 	});
@@ -374,7 +419,9 @@
 			return this.getChildren().last();
 		},
 		attr: function(name, value, prefix) {
-			prefix == null && (prefix = '');
+			if ( prefix == null ) {
+				prefix = '';
+			}
 			if ( value === undefined ) {
 				if ( typeof name == 'string' ) {
 					return this.getAttribute(prefix + name);
@@ -426,6 +473,19 @@
 		getElements: function(selector) {
 			return $$(this.querySelectorAll(selector));
 		},
+		getElementsByText: function(text, simple) {
+			return this.getElements('*').filter(function(el) {
+				if ( simple || el.children.length == 0 ) {
+					var tc = simple ? el.textContent.trim() : el.textContent;
+					return text instanceof RegExp ? text.test(tc) : tc === text;
+				}
+
+				return false;
+			});
+		},
+		getElementByText: function(text, simple) {
+			return this.getElementsByText(text, simple)[0];
+		},
 		removeClass: function(token) {
 			this.classList.remove(token);
 			return this;
@@ -434,8 +494,8 @@
 			this.classList.add(token);
 			return this;
 		},
-		toggleClass: function(token) {
-			this.classList.toggle(token);
+		toggleClass: function(token, add) {
+			this.classList.toggle.apply(this.classList, arguments);
 			return this;
 		},
 		replaceClass: function(before, after) {
@@ -456,8 +516,16 @@
 			parent.appendChild(this);
 			return this;
 		},
+		appendTo: function(parent) {
+			return this.inject(parent);
+		},
 		injectTop: function(parent) {
-			parent.firstChild ? parent.insertBefore(this, parent.firstChild) : parent.appendChild(this);
+			if ( parent.firstChild ) {
+				parent.insertBefore(this, parent.firstChild);
+			}
+			else {
+				parent.appendChild(this);
+			}
 			return this;
 		},
 		append: function(child) {
@@ -487,7 +555,7 @@
 		},
 		show: function() {
 			if ( !cssDisplays[this.nodeName] ) {
-				var el = document.el(this.nodeName).inject(this.ownerDocument.body);
+				var el = D.el(this.nodeName).inject(this.ownerDocument.body);
 				cssDisplays[this.nodeName] = el.getStyle('display');
 				el.remove();
 			}
@@ -496,20 +564,28 @@
 		hide: function() {
 			return this.css('display', 'none');
 		},
-		toggle: function() {
-			return this.getStyle('display') == 'none' ? this.show() : this.hide();
+		toggle: function(show) {
+			if ( show == null ) {
+				show = this.getStyle('display') == 'none';
+			}
+
+			return show ? this.show() : this.hide();
 		}
 	});
 
-	r.extend(document, {
+	r.extend(D, {
 		getElement: Element.prototype.getElement,
-		getElements: Element.prototype.getElements
+		getElements: Element.prototype.getElements,
+		getElementsByText: Element.prototype.getElementsByText,
+		getElementByText: Element.prototype.getElementByText
 	});
 
 	Event.Custom.ready = {
 		before: function() {
-			if ( this == document ) {
-				domReadyAttached || attachDomReady();
+			if ( this == D ) {
+				if ( !domReadyAttached ) {
+					attachDomReady();
+				}
 			}
 		}
 	};
@@ -541,7 +617,7 @@
 		return r.arrayish(selector) ? new Elements(selector) : D.getElements(selector);
 	}
 	function XHR(url, options) {
-		options = r.merge({}, {
+		var defaults = {
 			method: 'GET',
 			async: true,
 			send: true,
@@ -549,7 +625,8 @@
 			url: url,
 			requester: 'XMLHttpRequest',
 			execScripts: true
-		}, options || {});
+		};
+		options = options ? r.merge({}, defaults, options) : defaults;
 		options.method = options.method.toUpperCase();
 
 		var xhr = new XMLHttpRequest;
@@ -566,8 +643,10 @@
 			catch (ex) {}
 			var response = this.responseJSON || t;
 
+			var scripts;
+
 			if ( this.options.execScripts ) {
-				var scripts = [];
+				scripts = [];
 				if ( typeof response == 'string' ) {
 					var regex = /<script[^>]*>([\s\S]*?)<\/script>/i,
 						script;
@@ -583,7 +662,7 @@
 			this.fire(eventType, e, response);
 			this.fire('done', e, response);
 
-			if ( this.options.execScripts && scripts.length ) {
+			if ( this.options.execScripts && scripts && scripts.length ) {
 				scripts.forEach(function(code) {
 					eval.call(W, code);
 				});
@@ -601,11 +680,20 @@
 			}
 		}
 		if ( options.send ) {
-			options.requester && xhr.setRequestHeader('X-Requested-With', options.requester);
+			if ( options.requester ) {
+				xhr.setRequestHeader('X-Requested-With', options.requester);
+			}
 
 			xhr.fire('start');
 
-			options.async ? setTimeout(function() { xhr.send(options.data); }, 1) : xhr.send(options.data);
+			if ( options.async ) {
+				setTimeout(function() {
+					xhr.send(options.data);
+				}, 1);
+			}
+			else {
+				xhr.send(options.data);
+			}
 		}
 		return xhr;
 	}
@@ -620,7 +708,9 @@
 
 	function shortXHR(method) {
 		return function(url, data, options) {
-			options || (options = {});
+			if ( !options ) {
+				options = {};
+			}
 			options.method = method;
 			options.data = data;
 			var xhr = XHR(url, options);
@@ -638,4 +728,5 @@
 	W.Elements = Elements;
 	W.AnyEvent = AnyEvent;
 	W.Eventable = Eventable;
+
 })(this, this.document);
