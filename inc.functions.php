@@ -219,11 +219,13 @@ function jira_url( $resource, $query = null, $info = null ) {
 	return $url;
 }
 
-function jira_curl( $url, $method = '', $info = null ) {
+function jira_curl( $url, $method = '', &$info = null ) {
 	empty($GLOBALS['jira_requests']) && $GLOBALS['jira_requests'] = array();
 	$GLOBALS['jira_requests'][] = $method . ' ' . $url;
 
 	$auth = $info && @$info['JIRA_AUTH'] ? $info['JIRA_AUTH'] : JIRA_AUTH;
+
+	$info['_start'] = microtime(1);
 
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, $url);
@@ -342,9 +344,7 @@ function jira_response( $ch, &$error = null, &$info = null ) {
 		@list($header, $body) = explode("\r\n\r\n", $body, 2);
 	}
 
-	$params = $info;
-
-	$info = curl_getinfo($ch);
+	$info = curl_getinfo($ch) + $info;
 	curl_close($ch);
 
 	$info['headers'] = jira_http_headers($header);
@@ -354,7 +354,7 @@ function jira_response( $ch, &$error = null, &$info = null ) {
 	$invalid_url = $code == 404 && is_int(strpos($info['content_type'], 'text/html'));
 	$unauth = $code == 401 || $code == 403 /*|| $invalid_url*/;
 
-	if ( $unauth && empty($params['unauth_ok']) ) {
+	if ( $unauth && empty($info['unauth_ok']) ) {
 		global $db;
 		$db->delete('users', array('jira_url' => JIRA_URL, 'jira_user' => JIRA_USER));
 		do_logout(true);
@@ -369,7 +369,12 @@ function jira_response( $ch, &$error = null, &$info = null ) {
 		$info['error'] = ($json = @json_decode($body)) ? $json : null;
 	}
 
-	return $success ? @json_decode($body) : false;
+	$response = $success ? @json_decode($body) : false;
+
+	$info['_end'] = microtime(1);
+	$info['_time'] = $info['_end'] - $info['_start'];
+
+	return $response;
 }
 
 function jira_http_headers( $header ) {
