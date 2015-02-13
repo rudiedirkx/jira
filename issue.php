@@ -220,7 +220,7 @@ if ( isset($_GET['edit']) ) {
 	echo '<form autocomplete="off" action method="post">';
 	echo '	<p>Summary: <input name="summary" value="' . html($fields->summary) . '" /></p>';
 
-	echo '	<p>Description: <textarea name="description" rows="8">' . html($fields->description) . '</textarea></p>';
+	echo '	<p>Description: <textarea name="description" rows="20">' . html($fields->description) . '</textarea></p>';
 
 	echo '	<p>Issue type: <select name="issuetype">' . html_options($issuetypes, $fields->issuetype->id) . '</select></p>';
 	echo '	<p>Priority: <select name="priority">' . html_options($priorities, @$fields->priority->id, '?') . '</select></p>';

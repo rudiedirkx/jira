@@ -4,7 +4,7 @@ require 'inc.bootstrap.php';
 
 do_logincheck();
 
-if ( isset($_GET['project'], $_GET['issuetype'], $_POST['summary'], $_POST['description'], $_POST['priority']) ) {
+if ( isset($_GET['project'], $_GET['issuetype'], $_POST['summary'], $_POST['description'], $_POST['priority'], $_POST['assignee']) ) {
 	$fields = array(
 		'project' => array('id' => $_GET['project']),
 		'issuetype' => array('id' => $_GET['issuetype']),
@@ -32,73 +32,104 @@ if ( isset($_GET['project'], $_GET['issuetype'], $_POST['summary'], $_POST['desc
 	exit;
 }
 
-include 'tpl.header.php';
+$project = @$_GET['project'];
+$issuetype = @$_GET['issuetype'];
 
-$meta = jira_get('issue/createmeta', array('expand' => 'projects.issuetypes.fields'), $error, $info);
+include 'tpl.header.php';
 
 echo '<h1>Create new issue</h1>';
 
+
+
 // Choose project
 echo '<h2>Project</h2>';
-echo '<ul>';
-foreach ( $meta->projects AS $project ) {
-	$active = @$_GET['project'] == $project->id ? 'active' : '';
-	echo '<li><a class="' . $active . '" href="new.php?project=' . $project->id . '">' . $project->name . '</a></li>';
-}
-echo '</ul>';
 
-// Have project
-if ( !empty($_GET['project']) && ($project = get_project($meta->projects, $_GET['project'])) ) {
-	// print_r($project);
-
-	// Choose issue type
-	echo '<h2>Issue type</h2>';
+if ( !$project ) {
+	$projects = jira_get('project', array(), $error, $info);
 	echo '<ul>';
-	foreach ( $project->issuetypes AS $issuetype ) {
-		$active = @$_GET['issuetype'] == $issuetype->id ? 'active' : '';
-		echo '<li><a class="' . $active . '" href="new.php?project=' . $project->id . '&issuetype=' . $issuetype->id . '">' . $issuetype->name . '</a></li>';
+	foreach ( $projects AS $project ) {
+		echo '<li>';
+		echo '<a href="new.php?project=' . $project->id . '">' . $project->name . '</a>';
+		echo '</li>';
 	}
 	echo '</ul>';
+	exit;
+}
 
-	// Have issue type
-	if ( !empty($_GET['issuetype']) && ($issuetype = get_issuetype($project->issuetypes, $_GET['issuetype'])) ) {
-		$priorities = array();
-		foreach ( $issuetype->fields->priority->allowedValues AS $priority ) {
-			$priorities[$priority->id] = $priority->name;
-		}
-		$priorityKeys = array_keys($priorities);
-		$defaultPriority = $priorityKeys[ ceil((count($priorities)-1)/2) ];
+// Get project meta data
+$meta = jira_get('issue/createmeta', array(
+	'expand' => 'projects.issuetypes.fields',
+	'projectIds' => $project,
+	'issuetypeIds' => $issuetype ?: null,
+), $error, $info);
+$project = $meta->projects[0];
 
-		?>
+// Show selected project
+echo '<ul>';
+echo '<li>';
+echo '<a href="new.php?project=' . $project->id . '">' . $project->name . '</a>';
+echo ' (<a href="new.php">change</a>)';
+echo '</li>';
+echo '</ul>';
+
+
+
+// Choose issue type
+echo '<h2>Issue type</h2>';
+
+if ( !$issuetype ) {
+	echo '<ul>';
+	foreach ( $project->issuetypes AS $issuetype ) {
+		echo '<li>';
+		echo '<a href="new.php?project=' . $project->id . '&issuetype=' . $issuetype->id . '">' . $issuetype->name . '</a>';
+		echo '</li>';
+	}
+	echo '</ul>';
+	exit;
+}
+
+// Get issue type meta data
+$issuetype = get_issuetype($project, $issuetype);
+
+// Show selected issue type
+echo '<ul>';
+echo '<li>';
+echo '<a href="new.php?project=' . $project->id . '&issuetype=' . $issuetype->id . '">' . $issuetype->name . '</a>';
+echo ' (<a href="new.php?project=' . $project->id . '">change</a>)';
+echo '</li>';
+echo '</ul>';
+
+
+
+// Get priority meta data
+$priorities = array_reduce($issuetype->fields->priority->allowedValues, function($list, $priority) {
+	$list[ $priority->id ] = $priority->name;
+	return $list;
+});
+$priorityKeys = array_keys($priorities);
+$defaultPriority = $priorityKeys[ floor((count($priorities) - 1) / 2) ];
+
+?>
 <form autocomplete="off" action method="post">
 	<p>Summary: <input name="summary" /></p>
 	<p>Description: <textarea name="description" rows="8"></textarea></p>
 	<p>Priority: <select name="priority"><?= html_options($priorities, $defaultPriority) ?></select></p>
-	<p>Assignee: <input name="assignee" /></p>
+	<p>Assignee: <input name="assignee" value="<?= JIRA_USER ?>" /></p>
 
 	<p><input type="submit" /></p>
 </form>
-		<?php
-	}
-}
+<?php
 
-// echo '<pre>';
-// print_r($meta);
+if ( isset($_GET['debug']) ) {
+	echo '<pre>' . print_r($issuetype, 1) . '</pre>';
+}
 
 include 'tpl.footer.php';
 
 
 
-function get_project( $projects, $is_project ) {
-	foreach ( $projects AS $project ) {
-		if ( $project->id == $is_project ) {
-			return $project;
-		}
-	}
-}
-
-function get_issuetype( $issuetypes, $is_issuetype ) {
-	foreach ( $issuetypes AS $issuetype ) {
+function get_issuetype( $project, $is_issuetype ) {
+	foreach ( $project->issuetypes AS $issuetype ) {
 		if ( $issuetype->id == $is_issuetype ) {
 			return $issuetype;
 		}
