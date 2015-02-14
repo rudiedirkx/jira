@@ -157,6 +157,9 @@ $actions['Labels'] = 'labels.php?key=' . $key;
 $actions['Log work'] = 'logwork.php?key=' . $key . '&summary=' . urlencode($fields->summary);
 $actions['Upload'] = 'upload.php?key=' . $key . '&summary=' . urlencode($fields->summary);
 $actions['Link'] = 'link.php?key=' . $key . '&summary=' . urlencode($fields->summary);
+if ( !$fields->issuetype->subtask ) {
+	$actions['Subtask'] = 'new.php?project=' . $fields->project->id . '&parent=' . $key . '&parentsummary=' . urlencode($fields->summary);
+}
 $actions['➔ View in Jira'] = JIRA_URL . '/browse/' . $key;
 
 $resolution = '';
@@ -239,7 +242,7 @@ if ( isset($_GET['edit']) ) {
 echo '<div class="issue-description markup">' . ( do_remarkup($issue->renderedFields->description) ?: '<em>No description</em>' ) . '</div>';
 
 if ( $subtasks ) {
-	echo '<h2>' . count($subtasks) . ' sub tasks</h2>';
+	echo '<h2 class="pre-menu">' . count($subtasks) . ' sub tasks</h2> (<a href="' . $actions['Subtask'] . '">add</a>)';
 	echo '<ol>';
 	foreach ( $subtasks as $task ) {
 		echo '<li>';
@@ -247,7 +250,6 @@ if ( $subtasks ) {
 		echo '<a href="issue.php?key=' . $task->key . '">' . $task->key . '</a> ';
 		echo html_icon($task->fields->status, 'status') . ' ';
 		echo html($task->fields->summary) . ' ';
-		// echo '<em>' . ( html(@$task->fields->assignee->displayName) ?: 'No assignee' ) . '</em>';
 		echo '</li>';
 	}
 	echo '</ol>';
@@ -316,7 +318,7 @@ if ( $worklogs ) {
 		include 'tpl.worklogs.php';
 	}
 }
-else {
+else if ( !$fields->issuetype->subtask ) {
 	echo '<h2 class="pre-menu">? worklogs</h2> (<a href="' . $actions['Log work'] . '">add</a>)';
 	echo '<p><a href="worklogs.php?key=' . $key . '&subtasks=' . implode(',', $subkeys) . '&summary=' . urlencode($fields->summary) . '">See ALL worklogs, incl subtasks.</a></p>';
 }

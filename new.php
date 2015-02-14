@@ -15,6 +15,9 @@ if ( isset($_GET['project'], $_GET['issuetype'], $_POST['summary'], $_POST['desc
 	if ( !empty($_POST['assignee']) ) {
 		$fields['assignee'] = array('name' => $_POST['assignee']);
 	}
+	if ( !empty($_POST['parent']) ) {
+		$fields['parent'] = array('key' => $_POST['parent']);
+	}
 
 	$response = jira_post('issue', compact('fields'), $error, $info);
 
@@ -35,9 +38,25 @@ if ( isset($_GET['project'], $_GET['issuetype'], $_POST['summary'], $_POST['desc
 $project = @$_GET['project'];
 $issuetype = @$_GET['issuetype'];
 
+$parent = (string)@$_GET['parent'];
+$parentsummary = (string)@$_GET['parentsummary'];
+
 include 'tpl.header.php';
 
 echo '<h1>Create new issue</h1>';
+
+
+
+// Show parent issue
+if ( $parent && $parentsummary ) {
+	echo '<h2>Parent issue</h2>';
+
+	echo '<ul>';
+	echo '<li>';
+	echo '<a href="issue.php?key=' . urlencode($parent) . '">' . html($parent) . ' ' . html($parentsummary) . '</a>';
+	echo '</li>';
+	echo '</ul>';
+}
 
 
 
@@ -49,7 +68,7 @@ if ( !$project ) {
 	echo '<ul>';
 	foreach ( $projects AS $project ) {
 		echo '<li>';
-		echo '<a href="new.php?project=' . $project->id . '">' . $project->name . '</a>';
+		echo '<a href="new.php?project=' . $project->id . '">' . html($project->name) . '</a>';
 		echo '</li>';
 	}
 	echo '</ul>';
@@ -67,8 +86,8 @@ $project = $meta->projects[0];
 // Show selected project
 echo '<ul>';
 echo '<li>';
-echo '<a href="new.php?project=' . $project->id . '">' . $project->name . '</a>';
-echo ' (<a href="new.php">change</a>)';
+echo '<a href="new.php?project=' . $project->id . '">' . html($project->name) . '</a>';
+echo ' (<a href="new.php?parent=' . urlencode($parent) . '">change</a>)';
 echo '</li>';
 echo '</ul>';
 
@@ -79,10 +98,13 @@ echo '<h2>Issue type</h2>';
 
 if ( !$issuetype ) {
 	echo '<ul>';
+	$subtask = !empty($parent);
 	foreach ( $project->issuetypes AS $issuetype ) {
-		echo '<li>';
-		echo '<a href="new.php?project=' . $project->id . '&issuetype=' . $issuetype->id . '">' . $issuetype->name . '</a>';
-		echo '</li>';
+		if ( $issuetype->subtask == $subtask ) {
+			echo '<li>';
+			echo '<a href="new.php?project=' . $project->id . '&issuetype=' . $issuetype->id . '&parent=' . urlencode($parent) . '&parentsummary=' . urlencode($parentsummary) . '">' . $issuetype->name . '</a>';
+			echo '</li>';
+		}
 	}
 	echo '</ul>';
 	exit;
@@ -95,7 +117,7 @@ $issuetype = get_issuetype($project, $issuetype);
 echo '<ul>';
 echo '<li>';
 echo '<a href="new.php?project=' . $project->id . '&issuetype=' . $issuetype->id . '">' . $issuetype->name . '</a>';
-echo ' (<a href="new.php?project=' . $project->id . '">change</a>)';
+echo ' (<a href="new.php?project=' . $project->id . '&parent=' . urlencode($parent) . '&parentsummary=' . urlencode($parentsummary) . '">change</a>)';
 echo '</li>';
 echo '</ul>';
 
@@ -111,6 +133,10 @@ $defaultPriority = $priorityKeys[ floor((count($priorities) - 1) / 2) ];
 
 ?>
 <form autocomplete="off" action method="post">
+	<? if ($parent && $parentsummary): ?>
+		<input type="hidden" name="parent" value="<?= html($parent) ?>" />
+		<p>Parent issue: <input readonly disabled value="<?= html($parent . ' ' . $parentsummary) ?>" /></p>
+	<? endif ?>
 	<p>Summary: <input name="summary" /></p>
 	<p>Description: <textarea name="description" rows="8"></textarea></p>
 	<p>Priority: <select name="priority"><?= html_options($priorities, $defaultPriority) ?></select></p>
