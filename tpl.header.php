@@ -16,12 +16,13 @@
 	<div class="hor-loader"></div>
 
 	<p class="top-menu">
-		<?if (!$index):?><a href="index.php">&lt; index</a> | <?endif?>
+		<a href="index.php">&lt; index</a> |
+		<a href="new.php">+Issue</a> |
 		<a href="auth.php">You (<?= $user->jira_user ?>)</a> |
 		<a href="filters.php">Filters</a> |
 		<a href="accounts.php">Accounts</a> |
 		<a href="variables.php">Vars</a> |
 		<a href="tempo.php">Tempo</a>
 		<?if ($user->config('agile_view_id')):?> | <a href="agile.php">Agile</a><?endif?>
-		<?if ($index):?> | <a href="logout.php">Log out</a><?endif?>
+		| <a href="logout.php">Log out</a>
 	</p>
