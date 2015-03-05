@@ -121,7 +121,17 @@ else if ( isset($_GET['transitions']) ) {
 	exit;
 }
 
-$issue = jira_get('issue/' . $key, array('expand' => 'transitions,renderedFields'));
+include 'tpl.header.php';
+
+$issue = jira_get('issue/' . $key, array('expand' => 'transitions,renderedFields'), $error, $info);
+if ( !$issue || $error ) {
+	echo '<p>Invalid issue...</p>';
+	echo '<pre>';
+	var_dump($error);
+	print_r($info);
+	exit;
+}
+
 // print_r($issue);
 $fields = $issue->fields;
 $created = strtotime($fields->created);
@@ -142,8 +152,6 @@ $fieldsmeta = $user->custom_field_ids;
 usort($attachments, function($a, $b) {
 	return strtotime($a->created) - strtotime($b->created);
 });
-
-include 'tpl.header.php';
 
 $actionPath = 'transition.php?key=' . $key . '&assignee=' . urlencode(@$fields->assignee->name) . '&summary=' . urlencode($fields->summary) . '&transition=';
 
