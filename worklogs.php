@@ -20,6 +20,8 @@ echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($summar
 
 echo '<h2 class="pre-menu">' . count($worklogs) . ' worklogs</h2> (<a href="logwork.php?key=' . $key . '&summary=' . urlencode($summary) . '">add</a>)';
 
+$filterDate = @$_GET['date'];
+$filterUser = @$_GET['user'];
 include 'tpl.worklogs.php';
 
 include 'tpl.footer.php';

@@ -86,14 +86,16 @@ td.time {
 </style>
 <?php
 
+echo '<div class="table tempo striping">';
 echo '<table width="100%">';
 foreach ($dated as $date => $workedIssues) {
 	$utc = jiraDateToUTC($date);
+	$ymdDate = date('Y-m-d', $utc);
 	$prettyDate = date('D ' . FORMAT_DATE, $utc);
 
 	$h = floor($totals[$date]);
 	$m = round($totals[$date] * 60 - $h * 60);
-	echo '<tr><th colspan="2">';
+	echo '<tr class="new-section"><th colspan="2">';
 	echo '<span class="total">' . $h . 'h' . ( $m ? ' ' . $m . 'm' : '' ) . '</span> ';
 	echo '<span class="date">' . $prettyDate . '</span>';
 	echo '</th></tr>';
@@ -106,13 +108,14 @@ foreach ($dated as $date => $workedIssues) {
 		echo '<a class="issue-key hide-summary" href="issue.php?key=' . $key . '">' . $key . '</a>';
 		echo '<div class="issue-summary">' . $issue->summary . '</div>';
 		echo '</td>';
-		echo '<td class="time">' . $time . '</td>';
+		echo '<td class="time actions"><a href="worklogs.php?key=' . $key . '&summary=' . urlencode($issue->summary) . '&date=' . $ymdDate . '&user=' . JIRA_USER . '">' . $time . '</a></td>';
 		echo '</tr>';
 	}
 
 	echo '<tr><td colspan="2"><br></td></tr>';
 }
 echo '</table>';
+echo '</div>';
 
 ?>
 <script>
