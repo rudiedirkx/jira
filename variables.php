@@ -9,7 +9,7 @@ if ( isset($_POST['manual_update']) ) {
 	return do_redirect('variables');
 }
 
-else if ( isset($_POST['name'], $_POST['regex'], $_POST['replacement'], $_POST['value']) ) {
+else if ( isset($_POST['name'], $_POST['regex'], $_POST['replacement']) ) {
 	$invalid = count(array_filter($_POST)) != count($_POST);
 	if ( !$invalid ) {
 		$db->insert('variables', array(
@@ -17,14 +17,12 @@ else if ( isset($_POST['name'], $_POST['regex'], $_POST['replacement'], $_POST['
 			'name' => trim($_POST['name']),
 			'regex' => trim($_POST['regex']),
 			'replacement' => trim($_POST['replacement']),
-			'value' => trim($_POST['value']),
 		));
 	}
 	return do_redirect('variables');
 }
 
 else if ( isset($_POST['v']) ) {
-	print_r($_POST['v']);
 	foreach ( $_POST['v'] AS $id => $var ) {
 		$db->update('variables', $var, array('id' => $id, 'user_id' => $user->id));
 	}
