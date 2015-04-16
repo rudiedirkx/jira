@@ -4,9 +4,9 @@ require 'inc.bootstrap.php';
 
 do_logincheck();
 
-// @todo Fetch the last 30 days, not current month (standard)
-$tempo = jira_get('/rest/tempo-timesheets/1/user/issues/ASS', array(
-	'username' => JIRA_USER,
+$tempo = jira_get('/rest/tempo-timesheets/3/worklogs', array(
+	'dateFrom' => date('Y-m-d', strtotime('-1 month')),
+	'dateTo' => date('Y-m-d'),
 ), $error, $info);
 
 if ( $error ) {
@@ -28,29 +28,27 @@ if ( $error ) {
 
 // Group by date, index by issue
 $dated = $issues = $totals = array();
-if (isset($tempo->timesheetLines[0]->key)) {
-	foreach ( $tempo->timesheetLines as $i => $line ) {
-		// Index by issue
-		if ( !isset($issues[$line->key]) ) {
-			$issues[$line->key] = clone $line;
-			unset($issues[$line->key]->workedHours, $issues[$line->key]->date);
-		}
+if (isset($tempo[0]->id)) {
+	foreach ( $tempo as $i => $worklog ) {
+		// Index issues
+		$issues[$worklog->issue->key] = $worklog->issue;
 
-		// Group by date
-		foreach ( $line->workedHours as $di => $seconds ) {
-			if ( $seconds > 0 ) {
-				$date = $line->date[$di];
-				$hours = round($seconds / 3600, 2);
-				$dated[$date][$line->key] = $hours;
-				@$totals[$date] += $hours;
-			}
+		$seconds = (int)$worklog->timeSpentSeconds;
+		if ( $seconds > 0 ) {
+			$utc = strtotime($worklog->dateStarted);
+			$date = date('Y-m-d', $utc);
+
+			// Group by date & issue
+			@$dated[$date][$worklog->issue->key] += $seconds;
+
+			@$totals[$date] += $seconds;
 		}
 	}
 }
 
 // Sort by date: newest first
 uksort($dated, function($a, $b) {
-	return jiraDateToUTC($b) - jiraDateToUTC($a);
+	return strtotime($b) - strtotime($a);
 });
 
 // Sort every date's issues by work time: more first
@@ -89,18 +87,18 @@ td.time {
 echo '<div class="table tempo striping">';
 echo '<table width="100%">';
 foreach ($dated as $date => $workedIssues) {
-	$utc = jiraDateToUTC($date);
-	$ymdDate = date('Y-m-d', $utc);
+	$utc = strtotime($date);
 	$prettyDate = date('D ' . FORMAT_DATE, $utc);
 
-	$h = floor($totals[$date]);
-	$m = round($totals[$date] * 60 - $h * 60);
+	$h = floor($totals[$date] / 3600);
+	$m = round($totals[$date] / 60 - $h * 60);
 	echo '<tr class="new-section"><th colspan="2">';
 	echo '<span class="total">' . $h . 'h' . ( $m ? ' ' . $m . 'm' : '' ) . '</span> ';
 	echo '<span class="date">' . $prettyDate . '</span>';
 	echo '</th></tr>';
-	foreach ($workedIssues as $key => $hours) {
+	foreach ($workedIssues as $key => $seconds) {
 		$issue = $issues[$key];
+		$hours = round($seconds / 3600, 2);
 		$time = $hours >= 1.0 ? $hours . 'h' : round($hours * 60) . 'm';
 
 		echo '<tr>';
@@ -108,7 +106,7 @@ foreach ($dated as $date => $workedIssues) {
 		echo '<a class="issue-key hide-summary" href="issue.php?key=' . $key . '">' . $key . '</a>';
 		echo '<div class="issue-summary">' . $issue->summary . '</div>';
 		echo '</td>';
-		echo '<td class="time actions"><a href="worklogs.php?key=' . $key . '&summary=' . urlencode($issue->summary) . '&date=' . $ymdDate . '&user=' . JIRA_USER . '">' . $time . '</a></td>';
+		echo '<td class="time actions"><a href="worklogs.php?key=' . $key . '&summary=' . urlencode($issue->summary) . '&date=' . $date . '&user=' . JIRA_USER . '">' . $time . '</a></td>';
 		echo '</tr>';
 	}
 
