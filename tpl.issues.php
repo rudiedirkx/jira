@@ -3,7 +3,7 @@
 $fieldsmeta = $user->custom_field_ids;
 
 echo '<div class="menu">';
-echo '	<h2 class="pre-menu">Showing ' . count($issues->issues) . ' of ' . $issues->total . '</h2>';
+echo '	<h2 class="pre-menu">Showing ' . ($page * $perPage + 1) . ' - ' . ($page * $perPage + count($issues->issues)) . ' of ' . $issues->total . '</h2>';
 echo '	(<a href="new.php">create</a>)';
 echo '</div>';
 
@@ -44,7 +44,7 @@ foreach ( $issues->issues AS $issue ) {
 ?>
 
 <p id="pager">
-	<a href="?<?= html_q(array('page' => $page-1)) ?>">&lt; prev</a> |
+	<a class="<?= $page <= 0 ? 'disabled' : '' ?>" href="<?= html_q(array('page' => $page == 1 ? false : $page-1)) ?>">&lt; prev</a> |
 	<span><?= $page+1 ?> / <?= ceil($issues->total/$perPage) ?> (<?= $issues->total ?>)</span> |
-	<a href="?<?= html_q(array('page' => $page+1)) ?>">next &gt;</a>
+	<a class="<?= $page+1 >= ceil($issues->total/$perPage) ? 'disabled' : '' ?>" href="<?= html_q(array('page' => $page+1)) ?>">next &gt;</a>
 </p>

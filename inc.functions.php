@@ -161,7 +161,10 @@ function html( $text ) {
 function html_q( $change, $stringify = true, $source = null ) {
 	$source || $source = $_GET;
 	$source = $change + $source;
-	return $stringify ? http_build_query($source) : $source;
+	$source = array_filter($source, function($value) {
+		return $value !== false;
+	});
+	return $stringify ? $_SERVER['PHP_SELF'] . ($source ? '?' . http_build_query($source) : '') : $source;
 }
 
 function html_links( $links ) {

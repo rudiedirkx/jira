@@ -49,7 +49,7 @@ $page = max(0, (int)@$_GET['page']);
 $issues = jira_get('search', array('maxResults' => $perPage, 'startAt' => $page * $perPage, 'jql' => $query), $error, $info);
 
 // Ajax callback
-if ( isset($_GET['ajax']) ) {
+if ( IS_AJAX ) {
 	include 'tpl.issues.php';
 	exit;
 }
@@ -71,24 +71,48 @@ echo '</div>';
 
 ?>
 <script>
-bindPagerEventListeners();
+var $content = $('content');
+var pages = {};
+pages[location.href] = $content.getHTML();
 
-function bindPagerEventListeners() {
-	$('pager').getElements('a').on('click', function(e) {
-		e.preventDefault();
+function loadPage(href, push) {
+	document.body.addClass('loading');
+	$.get(href).on('done', function(e, t) {
+		$content.setHTML(t);
+		if (push) {
+			history.pushState({}, '', href);
+		}
+		pages[location.href] = $content.getHTML();
 
-		document.body.addClass('loading');
-		$.get(this.href + '&ajax=1').on('done', function(e, t) {
-			var $content = $('content').setHTML(t);
-			bindPagerEventListeners();
-
-			setTimeout(function() {
+		setTimeout(function() {
+			if (push) {
 				$content.scrollIntoView();
-				document.body.removeClass('loading');
-			}, 100);
-		});
+			}
+			document.body.removeClass('loading');
+		}, 100);
 	});
 }
+
+window.on('popstate', function(e) {
+	if (pages[location.href]) {
+		$content.setHTML(pages[location.href]);
+	}
+	else {
+		loadPage(location.href, false);
+	}
+});
+
+$('content').on('click', '#pager a', function(e) {
+	e.preventDefault();
+
+	if (pages[this.href]) {
+		$content.setHTML(pages[this.href]);
+		$content.scrollIntoView();
+	}
+	else {
+		loadPage(this.href, true);
+	}
+});
 </script>
 <?php
 

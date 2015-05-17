@@ -227,6 +227,10 @@ td.wrap {
 #pager {
 	text-align: center;
 }
+#pager a.disabled {
+	color: inherit;
+	text-decoration: none;
+}
 
 
 
