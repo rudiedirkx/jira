@@ -10,7 +10,11 @@ $baseParams = array('rapidViewId' => $boardId);
 // echo '<pre>';
 
 // Quick filters (->currentViewConfig->quickFilters) etc
+// DEBUG //
 $board = jira_get('/rest/greenhopper/1.0/xboard/config', $baseParams, $error, $info);
+// $board = unserialize(file_get_contents('debug-board.txt'));
+// echo "\n\n\n\n\n" . serialize($board) . "\n\n\n\n\n";
+// DEBUG //
 // print_r($board);
 // var_dump($error);
 // print_r($info);
@@ -20,8 +24,13 @@ $params = $baseParams;
 if ( !empty($_GET['filter']) ) {
 	$params += array('activeQuickFilters' => $_GET['filter']);
 }
+
+// DEBUG //
 $plan = jira_get('/rest/greenhopper/1.0/xboard/plan/backlog/data', $params, $error, $info);
-unset($plan->epicData, $plan->versionData);
+// unset($plan->epicData, $plan->versionData);
+// $plan = unserialize(file_get_contents('debug-plan.txt'));
+// echo "\n\n\n\n\n" . serialize($plan) . "\n\n\n\n\n";
+// DEBUG //
 // print_r($plan);
 // var_dump($error);
 // print_r($info);
@@ -68,6 +77,14 @@ include 'tpl.header.php';
 	border-left: solid 1px #ccc;
 	border-right: solid 1px #ccc;
 }
+
+.epic {
+	background-color: black;
+	color: white;
+	padding: 1px 4px;
+	border-radius: 4px;
+	white-space: nowrap;
+}
 </style>
 
 <h1>Plan</h1>
@@ -83,6 +100,19 @@ include 'tpl.header.php';
 
 <?php
 
+$epicColors = array(
+	array('red', 'white'),
+	array('green', 'white'),
+	array('blue', 'white'),
+	array('yellow', 'black'),
+	array('orange', 'black'),
+	array('purple', 'white'),
+	array('pink', 'black'),
+	array('lime', 'white'),
+	array('lightblue', 'white'),
+);
+$epicClasses = array();
+
 echo '<table class="longdata">';
 echo '<tr><th colspan="4">' . count($issues) . ' issues</th></tr>';
 foreach ($issues as $issue) {
@@ -91,15 +121,34 @@ foreach ($issues as $issue) {
 		$priority = html_icon($issue, 'priority');
 	}
 
+	$epic = '';
+	if (@$issue->epic) {
+		$epic = '<span class="epic ' . html($issue->epicField->epicColor) . '">' . html($issue->epicField->text) . '</span>';
+		$epicClasses[] = $issue->epicField->epicColor;
+	}
+
 	echo '<tr>';
 	// echo '<td class="type" style="background-color: ' . $issue->color . '; color: ' . $issue->color . '">.</td>';
 	echo '<td class="key" style="border-left-color: ' . $issue->color . '"><div class="out"><div class="in">' . $issue->key . '</div></div></td>';
 	echo '<td class="priority">' . $priority . '</td>';
-	echo '<td class="summary wrap"><a href="issue.php?key=' . $issue->key . '">' . ( $issue->summary ?: '???' ) . '</a></td>';
+	echo '<td class="summary wrap"><a href="issue.php?key=' . $issue->key . '">' . ( $issue->summary ?: '???' ) . '</a> ' . $epic . '</td>';
 	echo '<td class="sp">' . @$issue->estimateStatistic->statFieldValue->value . '</td>';
 	echo '</tr>';
 }
-echo '</table>';
+echo '</table>' . "\n\n";
+
+$epicClasses = array_values(array_unique($epicClasses));
+
+?>
+<style>
+<? foreach (array_intersect_key($epicClasses, $epicColors) as $i => $class): ?>
+.epic.<?= $class ?> {
+	background-color: <?= $epicColors[$i][0] ?>;
+	color: <?= $epicColors[$i][1] ?>;
+}
+<? endforeach ?>
+</style>
+<?php
 
 if ( isset($_GET['debug']) ) {
 	echo '<pre>' . print_r($board, 1) . '</pre>';
