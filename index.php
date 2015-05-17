@@ -69,53 +69,6 @@ echo '<div id="content">';
 include 'tpl.issues.php';
 echo '</div>';
 
-?>
-<script>
-var $content = $('content');
-var pages = {};
-pages[location.href] = $content.getHTML();
-
-function loadPage(href, push) {
-	document.body.addClass('loading');
-	$.get(href).on('done', function(e, t) {
-		$content.setHTML(t);
-		if (push) {
-			history.pushState({}, '', href);
-		}
-		pages[location.href] = $content.getHTML();
-
-		setTimeout(function() {
-			if (push) {
-				$content.scrollIntoView();
-			}
-			document.body.removeClass('loading');
-		}, 100);
-	});
-}
-
-window.on('popstate', function(e) {
-	if (pages[location.href]) {
-		$content.setHTML(pages[location.href]);
-	}
-	else {
-		loadPage(location.href, false);
-	}
-});
-
-$('content').on('click', '#pager a', function(e) {
-	e.preventDefault();
-
-	if (pages[this.href]) {
-		$content.setHTML(pages[this.href]);
-		$content.scrollIntoView();
-	}
-	else {
-		loadPage(this.href, true);
-	}
-});
-</script>
-<?php
-
 // echo implode('<br>', $jira_requests);
 // echo '<pre>';
 // print_r($issues);
