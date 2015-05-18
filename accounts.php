@@ -81,6 +81,7 @@ else if ( isset($_POST['config']) ) {
 
 // Reset cookies
 do_login('', '');
+$user->unsync();
 
 include 'tpl.header.php';
 

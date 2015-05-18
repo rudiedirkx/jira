@@ -130,6 +130,7 @@ class User extends db_generic_record {
 
 	function get_custom_field_ids() {
 		if ( !$this->cache__custom_field_ids ) {
+// echo __FUNCTION__ . "\n";
 			$fields = array();
 			foreach ($this->custom_fields as $field) {
 				$fields[mb_strtolower($field->name)] = $field->id;

@@ -23,6 +23,8 @@ if ( defined('JIRA_AUTH') ) {
 	// Update timezone from Jira
 	$user->save(array('jira_timezone' => $account->timeZone));
 
+	print_r($user->custom_field_ids);
+
 	echo '</pre>';
 	include 'tpl.footer.php';
 	exit;

@@ -249,6 +249,41 @@ if ( isset($_GET['edit']) ) {
 
 echo '<div class="issue-description markup">' . ( do_remarkup($issue->renderedFields->description) ?: '<em>No description</em>' ) . '</div>';
 
+$customs = array();
+foreach ( $fieldsmeta as $name => $key ) {
+	if ( $value = @$issue->renderedFields->$key ) {
+		$customs[$name] = $issue->renderedFields->$key;
+	}
+	else if ( $value = @$fields->$key ) {
+		$customs[$name] = nl2br(html(trim(implode("\n", (array)$value))));
+	}
+}
+
+if ( $customs ) {
+	echo '<h2 class="visiblity-toggle-header open"><a id="custom-fields-toggler" href="#">' . count($customs) . ' custom fields</a></h2>';
+	echo '<div class="custom-fields">';
+	foreach ($customs as $name => $html) {
+		echo '<div class="custom-field">';
+		echo '<h3 class="custom-field-title">' . html($name) . '</h3>';
+		echo '<div class="custom-field-value">' . $html . '</div>';
+		echo '</div>';
+	}
+	echo '</div>';
+
+	?>
+	<script>
+	(function(a) {
+		a.parentNode.classList.remove('open');
+		a.addEventListener('click', function(e) {
+			e.preventDefault();
+			var h2 = this.parentNode;
+			h2.classList.toggle('open');
+		});
+	})(document.querySelector('#custom-fields-toggler'));
+	</script>
+	<?php
+}
+
 if ( $subtasks ) {
 	echo '<h2 class="pre-menu">' . count($subtasks) . ' sub tasks</h2> (<a href="' . $actions['Subtask'] . '">add</a>)';
 	echo '<ol>';

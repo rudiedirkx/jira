@@ -50,6 +50,9 @@ h1, h1 a,
 h2, h2 a {
 	color: #326ca6;
 }
+h3 {
+	margin: 0.6em 0 0.2em;
+}
 pre {
 	white-space: pre-wrap;
 }
@@ -175,6 +178,24 @@ h1.with-parent-issue {
 }
 .active-state.active {
 	opacity: 1.0;
+}
+
+
+
+/* visibility toggles */
+h2.visiblity-toggle-header > a {
+	text-decoration: none;
+}
+h2.visiblity-toggle-header > a:after {
+	/*content: " ∧";*/
+	content: " \2227";
+}
+h2.visiblity-toggle-header.open > a:after {
+	/*content: " ∨";*/
+	content: " \2228";
+}
+h2.visiblity-toggle-header:not(.open) + div {
+	display: none;
 }
 
 
