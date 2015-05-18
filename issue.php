@@ -250,21 +250,21 @@ if ( isset($_GET['edit']) ) {
 echo '<div class="issue-description markup">' . ( do_remarkup($issue->renderedFields->description) ?: '<em>No description</em>' ) . '</div>';
 
 $customs = array();
-foreach ( $fieldsmeta as $name => $key ) {
-	if ( $value = @$issue->renderedFields->$key ) {
-		$customs[$name] = $issue->renderedFields->$key;
+foreach ( $fieldsmeta as $cfName => $cfKey ) {
+	if ( $value = @$issue->renderedFields->$cfKey ) {
+		$customs[$cfName] = $issue->renderedFields->$cfKey;
 	}
-	else if ( $value = @$fields->$key ) {
-		$customs[$name] = nl2br(html(trim(implode("\n", (array)$value))));
+	else if ( $value = @$fields->$cfKey ) {
+		$customs[$cfName] = nl2br(html(trim(implode("\n", (array)$value))));
 	}
 }
 
 if ( $customs ) {
 	echo '<h2 class="visiblity-toggle-header open"><a id="custom-fields-toggler" href="#">' . count($customs) . ' custom fields</a></h2>';
 	echo '<div class="custom-fields">';
-	foreach ($customs as $name => $html) {
+	foreach ($customs as $cfName => $html) {
 		echo '<div class="custom-field">';
-		echo '<h3 class="custom-field-title">' . html($name) . '</h3>';
+		echo '<h3 class="custom-field-title">' . html($cfName) . '</h3>';
 		echo '<div class="custom-field-value">' . $html . '</div>';
 		echo '</div>';
 	}
