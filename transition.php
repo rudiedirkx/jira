@@ -16,8 +16,19 @@ if ( isset($_POST['status'], $_POST['comment'], $_POST['assignee']) ) {
 	$comment = trim($_POST['comment']);
 	$assignee = trim($_POST['assignee']);
 
+	$update = array();
+
 	// ASSIGN
-	if ( $assignee && $status == 'assign' ) {
+	if ( $status == 'assign' ) {
+		if ( !$assignee ) {
+			echo "Must enter assignee username.";
+			exit;
+		}
+
+		if ( in_array($assignee, array('unassign', 'unassigned')) ) {
+			$assignee = null;
+		}
+
 		// Add comment
 		if ( $comment ) {
 			$response = jira_post('issue/' . $key . '/comment', array('body' => $comment), $error, $info);
@@ -29,12 +40,13 @@ if ( isset($_POST['status'], $_POST['comment'], $_POST['assignee']) ) {
 		// Only move forward if that worked, since this action requires 2 API calls =(
 		if ( !$error ) {
 			// Change assignee
-			$response = jira_put('issue/' . $key . '/assignee', array('name' => $assignee), $error, $info);
+			$update['name'] = $assignee;
+			$response = jira_put('issue/' . $key . '/assignee', $update, $error, $info);
 		}
 	}
+
 	// TRANSITION
 	else {
-		$update = array();
 		if ( $comment ) {
 			$update['update']['comment'][0]['add']['body'] = $comment;
 		}
@@ -90,7 +102,7 @@ if ( isset($transitionsById[$action]->fields->resolution) ) {
 	echo '<p>Resolution: <select name="resolution">' . html_options($resolutions, 'Fixed') . '</select></p>';
 }
 echo '<p>Comment:<br><textarea name="comment" rows="8"></textarea></p>';
-echo '<p>Assignee (' . $assignee . '): <input name="assignee" value="" /></p>';
+echo '<p>Assignee (' . $assignee . '): <input name="assignee" placeholder="Use &quot;unassign&quot; to unassign. Leave empty to not change." /></p>';
 echo '<p><input type="submit" /></p>';
 echo '</form>';
 echo '</div>';
