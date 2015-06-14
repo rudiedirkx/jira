@@ -383,13 +383,50 @@ foreach ( $comments AS $i => $comment ) {
 }
 echo '</div>';
 
-echo '<div id="new-comment" class="post-comment">';
-echo '<h2>New comment</h2>';
-echo '<form autocomplete="off" method="post">';
-echo '<p><textarea name="comment" rows="8"></textarea></p>';
-echo '<p><input type="submit" /></p>';
-echo '</form>';
-echo '</div>';
+?>
+
+<div id="new-comment" class="post-comment">
+	<h2>New comment</h2>
+	<form autocomplete="off" method="post">
+		<p><textarea name="comment" rows="8"></textarea></p>
+		<p><input type="submit" /></p>
+	</form>
+</div>
+
+<script>
+[].forEach.call(document.querySelectorAll('img[data-attachment][data-src]'), function(img) {
+	var id = img.dataset.attachment;
+	var uri = localStorage['attachment_' + id];
+	if (uri) {
+		console.log(id, 'Using Data URI for localStorage');
+		img.src = uri;
+	}
+	else {
+		console.log(id, 'Using live URL once');
+		img.src = img.dataset.src;
+		img.onload = function(e) {
+			console.log(id, 'Image loaded, saving into localStorage');
+
+			var canvas = document.createElement('canvas');
+			canvas.width = img.width;
+			canvas.height = img.height;
+			var ctx = canvas.getContext('2d');
+			ctx.drawImage(img, 0, 0);
+			var data = canvas.toDataURL('image/png');
+
+			try {
+				localStorage['attachment_' + id] = data;
+			}
+			catch (ex) {
+				alert("Couldn't save image in localStorage. Full?");
+				alert("Error:\n\n" + ex.message);
+			}
+		};
+	}
+});
+</script>
+
+<?php
 
 if ( isset($_GET['debug']) ) {
 	echo '<pre>' . print_r($issue, 1) . '</pre>';

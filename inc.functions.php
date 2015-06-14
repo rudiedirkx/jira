@@ -112,6 +112,9 @@ function do_remarkup( $html ) {
 	// Non-full paths
 	$html = str_replace('="/', '="' . JIRA_ORIGIN . '/', $html);
 
+	// Images through proxy
+	$html = preg_replace('#src="' . preg_quote(JIRA_ORIGIN, '#') . '/secure/attachment/(\d+)/([^"]+)"#', 'data-attachment="$1" data-src="attachment.php?id=$1"', $html);
+
 	return $html;
 }
 
