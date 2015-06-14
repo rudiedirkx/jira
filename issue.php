@@ -149,6 +149,35 @@ $comments = $fields->comment->comments;
 
 $fieldsmeta = $user->custom_field_ids;
 
+$parentEpicKey = isset($fieldsmeta['epic link'], $fields->{$fieldsmeta['epic link']}) ? $fields->{$fieldsmeta['epic link']} : '';
+
+$selfEpic = null;
+$selfEpicLabel = '';
+$epicIssues = array();
+if ( isset($fieldsmeta['epic name'], $fieldsmeta['epic status'], $fieldsmeta['epic link']) ) {
+	if ( isset($fields->{$fieldsmeta['epic name']}, $fields->{$fieldsmeta['epic status']}) ) {
+		include 'tpl.epiccolors.php';
+
+		$selfEpic = (object) array(
+			'name' => $fields->{$fieldsmeta['epic name']},
+			'status' => $fields->{$fieldsmeta['epic status']},
+			'color' => '',
+		);
+		$epicColorField = @$fieldsmeta['epic colour'] ?: @$fieldsmeta['epic color'] ?: '';
+		if ( $epicColorField && isset($fields->{$epicColorField}) ) {
+			$selfEpic->color = $fields->{$epicColorField};
+		}
+
+		$selfEpicLabel = '<span class="epic ' . html($selfEpic->color) . '">' . html($selfEpic->name) . '</span>';
+
+		$query = '"Epic Link" = ' . $issue->key . ' ORDER BY Rank';
+		$issues = jira_get('search', array('jql' => $query), $error, $info);
+		if ( !$error && $issues && !empty($issues->issues) ) {
+			$epicIssues = $issues->issues;
+		}
+	}
+}
+
 usort($attachments, function($a, $b) {
 	return strtotime($a->created) - strtotime($b->created);
 });
@@ -166,7 +195,7 @@ $actions['Log work'] = 'logwork.php?key=' . $key . '&summary=' . urlencode($fiel
 $actions['Upload'] = 'upload.php?key=' . $key . '&summary=' . urlencode($fields->summary);
 $actions['Link'] = 'link.php?key=' . $key . '&summary=' . urlencode($fields->summary);
 if ( !$fields->issuetype->subtask ) {
-	$actions['Subtask'] = 'new.php?project=' . $fields->project->id . '&parent=' . $key . '&parentsummary=' . urlencode($fields->summary);
+	$actions['+Subtask'] = 'new.php?project=' . $fields->project->id . '&parent=' . $key . '&parentsummary=' . urlencode($fields->summary);
 }
 $actions['➔ View in Jira'] = JIRA_URL . '/browse/' . $key;
 
@@ -175,17 +204,21 @@ if ( $fields->resolution ) {
 	$resolution = ': ' . html($fields->resolution->name);
 }
 
-$h1Class = $parent ? ' class="with-parent-issue"' : '';
+$h1Class = $parent || $parentEpicKey ? ' class="with-parent-issue"' : '';
+if ( $parentEpicKey ) {
+	// @todo Optionally (user config) load the EPIC issue to show summary and color
+	echo '<p class="parent-epic">&gt; <span class="epic">EPIC</span> <a href="issue.php?key=' . $parentEpicKey . '">' . $parentEpicKey . '</a></p>';
+}
 if ( $parent ) {
 	echo '<p class="parent-issue">&gt; <a href="issue.php?key=' . $parent->key . '">' . $parent->key . '</a> ' . html($parent->fields->summary) . '</p>';
 }
 $storypoints = @$fieldsmeta['story points'] && @$fields->{$fieldsmeta['story points']} ? ' (' . @$fields->{$fieldsmeta['story points']} . ' pt)' : '';
 echo '<h1' . $h1Class . '><a href="issue.php?key=' . $issue->key . '">' . $issue->key . '</a> ' . html($fields->summary) . $storypoints . '</h1>';
-echo '<p class="menu">' . html_links($actions) . '</p>';
+echo '<p class="menu">' . html_links($actions) . '</p>' . "\n";
 
 $meta = array();
 echo '<p class="meta">';
-$meta[] = html_icon($fields->issuetype, 'issuetype') . ' ' . html($fields->issuetype->name);
+$meta[] = html_icon($fields->issuetype, 'issuetype') . ' ' . html($fields->issuetype->name) . ' ' . $selfEpicLabel;
 if ($fields->priority) {
 	$meta[] = html_icon($fields->priority, 'priority') . ' ' . html($fields->priority->name);
 }
@@ -207,7 +240,7 @@ if ( $updated && $updated > $created ) {
 	$meta[] = 'Updated on ' . date(FORMAT_DATETIME, $updated);
 }
 echo implode(' | ', $meta);
-echo '</p>';
+echo '</p>' . "\n";
 
 if ( isset($_GET['edit']) ) {
 	// Summary
@@ -284,8 +317,22 @@ if ( $customs ) {
 	<?php
 }
 
+if ( $epicIssues ) {
+	echo '<h2>' . count($epicIssues) . ' issues in epic</h2>';
+	echo '<ol>';
+	foreach ( $epicIssues as $task ) {
+		echo '<li>';
+		echo html_icon($task->fields->issuetype, 'issuetype') . ' ';
+		echo '<a href="issue.php?key=' . $task->key . '">' . $task->key . '</a> ';
+		echo html_icon($task->fields->status, 'status') . ' ';
+		echo html($task->fields->summary) . ' ';
+		echo '</li>';
+	}
+	echo '</ol>';
+}
+
 if ( $subtasks ) {
-	echo '<h2 class="pre-menu">' . count($subtasks) . ' sub tasks</h2> (<a href="' . $actions['Subtask'] . '">add</a>)';
+	echo '<h2 class="pre-menu">' . count($subtasks) . ' sub tasks</h2> (<a href="' . $actions['+Subtask'] . '">add</a>)';
 	echo '<ol>';
 	foreach ( $subtasks as $task ) {
 		echo '<li>';

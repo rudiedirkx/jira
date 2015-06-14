@@ -48,7 +48,7 @@ tabLink.fire('click');
 $('tab-page-goto').on('submit', function(e) {
 	e.preventDefault();
 
-	var key = this.elements.goto.value.trim();
+	var key = this.elements.goto.value.trim().toUpperCase();
 	location = 'issue.php?key=' + encodeURIComponent(key);
 });
 </script>

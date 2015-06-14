@@ -91,12 +91,13 @@ a.active {
 
 
 /* issue details */
-h1.with-parent-issue {
-	margin-top: 0;
-}
-.parent-issue {
+.parent-issue,
+.parent-epic {
 	color: #326ca6;
 	margin-bottom: 0;
+}
+h1.with-parent-issue {
+	margin-top: 0;
 }
 .short-meta {
 	text-align: center;
@@ -140,6 +141,17 @@ h1.with-parent-issue {
 	background: #e0f0ff;
 	padding: 1px 5px;
 	border-radius: 4px;
+}
+
+
+
+/* epic colors */
+.epic {
+	background-color: black;
+	color: white;
+	padding: 1px 4px;
+	border-radius: 4px;
+	white-space: nowrap;
 }
 
 

@@ -49,6 +49,8 @@ $issues = array_filter($plan->issues, function($issue) use ($hideIssues) {
 
 include 'tpl.header.php';
 
+include 'tpl.epiccolors.php';
+
 ?>
 <style>
 .longdata tr {
@@ -77,14 +79,6 @@ include 'tpl.header.php';
 	border-left: solid 1px #ccc;
 	border-right: solid 1px #ccc;
 }
-
-.epic {
-	background-color: black;
-	color: white;
-	padding: 1px 4px;
-	border-radius: 4px;
-	white-space: nowrap;
-}
 </style>
 
 <h1>Plan</h1>
@@ -100,19 +94,6 @@ include 'tpl.header.php';
 
 <?php
 
-$epicColors = array(
-	array('red', 'white'),
-	array('green', 'white'),
-	array('blue', 'white'),
-	array('yellow', 'black'),
-	array('orange', 'black'),
-	array('purple', 'white'),
-	array('pink', 'black'),
-	array('lime', 'white'),
-	array('lightblue', 'white'),
-);
-$epicClasses = array();
-
 echo '<table class="longdata">';
 echo '<tr><th colspan="4">' . count($issues) . ' issues</th></tr>';
 foreach ($issues as $issue) {
@@ -124,7 +105,6 @@ foreach ($issues as $issue) {
 	$epic = '';
 	if (@$issue->epic) {
 		$epic = '<span class="epic ' . html($issue->epicField->epicColor) . '">' . html($issue->epicField->text) . '</span>';
-		$epicClasses[] = $issue->epicField->epicColor;
 	}
 
 	echo '<tr>';
@@ -136,19 +116,6 @@ foreach ($issues as $issue) {
 	echo '</tr>';
 }
 echo '</table>' . "\n\n";
-
-$epicClasses = array_values(array_unique($epicClasses));
-
-?>
-<style>
-<? foreach (array_intersect_key($epicClasses, $epicColors) as $i => $class): ?>
-.epic.<?= $class ?> {
-	background-color: <?= $epicColors[$i][0] ?>;
-	color: <?= $epicColors[$i][1] ?>;
-}
-<? endforeach ?>
-</style>
-<?php
 
 if ( isset($_GET['debug']) ) {
 	echo '<pre>' . print_r($board, 1) . '</pre>';
