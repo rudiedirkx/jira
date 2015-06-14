@@ -4,6 +4,7 @@
 	<a href="#tab-page-query">Query</a>
 	<a href="#tab-page-project">Project</a>
 	<a href="#tab-page-search">Search</a>
+	<a href="#tab-page-goto">Go to</a>
 </div>
 <div class="tab-pages">
 	<form autocomplete="off" action class="filter tab-page" id="tab-page-filter">
@@ -23,6 +24,10 @@
 		<input name="search" value="<?= html(@$_GET['search']) ?>" placeholder="Fulltext search tokens..." />
 		<input type="submit" />
 	</form>
+	<form autocomplete="off" action class="filter tab-page" id="tab-page-goto">
+		<input name="goto" value="" placeholder="Issue key, like ABCD-123..." />
+		<input type="submit" />
+	</form>
 </div>
 
 <script>
@@ -39,4 +44,11 @@ if ( !activeTab || !(tabLink = $('.tab-links a[href="#tab-page-' + activeTab + '
 	tabLink = tabLinks[0];
 }
 tabLink.fire('click');
+
+$('tab-page-goto').on('submit', function(e) {
+	e.preventDefault();
+
+	var key = this.elements.goto.value.trim();
+	location = 'issue.php?key=' + encodeURIComponent(key);
+});
 </script>
