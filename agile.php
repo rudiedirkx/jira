@@ -104,7 +104,7 @@ foreach ($issues as $issue) {
 
 	$epic = '';
 	if (@$issue->epic) {
-		$epic = '<span class="epic ' . html($issue->epicField->epicColor) . '">' . html($issue->epicField->text) . '</span>';
+		$epic = '<span class="epic ' . html($issue->epicField->epicColor) . '"><a href="issue.php?key=' . html($issue->epicField->epicKey) . '">' . html($issue->epicField->text) . '</a></span>';
 	}
 
 	echo '<tr>';

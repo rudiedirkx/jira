@@ -17,6 +17,13 @@ class User extends db_generic_record {
 			'type' => 'number',
 			'required' => false,
 		),
+		'load_epics' => array(
+			'label' => 'Load epics (more requests, but more info)',
+			'default' => 0,
+			'size' => 1,
+			'type' => 'checkbox',
+			'required' => false,
+		),
 	);
 
 	function __construct() {
@@ -140,6 +147,23 @@ class User extends db_generic_record {
 		}
 
 		return unserialize($this->cache__custom_field_ids);
+	}
+
+	function get_cf_epic_link() {
+		return @$this->custom_field_ids['epic link'] ?: '';
+	}
+
+	function get_cf_epic_name() {
+		return @$this->custom_field_ids['epic name'] ?: '';
+	}
+
+	function get_cf_epic_status() {
+		return @$this->custom_field_ids['epic status'] ?: '';
+	}
+
+	function get_cf_epic_color() {
+		$fieldsmeta = $this->custom_field_ids;
+		return @$fieldsmeta['epic colour'] ?: @$fieldsmeta['epic color'] ?: '';
 	}
 
 	function unsync() {

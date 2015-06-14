@@ -66,9 +66,10 @@ else if ( isset($_GET['unlink']) ) {
 
 // Save user config/options
 else if ( isset($_POST['config']) ) {
+	$db->delete('options', array('user_id' => $user->id));
 	foreach ($_POST['config'] as $name => $value) {
 		if ( isset(User::$_config[$name]) ) {
-			$db->replace('options', array(
+			$db->insert('options', array(
 				'user_id' => $user->id,
 				'name' => $name,
 				'value' => $value,
@@ -109,20 +110,32 @@ include 'tpl.header.php';
 
 <form method="post">
 	<table>
-		<? foreach (User::$_config as $name => $info): ?>
+		<? foreach (User::$_config as $name => $info):
+			$checkbox = $info['type'] == 'checkbox';
+			?>
 			<tr>
 				<th align="right">
-					<?= html($info['label']) ?>
-					<?if ($info['required']):?> <span class="required">*</span><?endif?>
+					<?if (!$checkbox):?>
+						<label for="config_<?= $name ?>"><?= html($info['label']) ?></label>
+						<?if ($info['required']):?> <span class="required">*</span><?endif?>
+					<?endif?>
 				</th>
 				<td>
 					<input
+						id="config_<?= $name ?>"
 						type="<?= $info['type'] ?>"
 						name="config[<?= $name ?>]"
-						value="<?= html($user->config($name)) ?>"
+						<?if ($checkbox): ?>
+							<?if ($user->config($name)):?>checked<?endif?>
+						<?else:?>
+							value="<?= html($user->config($name)) ?>"
+						<?endif?>
 						style="width: <?= $info['size'] ?>em"
 						<?if ($info['required']):?>required<?endif?>
 					/>
+					<?if ($checkbox):?>
+						<label for="config_<?= $name ?>"><?= html($info['label']) ?></label>
+					<?endif?>
 				</td>
 			</tr>
 		<? endforeach ?>

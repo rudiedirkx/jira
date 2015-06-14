@@ -122,6 +122,7 @@ else if ( isset($_GET['transitions']) ) {
 }
 
 include 'tpl.header.php';
+include 'tpl.epiccolors.php';
 
 $issue = jira_get('issue/' . $key, array('expand' => 'transitions,renderedFields'), $error, $info);
 if ( !$issue || $error ) {
@@ -149,23 +150,24 @@ $comments = $fields->comment->comments;
 
 $fieldsmeta = $user->custom_field_ids;
 
-$parentEpicKey = isset($fieldsmeta['epic link'], $fields->{$fieldsmeta['epic link']}) ? $fields->{$fieldsmeta['epic link']} : '';
+$parentEpicKey = $user->cf_epic_link ? @$fields->{$user->cf_epic_link} : null;
+$parentEpic = null;
+if ( $parentEpicKey && $user->config('load_epics') ) {
+	$parentEpic = jira_get('issue/' . $parentEpicKey);
+}
 
 $selfEpic = null;
 $selfEpicLabel = '';
 $epicIssues = array();
-if ( isset($fieldsmeta['epic name'], $fieldsmeta['epic status'], $fieldsmeta['epic link']) ) {
-	if ( isset($fields->{$fieldsmeta['epic name']}, $fields->{$fieldsmeta['epic status']}) ) {
-		include 'tpl.epiccolors.php';
-
+if ( $user->cf_epic_name && $user->cf_epic_status && $user->cf_epic_link ) {
+	if ( @$fields->{$user->cf_epic_name} && @$fields->{$user->cf_epic_name} ) {
 		$selfEpic = (object) array(
-			'name' => $fields->{$fieldsmeta['epic name']},
-			'status' => $fields->{$fieldsmeta['epic status']},
+			'name' => $fields->{$user->cf_epic_name},
+			'status' => $fields->{$user->cf_epic_name},
 			'color' => '',
 		);
-		$epicColorField = @$fieldsmeta['epic colour'] ?: @$fieldsmeta['epic color'] ?: '';
-		if ( $epicColorField && isset($fields->{$epicColorField}) ) {
-			$selfEpic->color = $fields->{$epicColorField};
+		if ( $user->cf_epic_color && isset($fields->{$user->cf_epic_color}) ) {
+			$selfEpic->color = $fields->{$user->cf_epic_color};
 		}
 
 		$selfEpicLabel = '<span class="epic ' . html($selfEpic->color) . '">' . html($selfEpic->name) . '</span>';
@@ -206,8 +208,11 @@ if ( $fields->resolution ) {
 
 $h1Class = $parent || $parentEpicKey ? ' class="with-parent-issue"' : '';
 if ( $parentEpicKey ) {
-	// @todo Optionally (user config) load the EPIC issue to show summary and color
-	echo '<p class="parent-epic">&gt; <span class="epic">EPIC</span> <a href="issue.php?key=' . $parentEpicKey . '">' . $parentEpicKey . '</a></p>';
+	$parentEpicColor = $user->cf_epic_color ? @$parentEpic->fields->{$user->cf_epic_color} : '';
+	$parentEpicName = @$parentEpic->fields->{$user->cf_epic_name};
+	$parentEpicLabel = $parentEpic ? '<span class="epic ' . html($parentEpicColor) . '"><a href="issue.php?key=' . $parentEpicKey . '">' . html(trim($parentEpicName)) . '</a></span>' : '<span class="epic"><a href="issue.php?key=' . $parentEpicKey . '">EPIC</a></span>';
+	$parentEpicSummary = $parentEpic ? $parentEpic->fields->summary : $parentEpicKey;
+	echo '<p class="parent-epic">&gt; ' . $parentEpicLabel . ' ' . html($parentEpicSummary) . '</p>';
 }
 if ( $parent ) {
 	echo '<p class="parent-issue">&gt; <a href="issue.php?key=' . $parent->key . '">' . $parent->key . '</a> ' . html($parent->fields->summary) . '</p>';
