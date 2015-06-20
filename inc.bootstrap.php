@@ -21,8 +21,9 @@ $db = db_sqlite::open(array('database' => DB_PATH));
 $schema = require 'inc.schema.php';
 $db->schema($schema);
 
-// User class
+// Classes
 require 'inc.user.php';
+require 'inc.issue.php';
 
 // Jira API resource prefixes
 define('JIRA_AUTH_PATH', '/rest/auth/1/');

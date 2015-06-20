@@ -137,9 +137,8 @@ class User extends db_generic_record {
 
 	function get_custom_field_ids() {
 		if ( !$this->cache__custom_field_ids ) {
-// echo __FUNCTION__ . "\n";
 			$fields = array();
-			foreach ($this->custom_fields as $field) {
+			foreach ( $this->custom_fields as $field ) {
 				$fields[mb_strtolower($field->name)] = $field->id;
 			}
 			$this->cache__custom_field_ids = serialize($fields);
@@ -147,6 +146,10 @@ class User extends db_generic_record {
 		}
 
 		return unserialize($this->cache__custom_field_ids);
+	}
+
+	function get_cf_story_points() {
+		return @$this->custom_field_ids['story points'] ?: '';
 	}
 
 	function get_cf_epic_link() {
@@ -162,28 +165,24 @@ class User extends db_generic_record {
 	}
 
 	function get_cf_epic_color() {
-		$fieldsmeta = $this->custom_field_ids;
-		return @$fieldsmeta['epic colour'] ?: @$fieldsmeta['epic color'] ?: '';
+		return @$this->custom_field_ids['epic colour'] ?: @$this->custom_field_ids['epic color'] ?: '';
 	}
 
 	function unsync() {
-// echo "unsync & uncache\n";
 		global $db;
 
 		$db->delete('filters', array('user_id' => $this->id));
 		unset($this->filters, $this->filter_query_options);
 
 		$this->save(array('cache__custom_field_ids' => $this->cache__custom_field_ids = ''));
-		unset($this->filters, $this->filter_query_options, $this->custom_fields, $this->custom_field_ids);
+		unset($this->custom_fields, $this->custom_field_ids);
 	}
 
 	function get_filters() {
-// echo "get filters\n";
 		global $db;
 
 		$filters = $db->select('filters', 'user_id = ? ORDER BY name ASC', array($this->id))->all();
 		if ( !$filters ) {
-// echo "live fetch filters\n";
 			$jira_filters = jira_get('filter/favourite', null, $error, $info);
 
 			// Error, no need to prettify

@@ -47,6 +47,7 @@ list($activeTab) = explode(':', $querySource);
 // Execute
 $page = max(0, (int)@$_GET['page']);
 $issues = jira_get('search', array('maxResults' => $perPage, 'startAt' => $page * $perPage, 'jql' => $query), $error, $info);
+$issues->issues = Issue::map($issues->issues);
 
 // Ajax callback
 if ( IS_AJAX ) {

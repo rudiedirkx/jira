@@ -132,57 +132,10 @@ if ( !$issue || $error ) {
 	print_r($info);
 	exit;
 }
+$issue = new Issue($issue);
 
-// print_r($issue);
 $fields = $issue->fields;
-$created = strtotime($fields->created);
-$updated = strtotime($fields->updated);
 $transitions = $issue->transitions;
-$subtasks = !empty($fields->subtasks) ? $fields->subtasks : array();
-$subkeys = array_map(function($issue) {
-	return $issue->key;
-}, $subtasks);
-$parent = @$fields->parent;
-$attachments = $fields->attachment;
-$worklogs = $fields->worklog->worklogs;
-$links = $fields->issuelinks;
-$comments = $fields->comment->comments;
-
-$fieldsmeta = $user->custom_field_ids;
-
-$parentEpicKey = $user->cf_epic_link ? @$fields->{$user->cf_epic_link} : null;
-$parentEpic = null;
-if ( $parentEpicKey && $user->config('load_epics') ) {
-	$parentEpic = jira_get('issue/' . $parentEpicKey);
-}
-
-$selfEpic = null;
-$selfEpicLabel = '';
-$epicIssues = array();
-if ( $user->cf_epic_name && $user->cf_epic_status && $user->cf_epic_link ) {
-	if ( @$fields->{$user->cf_epic_name} && @$fields->{$user->cf_epic_name} ) {
-		$selfEpic = (object) array(
-			'name' => $fields->{$user->cf_epic_name},
-			'status' => $fields->{$user->cf_epic_name},
-			'color' => '',
-		);
-		if ( $user->cf_epic_color && isset($fields->{$user->cf_epic_color}) ) {
-			$selfEpic->color = $fields->{$user->cf_epic_color};
-		}
-
-		$selfEpicLabel = '<span class="epic ' . html($selfEpic->color) . '">' . html($selfEpic->name) . '</span>';
-
-		$query = '"Epic Link" = ' . $issue->key . ' ORDER BY Rank';
-		$issues = jira_get('search', array('jql' => $query), $error, $info);
-		if ( !$error && $issues && !empty($issues->issues) ) {
-			$epicIssues = $issues->issues;
-		}
-	}
-}
-
-usort($attachments, function($a, $b) {
-	return strtotime($a->created) - strtotime($b->created);
-});
 
 $actionPath = 'transition.php?key=' . $key . '&assignee=' . urlencode(@$fields->assignee->name) . '&summary=' . urlencode($fields->summary) . '&transition=';
 
@@ -206,28 +159,29 @@ if ( $fields->resolution ) {
 	$resolution = ': ' . html($fields->resolution->name);
 }
 
-$h1Class = $parent || $parentEpicKey ? ' class="with-parent-issue"' : '';
-if ( $parentEpicKey ) {
-	$parentEpicColor = $user->cf_epic_color ? @$parentEpic->fields->{$user->cf_epic_color} : '';
-	$parentEpicName = @$parentEpic->fields->{$user->cf_epic_name};
-	$parentEpicLabel = $parentEpic ? '<span class="epic ' . html($parentEpicColor) . '"><a href="issue.php?key=' . $parentEpicKey . '">' . html(trim($parentEpicName)) . '</a></span>' : '<span class="epic"><a href="issue.php?key=' . $parentEpicKey . '">EPIC</a></span>';
-	$parentEpicSummary = $parentEpic ? $parentEpic->fields->summary : $parentEpicKey;
-	echo '<p class="parent-epic">&gt; ' . $parentEpicLabel . ' ' . html($parentEpicSummary) . '</p>';
+$h1Class = $issue->parent || $issue->parent_epic_key ? ' class="with-parent-issue"' : '';
+if ( $issue->parent_epic_key ) {
+	if ( $issue->parent_epic ) {
+		echo '<p class="parent-epic">&gt; <span class="epic ' . html($issue->parent_epic->self_epic->color) . '"><a href="issue.php?key=' . $issue->parent_epic_key . '">' . html(trim($issue->parent_epic->self_epic->name)) . '</a></span> ' . html($issue->parent_epic->fields->summary) . '</p>';
+	}
+	else {
+		echo '<p class="parent-epic">&gt; <span class="epic"><a href="issue.php?key=' . $issue->parent_epic_key . '">EPIC</a></span> ' . html($issue->parent_epic_key) . '</p>';
+	}
 }
-if ( $parent ) {
-	echo '<p class="parent-issue">&gt; <a href="issue.php?key=' . $parent->key . '">' . $parent->key . '</a> ' . html($parent->fields->summary) . '</p>';
+else if ( $issue->parent ) {
+	echo '<p class="parent-issue">&gt; <a href="issue.php?key=' . $issue->parent->key . '">' . $issue->parent->key . '</a> ' . html($issue->parent->fields->summary) . '</p>';
 }
-$storypoints = @$fieldsmeta['story points'] && @$fields->{$fieldsmeta['story points']} ? ' (' . @$fields->{$fieldsmeta['story points']} . ' pt)' : '';
+$storypoints = $issue->story_points ? ' (' . $issue->story_points . ' pt)' : '';
 echo '<h1' . $h1Class . '><a href="issue.php?key=' . $issue->key . '">' . $issue->key . '</a> ' . html($fields->summary) . $storypoints . '</h1>';
 echo '<p class="menu">' . html_links($actions) . '</p>' . "\n";
 
 $meta = array();
 echo '<p class="meta">';
-$meta[] = html_icon($fields->issuetype, 'issuetype') . ' ' . html($fields->issuetype->name) . ' ' . $selfEpicLabel;
+$meta[] = html_icon($fields->issuetype, 'issuetype') . ' ' . html($fields->issuetype->name) . ' ' . $issue->self_epic_label;
 if ($fields->priority) {
 	$meta[] = html_icon($fields->priority, 'priority') . ' ' . html($fields->priority->name);
 }
-$meta[] = html($fields->reporter->displayName) . ' (' . date(FORMAT_DATETIME, $created) . ')';
+$meta[] = html($fields->reporter->displayName) . ' (' . date(FORMAT_DATETIME, $issue->created) . ')';
 $meta[] = html_icon($fields->status, 'status') . ' <strong>' . html($fields->status->name) . $resolution . '</strong>';
 $meta[] = '<em>' . ( html(@$fields->assignee->displayName) ?: 'No assignee' ) . '</em>';
 if ( $fields->labels ) {
@@ -241,8 +195,8 @@ if ( !empty($fields->votes) ) {
 	$voted = $fields->votes->hasVoted ? 'active' : '';
 	$meta[] = '<a href="issue.php?key=' . $key . '&vote=' . (int)!$voted . '&token=' . XSRF_TOKEN . '" class="ajax active-state ' .  $voted. '">♥</a> (vote)';
 }
-if ( $updated && $updated > $created ) {
-	$meta[] = 'Updated on ' . date(FORMAT_DATETIME, $updated);
+if ( $issue->updated && $issue->updated > $issue->created ) {
+	$meta[] = 'Updated on ' . date(FORMAT_DATETIME, $issue->updated);
 }
 echo implode(' | ', $meta);
 echo '</p>' . "\n";
@@ -288,7 +242,7 @@ if ( isset($_GET['edit']) ) {
 echo '<div class="issue-description markup">' . ( do_remarkup($issue->renderedFields->description) ?: '<em>No description</em>' ) . '</div>';
 
 $customs = array();
-foreach ( $fieldsmeta as $cfName => $cfKey ) {
+foreach ( $user->custom_field_ids as $cfName => $cfKey ) {
 	if ( $value = @$issue->renderedFields->$cfKey ) {
 		$customs[$cfName] = $issue->renderedFields->$cfKey;
 	}
@@ -322,10 +276,10 @@ if ( $customs ) {
 	<?php
 }
 
-if ( $epicIssues ) {
-	echo '<h2>' . count($epicIssues) . ' issues in epic</h2>';
+if ( $issue->self_epic_issues ) {
+	echo '<h2>' . count($issue->self_epic_issues) . ' issues in epic</h2>';
 	echo '<ol>';
-	foreach ( $epicIssues as $task ) {
+	foreach ( $issue->self_epic_issues as $task ) {
 		echo '<li>';
 		echo html_icon($task->fields->issuetype, 'issuetype') . ' ';
 		echo '<a href="issue.php?key=' . $task->key . '">' . $task->key . '</a> ';
@@ -336,10 +290,10 @@ if ( $epicIssues ) {
 	echo '</ol>';
 }
 
-if ( $subtasks ) {
-	echo '<h2 class="pre-menu">' . count($subtasks) . ' sub tasks</h2> (<a href="' . $actions['+Subtask'] . '">add</a>)';
+if ( $issue->subtasks ) {
+	echo '<h2 class="pre-menu">' . count($issue->subtasks) . ' sub tasks</h2> (<a href="' . $actions['+Subtask'] . '">add</a>)';
 	echo '<ol>';
-	foreach ( $subtasks as $task ) {
+	foreach ( $issue->subtasks as $task ) {
 		echo '<li>';
 		echo html_icon($task->fields->issuetype, 'issuetype') . ' ';
 		echo '<a href="issue.php?key=' . $task->key . '">' . $task->key . '</a> ';
@@ -350,11 +304,11 @@ if ( $subtasks ) {
 	echo '</ol>';
 }
 
-if ( $attachments ) {
-	echo '<h2 class="pre-menu">' . count($attachments) . ' attachments</h2> (<a href="' . $actions['Upload'] . '">add</a>)';
+if ( $issue->attachments ) {
+	echo '<h2 class="pre-menu">' . count($issue->attachments) . ' attachments</h2> (<a href="' . $actions['Upload'] . '">add</a>)';
 	echo '<div class="table attachments">';
 	echo '<table border="1">';
-	foreach ( $attachments AS $attachment ) {
+	foreach ( $issue->attachments AS $attachment ) {
 		$created = strtotime($attachment->created);
 		$size = $attachment->size > 1.2e6 ? number_format($attachment->size / 1e6, 2) . ' MB' : number_format($attachment->size / 1e3, 0, '.', '') . ' kB';
 
@@ -370,11 +324,11 @@ if ( $attachments ) {
 	echo '</div>';
 }
 
-if ( $links ) {
-	echo '<h2 class="pre-menu">' . count($links) . ' links</h2> (<a href="' . $actions['Link'] . '">add</a>)';
+if ( $issue->links ) {
+	echo '<h2 class="pre-menu">' . count($issue->links) . ' links</h2> (<a href="' . $actions['Link'] . '">add</a>)';
 	echo '<div class="table links">';
 	echo '<table border="1">';
-	foreach ( $links AS $i => $link ) {
+	foreach ( $issue->links AS $i => $link ) {
 		$first = $i == 0;
 
 		$linkedIssue = @$link->outwardIssue ?: $link->inwardIssue;
@@ -383,7 +337,7 @@ if ( $links ) {
 
 		echo '<tr>';
 		if ($first) {
-			echo '<td rowspan="' . count($links) . '">This issue</td>';
+			echo '<td rowspan="' . count($issue->links) . '">This issue</td>';
 		}
 		echo '<td>' . html($linkTitle) . '</td>';
 		echo '<td>' . html_icon($linkedIssue->fields->issuetype, 'issuetype') . ' <a href="issue.php?key=' . $linkedIssue->key . '">' . $linkedIssue->key . '</a> ' . html_icon($linkedIssue->fields->status, 'status') . ' ' . html($linkedIssue->fields->summary) . '</td>';
@@ -394,18 +348,18 @@ if ( $links ) {
 	echo '</div>';
 }
 
-if ( $worklogs ) {
+if ( $issue->worklogs ) {
 	echo '<h2 class="pre-menu">' . $fields->worklog->total . ' worklogs</h2> (<a href="' . $actions['Log work'] . '">add</a>)';
 
 	$minutes = 0;
-	foreach ($worklogs as $worklog) {
+	foreach ($issue->worklogs as $worklog) {
 		$minutes += $worklog->timeSpentSeconds / 60;
 	}
 
 	// Summarize and link
-	if ( $subtasks || $fields->worklog->total > count($worklogs) ) {
-		$guess = $minutes * $fields->worklog->total / count($worklogs);
-		echo '<p>~ ' . round($guess / 60, 1) . ' hours (<strong>guess</strong>) spent. <a href="worklogs.php?key=' . $key . '&subtasks=' . implode(',', $subkeys) . '&summary=' . urlencode($fields->summary) . '">See ALL worklogs, incl subtasks.</a></p>';
+	if ( $issue->subtasks || $fields->worklog->total > count($issue->worklogs) ) {
+		$guess = $minutes * $fields->worklog->total / count($issue->worklogs);
+		echo '<p>~ ' . round($guess / 60, 1) . ' hours (<strong>guess</strong>) spent. <a href="worklogs.php?key=' . $key . '&subtasks=' . implode(',', $issue->subkeys) . '&summary=' . urlencode($fields->summary) . '">See ALL worklogs, incl subtasks.</a></p>';
 	}
 	// Show all logs, there's nothing else
 	else {
@@ -415,12 +369,12 @@ if ( $worklogs ) {
 }
 else if ( !$fields->issuetype->subtask ) {
 	echo '<h2 class="pre-menu">? worklogs</h2> (<a href="' . $actions['Log work'] . '">add</a>)';
-	echo '<p><a href="worklogs.php?key=' . $key . '&subtasks=' . implode(',', $subkeys) . '&summary=' . urlencode($fields->summary) . '">See ALL worklogs, incl subtasks.</a></p>';
+	echo '<p><a href="worklogs.php?key=' . $key . '&subtasks=' . implode(',', $issue->subkeys) . '&summary=' . urlencode($fields->summary) . '">See ALL worklogs, incl subtasks.</a></p>';
 }
 
-echo '<h2 class="pre-menu">' . count($comments) . ' comments</h2> (<a href="#new-comment">add</a>)';
+echo '<h2 class="pre-menu">' . count($issue->comments) . ' comments</h2> (<a href="#new-comment">add</a>)';
 echo '<div class="comments">';
-foreach ( $comments AS $i => $comment ) {
+foreach ( $issue->comments AS $i => $comment ) {
 	$created = strtotime($comment->created);
 	echo '<div id="comment-' . $comment->id . '">';
 	echo '<p class="meta">';
@@ -481,6 +435,7 @@ echo '</div>';
 <?php
 
 if ( isset($_GET['debug']) ) {
+	$issue->__unget();
 	echo '<pre>' . print_r($issue, 1) . '</pre>';
 }
 
