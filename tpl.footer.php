@@ -1,7 +1,7 @@
 
 <details>
 	<summary>Jira requests</summary>
-	<pre style="margin: 0"><?= implode('<br />', $jira_history) ?></pre>
+	<pre style="white-space: pre-line; margin: 0"><?= implode('<br />', $jira_history) ?></pre>
 </details>
 
 <script>

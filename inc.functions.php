@@ -153,6 +153,9 @@ function do_redirect( $path, $query = null ) {
 
 function do_logincheck() {
 	if ( !defined('JIRA_AUTH') ) {
+		if ( basename($_SERVER['PHP_SELF']) != 'auth.php' ) {
+			do_redirect('auth');
+		}
 		exit('<a href="auth.php">Need login</a>' . "\n");
 	}
 }

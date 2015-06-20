@@ -46,6 +46,7 @@ if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
 		$db->insert('users', array(
 			'jira_url' => $url,
 			'jira_user' => $username,
+			'created' => time(),
 		));
 	}
 	catch ( db_exception $ex ) {

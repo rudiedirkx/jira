@@ -115,12 +115,6 @@ include 'tpl.header.php';
 			?>
 			<tr>
 				<th align="right">
-					<?if (!$checkbox):?>
-						<label for="config_<?= $name ?>"><?= html($info['label']) ?></label>
-						<?if ($info['required']):?> <span class="required">*</span><?endif?>
-					<?endif?>
-				</th>
-				<td>
 					<input
 						id="config_<?= $name ?>"
 						type="<?= $info['type'] ?>"
@@ -133,9 +127,10 @@ include 'tpl.header.php';
 						style="width: <?= $info['size'] ?>em"
 						<?if ($info['required']):?>required<?endif?>
 					/>
-					<?if ($checkbox):?>
-						<label for="config_<?= $name ?>"><?= html($info['label']) ?></label>
-					<?endif?>
+				</th>
+				<td>
+					<?if ($info['required']):?> <span class="required">*</span><?endif?>
+					<label for="config_<?= $name ?>"><?= html($info['label']) ?></label>
 				</td>
 			</tr>
 		<? endforeach ?>

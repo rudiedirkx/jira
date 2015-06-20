@@ -13,6 +13,7 @@ return array(
 				'last_sync' => array('unsigned' => true),
 				'jira_timezone' => array('type' => 'text'),
 				'cache__custom_field_ids' => array('type' => 'blob'),
+				'created' => array('unsigned' => true, 'default' => 0),
 			),
 			'indexes' => array(
 				'user' => array(
