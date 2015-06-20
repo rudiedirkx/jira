@@ -32,6 +32,9 @@ define('JIRA_API_1_PATH', '/rest/api/1.0/');
 // Request constants
 define('IS_AJAX', strtolower(@$_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
 
+// Init Jira request history
+$jira_history = array();
+
 // Current session
 $user = null;
 if ( isset($_COOKIE['JIRA_URL'], $_COOKIE['JIRA_AUTH']) && ($accounts = get_accounts()) ) {

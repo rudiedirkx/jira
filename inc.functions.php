@@ -353,6 +353,9 @@ function jira_response( $ch, &$error = null, &$info = null ) {
 	$info = curl_getinfo($ch) + $info;
 	curl_close($ch);
 
+	global $jira_history;
+	$jira_history[] = $info['url'];
+
 	$info['headers'] = jira_http_headers($header);
 
 	$code = $info['http_code'];
