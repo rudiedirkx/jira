@@ -57,6 +57,11 @@ include 'tpl.epiccolors.php';
 
 ?>
 <style>
+#filter {
+	height: 40px;
+	height: calc(1.4em + 20px);
+}
+
 .longdata {
 	width: 100%;
 }
@@ -114,14 +119,13 @@ include 'tpl.epiccolors.php';
 
 <h1>Plan</h1>
 
-<p>
-	<? foreach ($board->currentViewConfig->quickFilters as $index => $filter):
-		$active = @$_GET['filter'] == $filter->id;
-		?>
-		<? if ($index): ?> | <? endif ?>
-		<a class="<?= $active ? 'active' : '' ?>" href="agile.php?filter=<?= $filter->id ?>"><?= html($filter->name) ?></a>
-	<? endforeach ?>
-</p>
+<form id="form-filter" onsubmit="return false">
+	<p>
+		<select id="filter"><?= html_options(array_reduce($board->currentViewConfig->quickFilters, function($options, $option) {
+			return $options + array($option->id => '&nbsp; ' . $option->name);
+		}, array()), @$_GET['filter'], '&nbsp; -- All issues --', false) ?></select>
+	</p>
+</form>
 
 <?php
 
@@ -160,6 +164,17 @@ echo '</table>' . "\n\n";
 
 ?>
 <script>
+// Reset SELECT
+setTimeout(function() {
+	$('form-filter').reset();
+}, 1);
+
+// Change page after filter selection
+$('filter').on('change', function(e) {
+	location = '?filter=' + (parseFloat(this.value) || '');
+});
+
+// Toggle issues tbody
 $$('.thead a').on('click', function(e) {
 	e.preventDefault();
 	var thead = this.ancestor('tbody');

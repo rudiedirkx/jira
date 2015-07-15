@@ -181,12 +181,12 @@ function html_links( $links ) {
 	return implode(' | ', $html);
 }
 
-function html_options( $options, $selected = null, $empty = '' ) {
+function html_options( $options, $selected = null, $empty = '', $sanitize = true ) {
 	$html = '';
 	$empty && $html .= '<option value="">' . $empty . '</option>';
 	foreach ( $options AS $value => $label ) {
 		$isSelected = $value == $selected ? ' selected' : '';
-		$html .= '<option value="' . html($value) . '"' . $isSelected . '>' . html($label) . '</option>';
+		$html .= '<option value="' . html($value) . '"' . $isSelected . '>' . ($sanitize ? html($label) : $label) . '</option>';
 	}
 	return $html;
 }
