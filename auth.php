@@ -38,8 +38,7 @@ if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
 	if ( !jira_test($url, $username, $_POST['pass'], $info) ) {
 		exit($info['error2']);
 	}
-
-	$account = $info['account'];
+	$jiraAccount = $info['account'];
 
 	// Save user to local db for preferences
 	try {
@@ -53,25 +52,23 @@ if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
 		// Let's assume it failed because the user already exists.
 	}
 
+	define('JIRA_URL', $info['JIRA_URL']);
+	define('JIRA_USER', $username);
+	define('JIRA_AUTH', $info['JIRA_AUTH']);
+
 	$user = User::load($url, $username);
 	$user->unsync();
-	$db->update('users', array('jira_timezone' => $account->timeZone), array('id' => $user->id));
+	$db->update('users', array('jira_timezone' => $jiraAccount->timeZone), array('id' => $user->id));
 
 	// Save credentials to cookie
-	$auth = $username . ':' . $_POST['pass'];
-	do_login($url, $auth);
+	do_login($url, $info['JIRA_AUTH']);
 
 	return do_redirect('index');
 }
 
-?>
-<link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<style>
-* { box-sizing: border-box; -webkit-box-sizing: border-box; }
-input:not([type="submit"]):not([type="button"]):not([type="radio"]):not([type="checkbox"]), select { width: 100%; }
-</style>
+include 'tpl.header.php';
 
+?>
 <p>All sensitive data is stored in a cookie ON YOUR COMPUTER. NOT on this server.</p>
 
 <? include 'tpl.login.php' ?>
