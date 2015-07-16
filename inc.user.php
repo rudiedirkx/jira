@@ -41,6 +41,9 @@ class User extends db_generic_record {
 		}
 
 		$sprints = jira_get('/rest/greenhopper/1.0/sprintquery/' . $boardId, array(), $error, $info);
+		if ( !$sprints ) {
+			return;
+		}
 		$actives = array_filter($sprints->sprints, function($sprint) {
 			return $sprint->state == 'ACTIVE';
 		});
@@ -69,15 +72,13 @@ class User extends db_generic_record {
 
 		$function = 'getAutoVar' . $type;
 		if ( method_exists($this, $function) ) {
-			$value = $this->$function();
-			if ( $value ) {
-				$db->update('variables', array(
-					'value' => $value,
-					'last_update' => time(),
-				), array(
-					'id' => $id,
-				));
-			}
+			$value = $this->$function() ?: '0';
+			$db->update('variables', array(
+				'value' => $value,
+				'last_update' => time(),
+			), array(
+				'id' => $id,
+			));
 		}
 	}
 
