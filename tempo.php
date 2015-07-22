@@ -73,6 +73,16 @@ echo '</p>';
 
 ?>
 <style>
+label[for="showTitles"] {
+	color: #326ca6;
+	text-decoration: underline;
+}
+#showTitles {
+	position: absolute;
+	visibility: hidden;
+	z-index: -1;
+}
+
 th, td {
 	padding: 3px;
 	white-space: normal;
@@ -88,10 +98,18 @@ td.time {
 	text-align: right;
 	vertical-align: top;
 }
+
 .issue-key.hide-summary + .issue-summary {
 	display: none;
 }
+/* On my phone `~` only works where `+` would work too!? `a + b + c` doesn't work either, so simple `+` it is =( */
+#showTitles:checked + .tempo .issue-summary {
+	display: block;
+}
 </style>
+
+<p><label for="showTitles" tabindex="0">Toggle titles</label></p>
+<input type="checkbox" id="showTitles" />
 <?php
 
 echo '<div class="table tempo striping">';
