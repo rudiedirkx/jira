@@ -4,8 +4,8 @@
 header('Content-type: text/html; charset=utf-8');
 
 // Some app constants
-define('FORCE_JIRA_USER_SYNC', 600);
-define('FORCE_AUTO_VARS_SYNC', 86400);
+define('FORCE_JIRA_USER_SYNC', 600); // 10m
+define('FORCE_AUTO_VARS_SYNC', 14400); // 4h
 define('FORMAT_DATETIME', "j M 'y H:i");
 define('FORMAT_DATE', "j M 'y");
 define('WORKLOG_DATETIME', 'Y-m-d\\TH:i:s.000O');
