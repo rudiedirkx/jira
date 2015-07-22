@@ -4,9 +4,13 @@ require 'inc.bootstrap.php';
 
 do_logincheck();
 
+$offset = (int)@$_GET['offset'];
+
+$from = strtotime(($offset - 1) . ' months');
+$to = strtotime(($offset - 0) . ' months');
 $tempo = jira_get('/rest/tempo-timesheets/3/worklogs', array(
-	'dateFrom' => date('Y-m-d', strtotime('-1 month')),
-	'dateTo' => date('Y-m-d'),
+	'dateFrom' => date('Y-m-d', $from),
+	'dateTo' => date('Y-m-d', $to),
 ), $error, $info);
 
 if ( $error ) {
@@ -60,6 +64,12 @@ foreach ($dated as $date => &$workedIssues) {
 include 'tpl.header.php';
 
 echo '<h1>Tempo</h1>';
+echo '<p>';
+echo '<a href="?offset=' . ($offset - 1) . '">&lt;&lt;</a> | ';
+echo date(FORMAT_DATE, $from) . ' &mdash; ' . date(FORMAT_DATE, $to);
+echo ' (~' . round(array_sum($totals) / 3600) . 'h)';
+echo ' | <a href="?offset=' . ($offset + 1) . '">&gt;&gt;</a>';
+echo '</p>';
 
 ?>
 <style>
