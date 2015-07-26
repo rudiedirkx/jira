@@ -48,7 +48,17 @@ tabLink.fire('click');
 $('tab-page-goto').on('submit', function(e) {
 	e.preventDefault();
 
-	var key = this.elements.goto.value.trim().toUpperCase();
-	location = 'issue.php?key=' + encodeURIComponent(key);
+	var key = this.elements.goto.value.trim(); // issue 17 | issue17
+	key = key.replace(/\s+/, '-').toUpperCase(); // ISSUE-17 | ISSUE17
+	key = key.replace(/^([A-Z_]+)(\d+)$/, '$1-$2'); // ISSUE-17
+
+	// Jira's keys are very simple. If it's not that, no need to redirect.
+	if ( !/^[A-Z_]+\-\d+$/.test(key) ) {
+		alert('Invalid key: ' + key);
+		return;
+	}
+
+	this.elements.goto.value = key;
+	location = 'issue.php?key=' + key;
 });
 </script>
