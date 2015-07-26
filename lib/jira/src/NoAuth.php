@@ -10,7 +10,7 @@ class NoAuth implements Auth {
 	 *
 	 */
 	public function signRequest( Request $request ) {
-		$request->build();
+		// $request->build();
 
 		// Don't add anything...
 	}

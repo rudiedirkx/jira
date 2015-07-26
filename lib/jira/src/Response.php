@@ -23,6 +23,9 @@ class Response {
 		foreach ($response as $key => $value) {
 			$this->$key = $value;
 		}
+
+		// Forget response source array, it's all in this object now
+		$request->transport->response = null;
 	}
 
 }

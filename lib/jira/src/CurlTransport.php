@@ -27,16 +27,7 @@ class CurlTransport extends Transport {
 		$method = $this->method;
 		$this->$method();
 
-		// Receive all of it
-		$result = curl_exec($this->curl);
-
-		// Parse to HEAD vs BODY level
-		@list($this->responseHeader, $this->responseBody) = explode("\r\n\r\n", $result, 2);
-
-		// 100 Continue requires another parse
-		if ( is_int(strpos($this->responseHeader, '100 Continue')) ) {
-			@list($this->responseHeader, $this->responseBody) = explode("\r\n\r\n", $this->responseBody, 2);
-		}
+		// Execute and receive in _receive()
 	}
 
 	/**
@@ -89,13 +80,24 @@ class CurlTransport extends Transport {
 	 *
 	 */
 	protected function _receive() {
-		$this->responseInfo = curl_getinfo($this->curl);
+		// Receive all of it
+		$result = curl_exec($this->curl);
+
+		// Parse to HEAD vs BODY level
+		@list($header, $body) = explode("\r\n\r\n", $result, 2);
+
+		// 100 Continue requires another parse
+		if ( is_int(strpos($header, '100 Continue')) ) {
+			@list($header, $body) = explode("\r\n\r\n", $body, 2);
+		}
+
+		$this->response['info'] = curl_getinfo($this->curl);
 		curl_close($this->curl);
 
-		$this->response['code'] = (int)$this->responseInfo['http_code'];
+		$this->response['code'] = (int)$this->response['info']['http_code'];
 
 		$headers = array();
-		foreach ( explode("\n", $this->responseHeader) AS $n => $line ) {
+		foreach ( explode("\n", $header) AS $n => $line ) {
 			if ( $n == 0 ) {
 				list(, , $status) = explode(' ', trim($line), 3);
 				$this->response['status'] = $status;
@@ -103,15 +105,13 @@ class CurlTransport extends Transport {
 			else {
 				list($name, $value) = explode(':', $line, 2);
 				if ( ($name = trim($name)) && ($value = trim($value)) ) {
-					$headers[strtolower($name)][] = urldecode($value);
+					$headers[strtolower(urldecode($name))][] = urldecode($value);
 				}
 			}
 		}
 		$this->response['headers'] = $headers;
 
-		$this->response['body'] = $this->responseBody;
-
-		$this->response['info'] = $this->responseInfo;
+		$this->response['body'] = $body;
 	}
 
 }
