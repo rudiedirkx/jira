@@ -58,7 +58,7 @@ class Issue extends db_generic_record {
 	 */
 
 	public function get_attachments() {
-		$attachments = @$this->fields->attachments ?: array();
+		$attachments = @$this->fields->attachment ?: array();
 		usort($attachments, function($a, $b) {
 			return strtotime($a->created) - strtotime($b->created);
 		});
