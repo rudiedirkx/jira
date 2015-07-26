@@ -4,18 +4,23 @@ namespace rdx\jira;
 
 use rdx\jira\Config;
 use rdx\jira\Auth;
+use rdx\jira\Cache;
+use rdx\jira\NoCache;
 
 class Client {
 
 	public $config;
 	public $auth;
+	public $cache;
 
 	/**
 	 *
 	 */
-	public function __construct(Config $config, Auth $auth) {
+	public function __construct(Config $config, Auth $auth, Cache $cache = null) {
 		$this->config = $config;
 		$this->auth = $auth;
+		$this->cache = $cache ?: new NoCache;
+		$this->cache->client = $this;
 	}
 
 	/**
