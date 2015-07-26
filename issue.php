@@ -315,7 +315,11 @@ if ( $issue->attachments ) {
 
 		echo '<tr>';
 		if ( $user->config('show_thumbnails') ) {
-			echo '<td class="thumbnail">' . $a . '<img data-attachment="' . $attachment->id . '" data-src="attachment.php?thumbnail&id=' . $attachment->id . '" /></a></td>';
+			echo '<td class="thumbnail">';
+			if ( !empty($attachment->thumbnail) ) {
+				echo $a . '<img data-attachment="' . $attachment->id . '" data-src="attachment.php?thumbnail&id=' . $attachment->id . '" /></a>';
+			}
+			echo '</td>';
 		}
 		echo '<td>' . $a . html($attachment->filename) . '</a></td>';
 		echo '<td align="right">' . $size . '</td>';
