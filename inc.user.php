@@ -18,7 +18,14 @@ class User extends db_generic_record {
 			'required' => false,
 		),
 		'load_epics' => array(
-			'label' => 'Load epics (more requests, but more info)',
+			'label' => 'Load epic issue details',
+			'default' => 0,
+			'size' => 1,
+			'type' => 'checkbox',
+			'required' => false,
+		),
+		'show_thumbnails' => array(
+			'label' => "Show attachments' thumbnails",
 			'default' => 0,
 			'size' => 1,
 			'type' => 'checkbox',

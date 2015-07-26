@@ -311,9 +311,13 @@ if ( $issue->attachments ) {
 	foreach ( $issue->attachments AS $attachment ) {
 		$created = strtotime($attachment->created);
 		$size = $attachment->size > 1.2e6 ? number_format($attachment->size / 1e6, 2) . ' MB' : number_format($attachment->size / 1e3, 0, '.', '') . ' kB';
+		$a = '<a target="_blank" href="attachment.php?id=' . $attachment->id . '">';
 
 		echo '<tr>';
-		echo '<td><a target="_blank" href="attachment.php?id=' . $attachment->id . '">' . html($attachment->filename) . '</a></td>';
+		if ( $user->config('show_thumbnails') ) {
+			echo '<td class="thumbnail">' . $a . '<img data-attachment="' . $attachment->id . '" data-src="attachment.php?thumbnail&id=' . $attachment->id . '" /></a></td>';
+		}
+		echo '<td>' . $a . html($attachment->filename) . '</a></td>';
 		echo '<td align="right">' . $size . '</td>';
 		echo '<td>' . date(FORMAT_DATETIME, $created) . '</td>';
 		echo '<td>' . html($attachment->author->displayName) . '</td>';

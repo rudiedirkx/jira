@@ -250,6 +250,22 @@ td.wrap {
 }
 
 
+
+/* attachments */
+.attachments .thumbnail {
+	padding: 0;
+	text-align: center;
+	background-color: black;
+}
+.attachments .thumbnail img {
+	max-width: 100px;
+	max-height: 100px;
+	display: block;
+	margin: 0 auto;
+}
+
+
+
 /* tabs */
 .tab-links .active {
 	font-weight: bold;

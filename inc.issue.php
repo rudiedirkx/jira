@@ -151,6 +151,10 @@ class Issue extends db_generic_record {
 
 
 
+	/**
+	 * Util
+	 */
+
 	public function __unget() {
 		foreach ( $this->_got as $name ) {
 			unset($this->$name);
