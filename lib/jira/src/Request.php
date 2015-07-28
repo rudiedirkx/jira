@@ -50,7 +50,7 @@ abstract class Request {
 
 		// Encode, create HTTP request, send it, receive dumb response
 		$body = $this->encode($this->body);
-		$response = $this->transport->send($this->body);
+		$response = $this->transport->send($body);
 
 		// Decode response, create smart response object
 		$response['response'] = $this->decode($response['body']);

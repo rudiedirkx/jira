@@ -17,6 +17,19 @@ class Issue extends JiraEntity {
 	/**
 	 *
 	 */
+	public function upload( $filePath, $fileName = null ) {
+		$fileName or $fileName = basename($filePath);
+
+		$request = new Api2Request($this->response->request->client, 'UPLOAD', 'issue/' . $this->key . '/attachments');
+		$request->build();
+		$request->transport->files['file'] = array($filePath, $fileName);
+		$response = $request->send();
+		return $response;
+	}
+
+	/**
+	 *
+	 */
 	public function __get( $name ) {
 		// Getter, cache in $this
 		if ( is_callable($method = array($this, 'get_' . $name)) ) {

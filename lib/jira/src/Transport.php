@@ -10,8 +10,11 @@ abstract class Transport {
 		'User-agent' => array('rdx\\jira 2.0'),
 	);
 	public $body = '';
+	public $files = array();
 
 	public $response = array(
+		'info' => array(),
+		'header' => '',
 		'code' => 0,
 		'status' => '',
 		'headers' => array(),
@@ -64,6 +67,11 @@ abstract class Transport {
 	 *
 	 */
 	abstract protected function POST();
+
+	/**
+	 *
+	 */
+	abstract protected function UPLOAD();
 
 	/**
 	 *

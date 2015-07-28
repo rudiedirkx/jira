@@ -2,6 +2,8 @@
 
 namespace rdx\jira;
 
+use CURLFile;
+
 class CurlTransport extends Transport {
 
 	public $curl;
@@ -65,6 +67,27 @@ class CurlTransport extends Transport {
 	/**
 	 *
 	 */
+	protected function UPLOAD() {
+		$data = array();
+		foreach ($this->files as $name => $file) {
+			$curlFile = '@' . $file[0] . '; filename=' . urlencode($file[1]);
+			if ( class_exists('CURLFile') ) {
+				$curlFile = new CURLFile($file[0]);
+				$curlFile->setPostFilename($file[1]);
+			}
+			$data[$name] = $curlFile;
+		}
+
+		curl_setopt($this->curl, CURLOPT_POST, true);
+		curl_setopt($this->curl, CURLOPT_POSTFIELDS, $data);
+		$this->setHeader('X-Atlassian-Token', 'nocheck');
+
+		$this->sendHeaders();
+	}
+
+	/**
+	 *
+	 */
 	protected function PUT() {
 
 	}
@@ -80,7 +103,7 @@ class CurlTransport extends Transport {
 	 *
 	 */
 	protected function _receive() {
-		// Receive all of it
+		// Send & receive all of it
 		$result = curl_exec($this->curl);
 
 		// Parse to HEAD vs BODY level
@@ -94,6 +117,7 @@ class CurlTransport extends Transport {
 		$this->response['info'] = curl_getinfo($this->curl);
 		curl_close($this->curl);
 
+		$this->resppnse['header'] = $header;
 		$this->response['code'] = (int)$this->response['info']['http_code'];
 
 		$headers = array();
