@@ -317,7 +317,7 @@ if ( $issue->attachments ) {
 		if ( $user->config('show_thumbnails') ) {
 			echo '<td class="thumbnail">';
 			if ( !empty($attachment->thumbnail) ) {
-				echo $a . '<img data-attachment="' . $attachment->id . '" data-src="attachment.php?thumbnail&id=' . $attachment->id . '" /></a>';
+				echo $a . '<img data-attachment="' . $attachment->id . '" data-context="thumbnail" data-src="attachment.php?thumbnail&id=' . $attachment->id . '" /></a>';
 			}
 			echo '</td>';
 		}
@@ -408,18 +408,38 @@ echo '</div>';
 </div>
 
 <script>
+var cleared = false;
 [].forEach.call(document.querySelectorAll('img[data-attachment][data-src]'), function(img) {
 	var id = img.dataset.attachment;
-	var uri = localStorage['attachment_' + id];
-	if (uri) {
-		console.log(id, 'Using Data URI for localStorage');
-		img.src = uri;
+	var context = img.dataset.context || 'unknown';
+
+	// Clean up cache
+	if ( !cleared ) {
+		cleared = true;
+		for ( var name in localStorage ) {
+			if ( /^attachment_/.test(name) ) {
+				var time = Number(localStorage[name].substr(0, 13));
+				if ( !time || isNaN(time) || time < Date.now() - 30*86400*1000 ) {
+					console.log('Purging', name);
+					delete localStorage[name];
+				}
+			}
+		}
 	}
+
+	// Load from cache
+	var uri = localStorage['attachment_' + id + '_' + context];
+	if ( uri ) {
+		console.log(id, context, 'Using Data URI for localStorage');
+		img.src = uri.substr(13);
+	}
+
+	// Load live and store in cache, maybe
 	else {
-		console.log(id, 'Using live URL once');
+		console.log(id, context, 'Using live URL...');
 		img.src = img.dataset.src;
 		img.onload = function(e) {
-			console.log(id, 'Image loaded, saving into localStorage');
+			console.log(id, context, 'Image loaded, saving into localStorage...');
 
 			var canvas = document.createElement('canvas');
 			canvas.width = img.width;
@@ -429,7 +449,13 @@ echo '</div>';
 			var data = canvas.toDataURL('image/png');
 
 			try {
-				localStorage['attachment_' + id] = data;
+				if ( data.length < 20000 ) {
+					localStorage['attachment_' + id + '_' + context] = String(Date.now()) + data;
+					console.log(id, context, 'Image saved: ' + Math.round(data.length/1024) + ' kb');
+				}
+				else {
+					console.log(id, context, 'Image not saved: ' + Math.round(data.length/1024) + ' kb is too big');
+				}
 			}
 			catch (ex) {
 				alert("Couldn't save image in localStorage. Full?");

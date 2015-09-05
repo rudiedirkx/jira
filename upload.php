@@ -8,7 +8,7 @@ $key = @$_GET['key'];
 
 $summary = @$_GET['summary'];
 
-// Post worklog
+// Upload file
 if ( isset($_FILES['file']) ) {
 	$file = $_FILES['file'];
 

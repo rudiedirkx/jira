@@ -161,7 +161,7 @@ class Issue extends db_generic_record {
 		}
 	}
 
-	public function __get( $name ) {
+	public function &__get( $name ) {
 		$this->_got[] = $name;
 		return parent::__get($name);
 	}
