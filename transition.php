@@ -77,6 +77,7 @@ if ( isset($_POST['status'], $_POST['comment'], $_POST['assignee']) ) {
 }
 
 $transitions = jira_get('issue/' . $key . '/transitions', array('expand' => 'transitions.fields'));
+// print_r($transitions);
 
 $actions = $transitionsById = array();
 $actions[''] = '-- No change';
@@ -95,11 +96,15 @@ echo '<h2>' . ( $actions[$action] ?: 'Transition' ) . '</h2>';
 echo '<form autocomplete="off" method="post">';
 echo '<p>Action: <select name="status">' . html_options($actions, $action) . '</select></p>';
 if ( isset($transitionsById[$action]->fields->resolution) ) {
+	$issue = jira_get('issue/' . $key, array(), $error, $info);
+	// print_r($issue);
+
 	$resolutions = array();
 	foreach ( $transitionsById[$action]->fields->resolution->allowedValues AS $resolution ) {
 		$resolutions[$resolution->name] = $resolution->name;
 	}
-	echo '<p>Resolution: <select name="resolution">' . html_options($resolutions, 'Fixed') . '</select></p>';
+
+	echo '<p>Resolution: <select name="resolution">' . html_options($resolutions, $issue->fields->resolution->name ?: 'Fixed') . '</select></p>';
 }
 echo '<p>Comment:<br><textarea name="comment" rows="8"></textarea></p>';
 echo '<p>Assignee (' . $assignee . '): <input name="assignee" placeholder="Use &quot;unassign&quot; to unassign. Leave empty to not change." /></p>';
