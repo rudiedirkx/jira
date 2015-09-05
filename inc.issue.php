@@ -19,6 +19,16 @@ class Issue extends db_generic_record {
 
 
 	/**
+	 *
+	 */
+
+	public function get_transitions() {
+		return array();
+	}
+
+
+
+	/**
 	 * Sub tasks
 	 */
 
