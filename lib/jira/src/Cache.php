@@ -6,15 +6,6 @@ use rdx\jira\Client;
 
 interface Cache {
 
-	// public $client;
-
-	// public $autoPersist = true;
-
-	/**
-	 *
-	 */
-	public function __construct( Client $client = null );
-
 	/**
 	 *
 	 */

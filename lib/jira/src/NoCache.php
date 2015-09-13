@@ -11,15 +11,6 @@ class NoCache implements Cache {
 	/**
 	 *
 	 */
-	public function __construct( Client $client = null ) {
-		if ( $client ) {
-			$this->client = $client;
-		}
-	}
-
-	/**
-	 *
-	 */
 	public function getFields( $name, &$fromCache ) {
 		$request = new Api2Request($this->client, 'GET', 'field');
 		$response = $request->send();

@@ -11,10 +11,9 @@ $client = new Client(
 	new Config('https://jira.ezcompany.nl/jira', array(
 		'FileCache' => array('dir' => __DIR__ . '/cache'),
 	)),
-	new BasicAuth(RDX_JIRA_LIB_TEST_USER, RDX_JIRA_LIB_TEST_PASS)
-	// ,new FileCache // Automatic client->cache->client
+	new BasicAuth(RDX_JIRA_LIB_TEST_USER, RDX_JIRA_LIB_TEST_PASS),
+	new FileCache
 );
-$client->cache = new FileCache($client); // Manual client->cache->client
 print_r($client);
 
 // Fetch custom field mapping, from cache, or not
