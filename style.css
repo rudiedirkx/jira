@@ -21,7 +21,7 @@ select,
 textarea {
 	background: #e0f0ff;
 	border: solid 1px #999;
-	padding: 3px 5px;
+	padding: 11px;
 }
 input:not([type="submit"]):not([type="button"]):not([type="radio"]):not([type="checkbox"]):not(.manual-width),
 select:not(.manual-width),
