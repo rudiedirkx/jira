@@ -291,28 +291,36 @@ if ( $issue->links ) {
 	echo '</div>';
 }
 
-if ( $issue->worklogs ) {
-	echo '<h2 class="pre-menu">' . $fields->worklog->total . ' worklogs</h2> (<a href="' . $actions['Log work'] . '">add</a>)';
+if ( $issue->worklogs->total || !$fields->issuetype->subtask ) {
+	$total = '0+';
+	if ( $issue->worklogs->total ) {
+		$total = $issue->worklogs->total;
+		if ( !$fields->issuetype->subtask ) {
+			$total .= '+';
+		}
+	}
+	echo '<h2 class="pre-menu">' . $total . ' worklogs</h2> (<a href="' . $actions['Log work'] . '">add</a>)';
 
 	$minutes = 0;
-	foreach ($issue->worklogs as $worklog) {
+	foreach ( $issue->worklogs->worklogs as $worklog ) {
 		$minutes += $worklog->timeSpentSeconds / 60;
 	}
 
+	// Show link to combined list
+	if ( !$minutes ) {
+		echo '<p><a href="worklogs.php?key=' . $key . '&subtasks=' . implode(',', $issue->subkeys) . '&summary=' . urlencode($fields->summary) . '">See ALL worklogs, incl subtasks.</a></p>';
+	}
 	// Summarize and link
-	if ( $issue->subtasks || $fields->worklog->total > count($issue->worklogs) ) {
-		$guess = $minutes * $fields->worklog->total / count($issue->worklogs);
+	else if ( $issue->subtasks || $fields->worklog->total > count($issue->worklogs->worklogs) ) {
+		$guess = $minutes * $fields->worklog->total / count($issue->worklogs->worklogs);
 		echo '<p>~ ' . round($guess / 60, 1) . ' hours (<strong>guess</strong>) spent. <a href="worklogs.php?key=' . $key . '&subtasks=' . implode(',', $issue->subkeys) . '&summary=' . urlencode($fields->summary) . '">See ALL worklogs, incl subtasks.</a></p>';
 	}
 	// Show all logs, there's nothing else
 	else {
 		$summary = $fields->summary;
+		$worklogs = $issue->worklogs->worklogs;
 		include 'tpl.worklogs.php';
 	}
-}
-else if ( !$fields->issuetype->subtask ) {
-	echo '<h2 class="pre-menu">? worklogs</h2> (<a href="' . $actions['Log work'] . '">add</a>)';
-	echo '<p><a href="worklogs.php?key=' . $key . '&subtasks=' . implode(',', $issue->subkeys) . '&summary=' . urlencode($fields->summary) . '">See ALL worklogs, incl subtasks.</a></p>';
 }
 
 echo '<h2 class="pre-menu">' . count($issue->comments) . ' comments</h2> (<a href="#new-comment">add</a>)';

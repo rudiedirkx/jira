@@ -76,7 +76,10 @@ class Issue extends db_generic_record {
 	}
 
 	public function get_worklogs() {
-		return @$this->fields->worklogs ?: array();
+		return @$this->fields->worklog ?: (object) array(
+			'total' => 0,
+			'worklogs' => array(),
+		);
 	}
 
 	public function get_links() {
