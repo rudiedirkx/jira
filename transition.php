@@ -8,25 +8,28 @@ $key = $_GET['key'];
 
 $summary = $_GET['summary'];
 $action = @$_GET['transition'];
-$assignee = isset($_GET['assignee']) ? ($_GET['assignee'] ?: '<em>None</em>') : '?';
 
-if ( isset($_POST['status'], $_POST['comment'], $_POST['assignee']) ) {
+if ( isset($_POST['status'], $_POST['comment']) ) {
 	$status = trim($_POST['status']);
 	$resolution = trim(@$_POST['resolution']);
 	$comment = trim($_POST['comment']);
-	$assignee = trim($_POST['assignee']);
+
+	$assigneetype = trim(@$_POST['assigneetype']);
+	$assignee = trim(@$_POST['assignee']);
+	if ( $assigneetype == 'unassign' ) {
+		$assignee = null;
+	}
+	else if ( $assigneetype == 'me' ) {
+		$assignee = JIRA_USER;
+	}
 
 	$update = array();
 
 	// ASSIGN
 	if ( $status == 'assign' ) {
-		if ( !$assignee ) {
+		if ( $assignee === '' ) {
 			echo "Must enter assignee username.";
 			exit;
-		}
-
-		if ( in_array($assignee, array('unassign', 'unassigned')) ) {
-			$assignee = null;
 		}
 
 		// Add comment
@@ -50,7 +53,7 @@ if ( isset($_POST['status'], $_POST['comment'], $_POST['assignee']) ) {
 		if ( $comment ) {
 			$update['update']['comment'][0]['add']['body'] = $comment;
 		}
-		if ( $assignee ) {
+		if ( $assignee !== '' ) {
 			$update['fields']['assignee']['name'] = $assignee;
 		}
 		if ( $resolution ) {
@@ -104,10 +107,18 @@ if ( isset($transitionsById[$action]->fields->resolution) ) {
 		$resolutions[$resolution->name] = $resolution->name;
 	}
 
-	echo '<p>Resolution: <select name="resolution">' . html_options($resolutions, $issue->fields->resolution->name ?: 'Fixed') . '</select></p>';
+	echo '<p>Resolution: <select name="resolution">' . html_options($resolutions, @$issue->fields->resolution->name ?: 'Fixed') . '</select></p>';
 }
 echo '<p>Comment:<br><textarea name="comment" rows="8"></textarea></p>';
-echo '<p>Assignee (' . $assignee . '): <input name="assignee" placeholder="Use &quot;unassign&quot; to unassign. Leave empty to not change." /></p>';
+
+if ( $action == 'assign' || isset($transitionsById[$action]->fields->assignee) ) {
+	echo '<p>Change assignee?<br />';
+	echo '<input type="radio" name="assigneetype" value="unassign" /> Unassign<br />';
+	echo '<input type="radio" name="assigneetype" value="me" /> Assign to me<br />';
+	echo '<input type="radio" name="assigneetype" value="other" checked /> No change, or assign to: <input name="assignee" style="width: 7em" placeholder="username" />';
+	echo '</p>';
+}
+
 echo '<p><input type="submit" /></p>';
 echo '</form>';
 echo '</div>';

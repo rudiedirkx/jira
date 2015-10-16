@@ -2,7 +2,7 @@
 
 $fields = $issue->fields;
 
-$actionPath = 'transition.php?key=' . $key . '&assignee=' . urlencode(@$fields->assignee->name) . '&summary=' . urlencode($fields->summary) . '&transition=';
+$actionPath = 'transition.php?key=' . $key . '&summary=' . urlencode($fields->summary) . '&transition=';
 
 $actions = array();
 $actions['Edit'] = 'issue.php?key=' . $key . '&edit';
