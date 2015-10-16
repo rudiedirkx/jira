@@ -95,9 +95,9 @@ include 'tpl.header.php';
 echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($summary) . '</h1>';
 
 echo '<div class="post-comment">';
-echo '<h2>' . ( $actions[$action] ?: 'Transition' ) . '</h2>';
+echo '<h2>' . ( @$actions[$action] ?: 'Transition' ) . '</h2>';
 echo '<form autocomplete="off" method="post">';
-echo '<p>Action: <select name="status">' . html_options($actions, $action) . '</select></p>';
+echo '<p>Action: <select required name="status">' . html_options($actions, $action) . '</select></p>';
 if ( isset($transitionsById[$action]->fields->resolution) ) {
 	$issue = jira_get('issue/' . $key, array(), $error, $info);
 	// print_r($issue);
