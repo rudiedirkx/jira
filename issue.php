@@ -306,18 +306,20 @@ if ( $issue->worklogs->total || !$fields->issuetype->subtask ) {
 		$minutes += $worklog->timeSpentSeconds / 60;
 	}
 
+	$storypoints = $issue->story_points ? ' (' . $issue->story_points . ' pt)' : '';
+	$summary = $fields->summary . $storypoints;
+
 	// Show link to combined list
 	if ( !$minutes ) {
-		echo '<p><a href="worklogs.php?key=' . $key . '&subtasks=' . implode(',', $issue->subkeys) . '&summary=' . urlencode($fields->summary) . '">See ALL worklogs, incl subtasks.</a></p>';
+		echo '<p><a href="worklogs.php?key=' . $key . '&subtasks=' . implode(',', $issue->subkeys) . '&summary=' . urlencode($summary) . '">See ALL worklogs, incl subtasks.</a></p>';
 	}
 	// Summarize and link
 	else if ( $issue->subtasks || $fields->worklog->total > count($issue->worklogs->worklogs) ) {
 		$guess = $minutes * $fields->worklog->total / count($issue->worklogs->worklogs);
-		echo '<p>~ ' . round($guess / 60, 1) . ' hours (<strong>guess</strong>) spent. <a href="worklogs.php?key=' . $key . '&subtasks=' . implode(',', $issue->subkeys) . '&summary=' . urlencode($fields->summary) . '">See ALL worklogs, incl subtasks.</a></p>';
+		echo '<p>~ ' . round($guess / 60, 1) . ' hours (<strong>guess</strong>) spent. <a href="worklogs.php?key=' . $key . '&subtasks=' . implode(',', $issue->subkeys) . '&summary=' . urlencode($summary) . '">See ALL worklogs, incl subtasks.</a></p>';
 	}
 	// Show all logs, there's nothing else
 	else {
-		$summary = $fields->summary;
 		$worklogs = $issue->worklogs->worklogs;
 		include 'tpl.worklogs.php';
 	}
