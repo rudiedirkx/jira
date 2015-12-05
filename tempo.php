@@ -99,7 +99,7 @@ td.time {
 	vertical-align: top;
 }
 
-.issue-key.hide-summary + .issue-summary {
+.issue-key.hide-summary + a + .issue-summary {
 	display: none;
 }
 /* On my phone `~` only works where `+` would work too!? `a + b + c` doesn't work either, so simple `+` it is =( */
@@ -131,7 +131,8 @@ foreach ($dated as $date => $workedIssues) {
 
 		echo '<tr>';
 		echo '<td class="key">';
-		echo '<a class="issue-key hide-summary" href="issue.php?key=' . $key . '">' . $key . '</a>';
+		echo '<a class="issue-key hide-summary" href="issue.php?key=' . $key . '">' . $key . '</a> ';
+		echo '&nbsp; <a href="logwork.php?key=' . $key . '">+</a>';
 		echo '<div class="issue-summary">' . $issue->summary . '</div>';
 		echo '</td>';
 		echo '<td class="time actions"><a href="worklogs.php?key=' . $key . '&summary=' . urlencode($issue->summary) . '&date=' . $date . '&user=' . JIRA_USER . '">' . $time . '</a></td>';
