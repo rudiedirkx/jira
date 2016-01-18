@@ -4,8 +4,22 @@ require 'inc.bootstrap.php';
 
 do_logincheck();
 
-$boardId = $user->config('agile_view_id');
+$boards = $user->agile_boards;
+
+$boardId = @$_GET['board'] ?: $user->config('agile_view_id');
 $baseParams = array('rapidViewId' => $boardId);
+
+if ( !$boardId || !isset($boards[$boardId]) ) {
+	include 'tpl.header.php';
+	?>
+	<h1>Plan</h1>
+	<form method="get" action="">
+		<p><select name="board"><?= html_options($boards, $boardId, '-- Select a board --') ?></select></p>
+		<p><button>Open</button></p>
+	</form>
+	<?php
+	exit;
+}
 
 $params = $baseParams;
 $board = jira_get('/rest/greenhopper/1.0/xboard/config', $params, $error, $info);
@@ -119,11 +133,14 @@ include 'tpl.epiccolors.php';
 
 <h1>Plan</h1>
 
-<form id="form-filter" onsubmit="return false">
+<form id="form-filter">
 	<p>
-		<select id="filter"><?= html_options(array_reduce($board->currentViewConfig->quickFilters, function($options, $option) {
-			return $options + array($option->id => '&nbsp; ' . $option->name);
-		}, array()), @$_GET['filter'], '&nbsp; -- All issues --', false) ?></select>
+		<select name="board"><?= html_options($boards, $boardId, '-- Select a board --') ?></select>
+	</p>
+	<p>
+		<select name="filter"><?= html_options(array_reduce($board->currentViewConfig->quickFilters, function($options, $option) {
+			return $options + array($option->id => '' . $option->name);
+		}, array()), @$_GET['filter'], '-- All issues --', false) ?></select>
 	</p>
 </form>
 
@@ -170,8 +187,8 @@ setTimeout(function() {
 }, 1);
 
 // Change page after filter selection
-$('filter').on('change', function(e) {
-	location = '?filter=' + (parseFloat(this.value) || '');
+$('form-filter').on('change', function(e) {
+	this.submit();
 });
 
 // Toggle issues tbody

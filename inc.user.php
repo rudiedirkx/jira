@@ -149,11 +149,26 @@ class User extends db_generic_record {
 			foreach ( $this->custom_fields as $field ) {
 				$fields[mb_strtolower($field->name)] = $field->id;
 			}
+
 			$this->cache__custom_field_ids = serialize($fields);
 			$this->save(array('cache__custom_field_ids' => $this->cache__custom_field_ids));
 		}
 
 		return unserialize($this->cache__custom_field_ids);
+	}
+
+	function get_agile_boards() {
+		if ( !$this->cache__agile_boards ) {
+			$boards = jira_get('/rest/agile/1.0/board');
+			$boardOptions = array_reduce($boards->values, function($options, $board) {
+				return $options + array($board->id => $board->name);
+			}, array());
+
+			$this->cache__agile_boards = serialize($boardOptions);
+			$this->save(array('cache__agile_boards' => $this->cache__agile_boards));
+		}
+
+		return unserialize($this->cache__agile_boards);
 	}
 
 	function get_cf_story_points() {
@@ -182,8 +197,15 @@ class User extends db_generic_record {
 		$db->delete('filters', array('user_id' => $this->id));
 		unset($this->filters, $this->filter_query_options);
 
-		$this->save(array('cache__custom_field_ids' => $this->cache__custom_field_ids = ''));
-		unset($this->custom_fields, $this->custom_field_ids);
+		$this->save(array(
+			'cache__custom_field_ids' => $this->cache__custom_field_ids = '',
+			'cache__agile_boards' => $this->cache__agile_boards = '',
+		));
+		unset(
+			$this->custom_fields,
+			$this->custom_field_ids,
+			$this->agile_boards
+		);
 	}
 
 	function get_filters() {

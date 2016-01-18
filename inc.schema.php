@@ -12,8 +12,9 @@ return array(
 				'index_filter' => array('unsigned' => true),
 				'last_sync' => array('unsigned' => true),
 				'jira_timezone' => array('type' => 'text'),
-				'cache__custom_field_ids' => array('type' => 'blob'),
 				'created' => array('unsigned' => true, 'default' => 0),
+				'cache__custom_field_ids' => array('type' => 'blob'),
+				'cache__agile_boards' => array('type' => 'blob'),
 			),
 			'indexes' => array(
 				'user' => array(
