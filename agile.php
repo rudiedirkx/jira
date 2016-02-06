@@ -27,9 +27,11 @@ $board = jira_get('/rest/greenhopper/1.0/xboard/config', $params, $error, $info)
 // $board = json_decode(file_get_contents('debug-board.json'));
 // echo "\n\n\n\n\n" . json_encode($board) . "\n\n\n\n\n";
 // DEBUG //
+// echo '<pre>';
 // print_r($board);
 // var_dump($error);
 // print_r($info);
+// exit;
 
 
 $params = $baseParams;
@@ -42,28 +44,30 @@ $plan = jira_get('/rest/greenhopper/1.0/xboard/plan/backlog/data', $params, $err
 // echo "\n\n\n\n\n" . json_encode($plan) . "\n\n\n\n\n";
 // exit;
 // DEBUG //
+// echo '<pre>';
 // print_r($plan);
 // var_dump($error);
 // print_r($info);
 // exit;
 
-$activeSprints = array_filter($plan->sprints, function($sprint) {
-	return $sprint->state == 'ACTIVE';
-});
-$activeSprint = reset($activeSprints);
-// print_r($activeSprint);
+$allSprints = array_reduce($plan->sprints, function($sprints, $sprint) {
+	$sprints[$sprint->id] = $sprint;
+	return $sprints;
+}, array());
 
-$hideIssues = $activeSprint ? $activeSprint->issuesIds : array();
-$groupedIssues = array_reduce($plan->issues, function($list, $issue) use ($hideIssues) {
-	if (empty($issue->hidden)) {
-		$hide = (int)in_array($issue->id, $hideIssues);
-		$list[$hide][] = $issue;
+$allIssues = array_reduce($plan->issues, function($issues, $issue) {
+	$issues[$issue->id] = $issue;
+	return $issues;
+}, array());
+
+$groupedIssues = array();
+foreach ($plan->sprints as $sprint) {
+	foreach ($sprint->issuesIds as $id) {
+		$groupedIssues[$sprint->id][] = $allIssues[$id];
+		unset($allIssues[$id]);
 	}
-	return $list;
-}, array(1 => array(), 0 => array()));
-// $issues = array_filter($plan->issues, function($issue) use ($hideIssues) {
-// 	return !in_array($issue->id, $hideIssues) && empty($issue->hidden);
-// });
+}
+$groupedIssues['backlog'] = array_values($allIssues);
 
 include 'tpl.header.php';
 
@@ -147,12 +151,14 @@ include 'tpl.epiccolors.php';
 <?php
 
 echo '<table class="longdata">';
-foreach ($groupedIssues as $hidden => $issues) {
-	$title = $hidden ? 'hidden' : 'unplanned';
-	$class = $hidden ? 'hidden hide' : 'unplanned';
+foreach ($groupedIssues as $sprintId => $issues) {
+	$sprint = @$allSprints[$sprintId];
+
+	$title = $sprint ? $sprint->name . ' (' . $sprint->state . ')' : 'BACKLOG';
+	$class = !$sprint || $sprint->state != 'ACTIVE' ? 'hidden hide' : 'unplanned';
 
 	echo '<tbody class="thead ' . $class . '">';
-	echo '<tr><th colspan="4"><a href="#">' . count($issues) . ' ' . $title . ' issues</a></th></tr>';
+	echo '<tr><th colspan="4"><a href="#">' . $title . ' -- ' . count($issues) . ' issues</a></th></tr>';
 	echo '</tbody>';
 
 	echo '<tbody class="tbody ' . $class . '">';
