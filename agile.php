@@ -56,18 +56,24 @@ $allSprints = array_reduce($plan->sprints, function($sprints, $sprint) {
 }, array());
 
 $allIssues = array_reduce($plan->issues, function($issues, $issue) {
-	$issues[$issue->id] = $issue;
+	empty($issue->hidden) and $issues[$issue->id] = $issue;
 	return $issues;
 }, array());
 
 $groupedIssues = array();
 foreach ($plan->sprints as $sprint) {
 	foreach ($sprint->issuesIds as $id) {
-		$groupedIssues[$sprint->id][] = $allIssues[$id];
-		unset($allIssues[$id]);
+		if ( isset($allIssues[$id]) ) {
+			$groupedIssues[$sprint->id][] = $allIssues[$id];
+			unset($allIssues[$id]);
+		}
 	}
 }
 $groupedIssues['backlog'] = array_values($allIssues);
+
+// echo '<pre>';
+// print_r($groupedIssues);
+// exit;
 
 include 'tpl.header.php';
 
@@ -170,14 +176,14 @@ foreach ($groupedIssues as $sprintId => $issues) {
 
 		$epic = '';
 		if (@$issue->epic) {
-			$epic = '<span class="epic ' . html($issue->epicField->epicColor) . '"><a href="issue.php?key=' . html($issue->epicField->epicKey) . '">' . html($issue->epicField->text) . '</a></span>';
+			$epic = '<span class="epic ' . html(@$issue->epicField->epicColor) . '"><a href="issue.php?key=' . html($issue->epicField->epicKey) . '">' . html($issue->epicField->text) . '</a></span>';
 		}
 
 		echo '<tr>';
 		// echo '<td class="type" style="background-color: ' . $issue->color . '; color: ' . $issue->color . '">.</td>';
-		echo '<td class="key" style="border-left-color: ' . $issue->color . '"><div class="out"><div class="in">' . $issue->key . '</div></div></td>';
+		echo '<td class="key" style="border-left-color: ' . @$issue->color . '"><div class="out"><div class="in">' . $issue->key . '</div></div></td>';
 		echo '<td class="priority">' . $priority . '</td>';
-		echo '<td class="summary wrap"><a href="issue.php?key=' . $issue->key . '">' . ( $issue->summary ?: '???' ) . '</a> ' . $epic . '</td>';
+		echo '<td class="summary wrap"><a href="issue.php?key=' . $issue->key . '">' . ( @$issue->summary ?: '???' ) . '</a> ' . $epic . '</td>';
 		echo '<td class="sp">' . @$issue->estimateStatistic->statFieldValue->value . '</td>';
 		echo '</tr>';
 	}
