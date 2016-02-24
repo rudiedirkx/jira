@@ -1,5 +1,7 @@
 <?php
 
+$_start = microtime(1);
+
 // Always. UTF-8. Everywhere. Always.
 header('Content-type: text/html; charset=utf-8');
 

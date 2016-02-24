@@ -227,7 +227,7 @@ table {
 .table.striping tr:nth-child(odd) {
 	background-color: #eee;
 }
-td {
+th, td {
 	padding: 2px 5px;
 	white-space: nowrap;
 }

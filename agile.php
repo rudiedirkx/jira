@@ -26,6 +26,7 @@ $board = jira_get('/rest/greenhopper/1.0/xboard/config', $params, $error, $info)
 // DEBUG //
 // $board = json_decode(file_get_contents('debug-board.json'));
 // echo "\n\n\n\n\n" . json_encode($board) . "\n\n\n\n\n";
+// exit;
 // DEBUG //
 // echo '<pre>';
 // print_r($board);
