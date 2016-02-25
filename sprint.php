@@ -88,7 +88,7 @@ if ( !empty($_GET['board']) ) {
 		echo '<table>';
 		foreach ($issues as $issue) {
 			echo '<tr>';
-			echo '<th>' . html($issue->key) . '</th>';
+			echo '<th nowrap><a href="issue.php?key=' . $issue->key . '" target="_blank">' . html($issue->key) . '</a></th>';
 			echo '<td class="wrap">' . html($issue->summary) . '</td>';
 			echo "</tr>\n";
 		}
