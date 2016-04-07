@@ -99,17 +99,12 @@ td.time {
 	vertical-align: top;
 }
 
-.issue-key.hide-summary + a + .issue-summary {
+body:not(.show-summaries) tr.hide-summary .issue-summary {
 	display: none;
-}
-/* On my phone `~` only works where `+` would work too!? `a + b + c` doesn't work either, so simple `+` it is =( */
-#showTitles:checked + .tempo .issue-summary {
-	display: block;
 }
 </style>
 
-<p><label for="showTitles" tabindex="0">Toggle titles</label></p>
-<input type="checkbox" id="showTitles" />
+<p><a href="#" class="toggle-summaries">Toggle titles</a></p>
 <?php
 
 echo '<div class="table tempo striping">';
@@ -129,9 +124,9 @@ foreach ($dated as $date => $workedIssues) {
 		$hours = round($seconds / 3600, 2);
 		$time = $hours >= 1.0 ? $hours . 'h' : round($hours * 60) . 'm';
 
-		echo '<tr>';
+		echo '<tr class="hide-summary">';
 		echo '<td class="key">';
-		echo '<a class="issue-key hide-summary" href="issue.php?key=' . $key . '">' . $key . '</a> ';
+		echo '<a class="issue-key" href="issue.php?key=' . $key . '">' . $key . '</a> ';
 		echo '&nbsp; <a href="logwork.php?key=' . $key . '">+</a>';
 		echo '<div class="issue-summary">' . $issue->summary . '</div>';
 		echo '</td>';
@@ -146,11 +141,15 @@ echo '</div>';
 
 ?>
 <script>
+$('.toggle-summaries', true).on('click', function(e) {
+	document.body.toggleClass('show-summaries');
+});
+
 $$('a.issue-key').on('click', function(e) {
-	if ( e.ctrlKey || e.metaKey || e.which == 2) return;
+	if ( e.ctrlKey || e.metaKey || e.which == 2 ) return;
 
 	e.preventDefault();
-	this.toggleClass('hide-summary');
+	this.ancestor('tr').toggleClass('hide-summary');
 });
 </script>
 <?php
