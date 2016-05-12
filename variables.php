@@ -70,7 +70,10 @@ body:not(.show-editables) .editable { display: none; }
 					</td>
 					<td class="editable">
 						<select name="v[<?= $var->id ?>][auto_update_type]">
-							<?= html_options(array('sprint' => 'Current sprint'), $var->auto_update_type, 'Custom') ?>
+							<?= html_options(array(
+								'sprint' => 'Current sprint',
+								'sprints' => 'Current sprints',
+							), $var->auto_update_type, 'Custom') ?>
 						</select>
 					</td>
 				</tr>

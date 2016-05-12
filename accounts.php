@@ -72,7 +72,7 @@ else if ( isset($_POST['config']) ) {
 			$db->insert('options', array(
 				'user_id' => $user->id,
 				'name' => $name,
-				'value' => $value,
+				'value' => implode(',', (array) $value),
 			));
 		}
 	}
@@ -82,7 +82,7 @@ else if ( isset($_POST['config']) ) {
 
 // Reset cookies
 do_login('', '');
-$user->unsync();
+// $user->unsync();
 
 include 'tpl.header.php';
 
@@ -110,7 +110,7 @@ include 'tpl.header.php';
 
 <form method="post">
 	<table>
-		<? foreach (User::$_config as $name => $info):
+		<? foreach (array_filter(User::$_config) as $name => $info):
 			$checkbox = $info['type'] == 'checkbox';
 			?>
 			<tr>
@@ -134,6 +134,19 @@ include 'tpl.header.php';
 				</td>
 			</tr>
 		<? endforeach ?>
+		<tr valign="top">
+			<th align="right">Agile boards</th>
+			<td style="white-space: normal">
+				<? foreach ($user->agile_boards as $id => $name):
+					$checked = in_array($id, $user->selected_agile_boards) ? 'checked' : '';
+					?>
+					<label style="display: inline-block">
+						<input type="checkbox" name="config[agile_view_ids][]" value="<?= $id ?>" <?= $checked ?> />
+						<?= html($name) ?>
+					</label>
+				<? endforeach ?>
+			</td>
+		</tr>
 	</table>
 	<p><button>Save</button></p>
 </form>

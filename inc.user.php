@@ -11,7 +11,7 @@ class User extends db_generic_record {
 			'required' => true,
 		),
 		'agile_view_id' => array(
-			'label' => 'Agile view/board ID',
+			'label' => 'Agile board ID',
 			'default' => '',
 			'size' => 4,
 			'type' => 'number',
@@ -31,6 +31,7 @@ class User extends db_generic_record {
 			'type' => 'checkbox',
 			'required' => false,
 		),
+		'agile_view_ids' => FALSE,
 	);
 
 	function __construct() {
@@ -47,26 +48,47 @@ class User extends db_generic_record {
 			return;
 		}
 
-		$sprints = jira_get('/rest/greenhopper/1.0/sprintquery/' . $boardId, array(), $error, $info);
-		if ( !$sprints ) {
-			return;
-		}
-		$actives = array_filter($sprints->sprints, function($sprint) {
-			return $sprint->state == 'ACTIVE';
-		});
-		if ( !$actives ) {
-			return;
+		$sprints = self::getActiveSprints((array) $boardId);
+		return reset($sprints);
+	}
+
+	static function getActiveSprints( array $boardIds ) {
+		$activeSprints = [];
+		foreach ( $boardIds as $id ) {
+			$activeSprints[$id] = false;
+
+			$sprints = jira_get('/rest/greenhopper/1.0/sprintquery/' . $id, array(), $error, $info);
+			if ( !$sprints ) {
+				continue;
+			}
+
+			$actives = array_filter($sprints->sprints, function($sprint) {
+				return $sprint->state == 'ACTIVE';
+			});
+			if ( !$actives ) {
+				continue;
+			}
+
+			$activeSprints[$id] = reset($actives);
 		}
 
-		return reset($actives);
+		return $activeSprints;
 	}
 
 	function getAutoVarSprint() {
-		global $db;
-
 		$sprint = $this->getActiveSprint();
 		if ( $sprint ) {
 			return $sprint->id;
+		}
+	}
+
+	function getAutoVarSprints() {
+		$boardIds = $this->selected_agile_boards;
+		if ($boardIds) {
+			$sprints = array_filter(self::getActiveSprints($boardIds));
+			return array_map(function($sprint) {
+				return $sprint->id;
+			}, $sprints);
 		}
 	}
 
@@ -74,14 +96,14 @@ class User extends db_generic_record {
 		global $db;
 
 		if ( !$id ) {
-			$id = $db->select_one('variables', 'id', array('user_id' => $this->id, 'auto_update_type' => 'sprint'));
+			$id = $db->select_one('variables', 'id', array('user_id' => $this->id, 'auto_update_type' => $type));
 		}
 
 		$function = 'getAutoVar' . $type;
 		if ( method_exists($this, $function) ) {
 			$value = $this->$function() ?: '0';
 			$db->update('variables', array(
-				'value' => $value,
+				'value' => implode(', ', (array) $value),
 				'last_update' => time(),
 			), array(
 				'id' => $id,
@@ -155,6 +177,12 @@ class User extends db_generic_record {
 		}
 
 		return unserialize($this->cache__custom_field_ids);
+	}
+
+	function get_selected_agile_boards() {
+		$ids = $this->config('agile_view_ids', '');
+		$ids = array_filter(explode(',', $ids));
+		return $ids;
 	}
 
 	function get_agile_boards() {
