@@ -276,6 +276,21 @@ td.wrap {
 
 
 
+/* frontpage search tabs */
+.tab-links,
+.tab-pages {
+	background: #eee;
+}
+.tab-page .input .project-side {
+	width: 80px;
+	text-transform: uppercase;
+}
+.tab-page .input .project-side + * {
+	width: calc(100% - 100px);
+}
+
+
+
 /* pager */
 #pager {
 	text-align: center;

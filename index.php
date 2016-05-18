@@ -7,39 +7,44 @@ do_logincheck();
 $perPage = $user->config('index_page_size');
 
 // Default query
-$query = 'status != Closed ORDER BY priority DESC, created DESC';
+$query = $selectedQuery = 'status != Closed ORDER BY priority DESC, created DESC';
 $querySource = '';
 $filterOptions = $user->filter_query_options;
 
 // GET search
 if ( !empty($_GET['search']) ) {
-	$query = "text ~ '" . addslashes(trim($_GET['search'])) . "' ORDER BY updated DESC";
+	$query = $selectedQuery = "text ~ '" . addslashes(trim($_GET['search'])) . "' ORDER BY updated DESC";
 	$querySource = 'search';
 }
 // GET query
 else if ( !empty($_GET['query']) ) {
-	$query = trim($_GET['query']);
+	$query = $selectedQuery = trim($_GET['query']);
 	$querySource = isset($filterOptions[$query]) ? 'filter:get' : 'query:get';
 }
 // GET project
 else if ( !empty($_GET['project']) ) {
-	$query = 'project = "' . addslashes(trim($_GET['project'])) . '" AND ' . $query;
+	$query = $selectedQuery = 'project = "' . addslashes(trim($_GET['project'])) . '" AND ' . $query;
 	$querySource = 'project:get';
 }
 // User's query
 else if ( $user->index_query ) {
-	$query = $user->index_query;
+	$query = $selectedQuery = $user->index_query;
 	$querySource = 'query:setting';
 }
 // User's Jira filter
 else if ( $user->index_filter_object ) {
-	$query = $user->index_filter_object->jql;
+	$query = $selectedQuery = $user->index_filter_object->jql;
 	$querySource = 'filter:setting';
 }
 // User's project
 else if ( $user->index_project ) {
-	$query = 'project = "' . $user->index_project . '" AND ' . $query;
+	$query = $selectedQuery = 'project = "' . $user->index_project . '" AND ' . $query;
 	$querySource = 'project:setting';
+}
+
+// Add Project condition to query
+if ( !empty($_GET['project']) ) {
+	$query = 'project = ' . $_GET['project'] . ' AND ' . $query;
 }
 
 list($activeTab) = explode(':', $querySource);

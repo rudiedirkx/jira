@@ -8,24 +8,37 @@
 </div>
 <div class="tab-pages">
 	<form autocomplete="off" action class="filter tab-page" id="tab-page-filter">
-		<select name="query"><?= html_options($filterOptions, $query, '-- Filter') ?></select>
+		<div class="input">
+			<input class="project-side manual-width" name="project" value="<?= html(@$_GET['project']) ?>" placeholder="Project..." />
+			<select class="manual-width" name="query"><?= html_options($filterOptions, $selectedQuery, '-- Filter') ?></select>
+		</div>
 		<input type="submit" />
 		<a href="filters.php">Your filters</a>
 	</form>
 	<form autocomplete="off" action class="filter tab-page" id="tab-page-query">
-		<input name="query" value="<?= html(@$query) ?>" />
+		<div class="input">
+			<input class="project-side manual-width" name="project" value="<?= html(@$_GET['project']) ?>" placeholder="Project..." />
+			<input class="manual-width" name="query" value="<?= html(@$selectedQuery) ?>" />
+		</div>
 		<input type="submit" />
 	</form>
 	<form autocomplete="off" action class="filter tab-page" id="tab-page-project">
-		<input name="project" value="<?= html(@$_GET['project'] ?: $user->index_project) ?>" placeholder="Project key..." />
+		<div class="input">
+			<input name="project" value="<?= html(@$_GET['project'] ?: $user->index_project) ?>" placeholder="Project key..." />
+		</div>
 		<input type="submit" />
 	</form>
 	<form autocomplete="off" action class="filter tab-page" id="tab-page-search">
-		<input name="search" value="<?= html(@$_GET['search']) ?>" placeholder="Fulltext search tokens..." />
+		<div class="input">
+			<input class="project-side manual-width" name="project" value="<?= html(@$_GET['project']) ?>" placeholder="Project..." />
+			<input class="manual-width" name="search" value="<?= html(@$_GET['search']) ?>" placeholder="Fulltext search tokens..." />
+		</div>
 		<input type="submit" />
 	</form>
 	<form autocomplete="off" action class="filter tab-page" id="tab-page-goto">
-		<input name="goto" value="" placeholder="Issue key, like ABCD-123..." />
+		<div class="input">
+			<input name="goto" value="" placeholder="Issue key, like ABCD-123..." />
+		</div>
 		<input type="submit" />
 	</form>
 </div>
