@@ -2,11 +2,20 @@
 
 namespace rdx\jira;
 
+use rdx\jira\Client;
+
 class NoCache implements Cache {
 
 	public $client;
 
 	public $autoPersist = true;
+
+	/**
+	 *
+	 */
+	public function setClient( Client $client ) {
+		$this->client = $client;
+	}
 
 	/**
 	 *

@@ -20,7 +20,7 @@ class Client {
 		$this->config = $config;
 		$this->auth = $auth;
 		$this->cache = $cache ?: new NoCache;
-		$this->cache->client = $this;
+		$this->cache->setClient($this);
 	}
 
 	/**

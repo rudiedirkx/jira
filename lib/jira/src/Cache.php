@@ -9,6 +9,11 @@ interface Cache {
 	/**
 	 *
 	 */
+	public function setClient( Client $client );
+
+	/**
+	 *
+	 */
 	public function getFields( $name, &$fromCache );
 
 	/**
