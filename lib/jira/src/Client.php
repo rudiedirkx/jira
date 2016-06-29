@@ -16,7 +16,7 @@ class Client {
 	/**
 	 *
 	 */
-	public function __construct(Config $config, Auth $auth, Cache $cache = null) {
+	public function __construct( Config $config, Auth $auth, Cache $cache = null ) {
 		$this->config = $config;
 		$this->auth = $auth;
 		$this->cache = $cache ?: new NoCache;

@@ -16,7 +16,7 @@ class Config {
 
 		$classes = $custom = array();
 		foreach ( $options as $class => $config ) {
-			$config = (array)$config;
+			$config = (array) $config;
 
 			// Override class name
 			if ( isset($config[0]) ) {

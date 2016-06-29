@@ -21,7 +21,7 @@ class NoCache implements Cache {
 	 *
 	 */
 	public function getCustomFields( $name, &$fromCache ) {
-		$custom = array_filter($this->fields, function($field) {
+		$custom = array_filter($this->fields, function( $field ) {
 			return !empty($field['custom']);
 		});
 

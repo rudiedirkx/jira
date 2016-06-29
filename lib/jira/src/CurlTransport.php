@@ -37,8 +37,8 @@ class CurlTransport extends Transport {
 	 */
 	protected function sendHeaders() {
 		$headers = array();
-		foreach ($this->headers as $name => $values) {
-			foreach ($values as $value) {
+		foreach ( $this->headers as $name => $values ) {
+			foreach ( $values as $value ) {
 				$headers[] = $name . ': ' . $value;
 			}
 		}
@@ -69,7 +69,7 @@ class CurlTransport extends Transport {
 	 */
 	protected function UPLOAD() {
 		$data = array();
-		foreach ($this->files as $name => $file) {
+		foreach ( $this->files as $name => $file ) {
 			$curlFile = '@' . $file[0] . '; filename=' . urlencode($file[1]);
 			if ( class_exists('CURLFile') ) {
 				$curlFile = new CURLFile($file[0]);
@@ -118,7 +118,7 @@ class CurlTransport extends Transport {
 		curl_close($this->curl);
 
 		$this->resppnse['header'] = $header;
-		$this->response['code'] = (int)$this->response['info']['http_code'];
+		$this->response['code'] = (int) $this->response['info']['http_code'];
 
 		$headers = array();
 		foreach ( explode("\n", $header) AS $n => $line ) {

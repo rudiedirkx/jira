@@ -24,7 +24,7 @@ abstract class Transport {
 	/**
 	 *
 	 */
-	public function __construct( $method,  $url ) {
+	public function __construct( $method, $url ) {
 		$this->method = strtoupper($method);
 		$this->url = $url;
 	}

@@ -20,7 +20,7 @@ class Response {
 	public function __construct( Request $request, array $response ) {
 		$this->request = $request;
 
-		foreach ($response as $key => $value) {
+		foreach ( $response as $key => $value ) {
 			$this->$key = $value;
 		}
 
