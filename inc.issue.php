@@ -159,7 +159,7 @@ class Issue extends db_generic_record {
 
 	public function get_story_points() {
 		global $user;
-		return $user->cf_story_points ? (int) @$this->fields->{$user->cf_story_points} : 0;
+		return $user->cf_story_points ? (float) @$this->fields->{$user->cf_story_points} : 0;
 	}
 
 
