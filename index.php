@@ -23,7 +23,7 @@ else if ( !empty($_GET['query']) ) {
 }
 // GET project
 else if ( !empty($_GET['project']) ) {
-	$query = $selectedQuery = 'project = "' . addslashes(trim($_GET['project'])) . '" AND ' . $query;
+	$query = $selectedQuery = 'project = "' . addslashes(strtoupper(trim($_GET['project']))) . '" AND ' . $query;
 	$querySource = 'project:get';
 }
 // User's query
@@ -43,8 +43,8 @@ else if ( $user->index_project ) {
 }
 
 // Add Project condition to query
-if ( !empty($_GET['project']) ) {
-	$query = 'project = ' . $_GET['project'] . ' AND ' . $query;
+if ( !empty($_GET['project']) && $querySource != 'project:get' ) {
+	$query = 'project = "' . addslashes(strtoupper(trim($_GET['project']))) . '" AND ' . $query;
 }
 
 list($activeTab) = explode(':', $querySource);

@@ -281,7 +281,7 @@ td.wrap {
 .tab-pages {
 	background: #eee;
 }
-.tab-page .input .project-side {
+.tab-page .input input[name="project"] {
 	width: 80px;
 	text-transform: uppercase;
 }
