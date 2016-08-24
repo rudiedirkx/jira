@@ -87,6 +87,15 @@ do_login('', '');
 include 'tpl.header.php';
 
 ?>
+<style>
+label:after {
+	content: '\A';
+	white-space: pre;
+}
+:not(:checked) + .board-id {
+	display: none;
+}
+</style>
 
 <h1>Accounts</h1>
 
@@ -140,8 +149,9 @@ include 'tpl.header.php';
 				<? foreach ($user->agile_boards as $id => $name):
 					$checked = in_array($id, $user->selected_agile_boards) ? 'checked' : '';
 					?>
-					<label style="display: inline-block">
+					<label>
 						<input type="checkbox" name="config[agile_view_ids][]" value="<?= $id ?>" <?= $checked ?> />
+						<span class="board-id">(<?= $id ?>)</span>
 						<?= html($name) ?>
 					</label>
 				<? endforeach ?>
