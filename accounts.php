@@ -80,9 +80,15 @@ else if ( isset($_POST['config']) ) {
 	return do_redirect('accounts');
 }
 
+// Unsync & re-sync
+else if ( isset($_POST['unsync']) ) {
+	$user->unsync();
+
+	return do_redirect('accounts');
+}
+
 // Reset cookies
 do_login('', '');
-// $user->unsync();
 
 include 'tpl.header.php';
 
@@ -114,6 +120,8 @@ label:after {
 </ul>
 
 <p><a href="logout.php">Log out all accounts</a></p>
+
+<p><form method="post" action><button name="unsync" value="1">Reset cache</button></form></p>
 
 <h2>Config for <span style="display: inline-block"><?= html($user->jira_id) ?></span></h2>
 
