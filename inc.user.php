@@ -92,6 +92,14 @@ class User extends db_generic_record {
 		}
 	}
 
+	function getCachedAutoVar( $type ) {
+		foreach ( $this->variables as $var ) {
+			if ( $var->auto_update_type == $type ) {
+				return array_map('trim', array_filter(explode(',', $var->value)));
+			}
+		}
+	}
+
 	function syncAnyAutoVar( $type, $id = null ) {
 		global $db;
 

@@ -9,12 +9,22 @@ include 'tpl.header.php';
 $boards = $user->agile_boards;
 natcasesort($boards);
 
+$agileViewId = @$_GET['board'] ?: $user->config('agile_view_id');
+
+$params = array('rapidViewId' => $agileViewId);
+$board = jira_get('/rest/greenhopper/1.0/xboard/config', $params, $error, $info);
+
+$sprints = jira_get("/rest/agile/1.0/board/{$agileViewId}/sprint", array('state' => 'ACTIVE'), $error, $info);
+$sprints = array_reduce($sprints->values, function($sprints, $sprint) {
+	return $sprints + array($sprint->id => $sprint->name);
+}, []);
+
 ?>
-<h1>Sprint</h1>
+<h1><?= implode(', ', $sprints) ?></h1>
 
 <form id="form-filter">
 	<p>
-		<select id="board" name="board"><?= html_options($boards, @$_GET['board'], '-- Select a board --') ?></select>
+		<select id="board" name="board"><?= html_options($boards, $agileViewId, '-- Select a board --') ?></select>
 	</p>
 </form>
 
@@ -26,75 +36,87 @@ $('form-filter').on('change', function(e) {
 
 <?php
 
-if ( !empty($_GET['board']) ) {
-	$baseParams = array('rapidViewId' => $_GET['board']);
+$columns = array_reduce($board->currentViewConfig->columns, function($list, $column) {
+	return $list + array($column->id => $column);
+}, []);
 
-	$params = $baseParams;
-	$board = jira_get('/rest/greenhopper/1.0/xboard/config', $params, $error, $info);
+$statusToColumn = array_reduce($columns, function($list, $column) {
+	return $list += array_combine($column->statusIds, array_fill(0, count($column->statusIds), $column->id));
+}, []);
 
-	$params = $baseParams;
-	if ( !empty($_GET['filter']) ) {
-		$params += array('activeQuickFilters' => $_GET['filter']);
+$issues = jira_get('search', array(
+	'maxResults' => 200,
+	'fields' => 'summary,status,parent,subtasks',
+	'jql' => 'sprint IN (' . implode(', ', array_keys($sprints)) . ') AND issuetype in standardIssueTypes() ORDER BY rank',
+), $error, $info);
+$issues = array_reduce($issues->issues, function($list, $issue) {
+	$issue->_subtasksByColumn = [];
+	return $list + [$issue->key => $issue];
+}, []);
+
+$columnize = function($issue) use (&$columns, &$statusToColumn) {
+	$statusId = $issue->fields->status->id;
+	if ( !isset($statusToColumn[$statusId]) ) {
+		$statusToColumn[$statusId] = 's_' . $statusId;
+		$columns['s_' . $statusId] = (object)['name' => $issue->fields->status->name];
 	}
-	$plan = jira_get('/rest/greenhopper/1.0/xboard/plan/backlog/data', $params, $error, $info);
+	return $statusToColumn[$statusId];
+};
 
-	// DEBUG //
-	// $board = json_decode(file_get_contents('debug-board.json'));
-	// $plan = json_decode(file_get_contents('debug-plan.json'));
-	// DEBUG //
+$issuesByColumn = [];
+foreach ($issues as $issue) {
+	// Place parent issue
+	$parentColumn = $columnize($issue);
+	$issuesByColumn[$parentColumn][] = $issue;
+	$parentInColumns = [$parentColumn];
 
-	$activeSprint = array_reduce($plan->sprints, function($foo, $sprint) {
-		return $sprint->state == 'ACTIVE' ? $sprint : $foo;
-	});
+	// Place subtasks, AND parent issue
+	foreach ((array) @$issue->fields->subtasks as $subtask) {
+		$subColumn = $columnize($subtask);
+		$issue->_subtasksByColumn[$subColumn][] = $subtask;
 
-	$columns = array_reduce($board->currentViewConfig->columns, function($list, $column) {
-		return $list + array($column->id => $column);
-	}, array());
-
-	$statusToColumn = array_reduce($columns, function($list, $column) {
-		return $list += array_combine($column->statusIds, array_fill(0, count($column->statusIds), $column->id));
-	}, array());
-
-	$allIssues = array_filter($plan->issues, function($issue) use ($activeSprint) {
-		return empty($issue->hidden) && in_array($issue->id, $activeSprint->issuesIds);
-	});
-
-	$issuesByColumn = array_reduce($allIssues, function($list, $issue) use ($statusToColumn) {
-		$list[ $statusToColumn[$issue->statusId] ][] = $issue;
-		return $list;
-	}, array());
-
-	?>
-	<style>
-	tr + tr > * {
-		border-top: solid 1px #aaa;
+		if ( !in_array($subColumn, $parentInColumns) ) {
+			$issuesByColumn[$subColumn][] = $issue;
+			$parentInColumns[] = $subColumn;
+		}
 	}
-	tr th {
-		text-align: left;
-		border-right: solid 1px #aaa;
-	}
-	</style>
+}
 
-	<h2><?= html($activeSprint->name) ?></h2>
+?>
+<style>
+tr + tr > * {
+	border-top: solid 1px #aaa;
+}
+tr th {
+	text-align: left;
+	border-right: solid 1px #aaa;
+}
+</style>
 
-	<?php
+<?php
 
-	foreach ($columns as $columnId => $column) {
-		$issues = (array)@$issuesByColumn[$columnId];
+foreach ($columns as $columnId => $column) {
+	$issues = (array)@$issuesByColumn[$columnId];
 
-		echo "<details>\n";
-		echo '<summary>' . html($column->name) . ' (' . count($issues) . ")</summary>\n";
+	echo "<details>\n";
+	echo '<summary>' . html($column->name) . ' (' . count($issues) . ")</summary>\n";
 
-		echo '<table>';
-		foreach ($issues as $issue) {
+	echo '<table>';
+	foreach ($issues as $issue) {
+		echo '<tr>';
+		echo '<th nowrap><a href="issue.php?key=' . $issue->key . '" target="_blank">' . html($issue->key) . '</a></th>';
+		echo '<td class="wrap">' . html($issue->fields->summary) . '</td>';
+		echo "</tr>\n";
+
+		foreach ((array) @$issue->_subtasksByColumn[$columnId] as $subtask) {
 			echo '<tr>';
-			echo '<th nowrap><a href="issue.php?key=' . $issue->key . '" target="_blank">' . html($issue->key) . '</a></th>';
-			echo '<td class="wrap">' . html($issue->summary) . '</td>';
+			echo '<th></th>';
+			echo '<td class="wrap"><a href="issue.php?key=' . $subtask->key . '" target="_blank">' . html($subtask->key) . '</a> | ' . html($subtask->fields->summary) . '</td>';
 			echo "</tr>\n";
 		}
-		echo "</table>\n";
-		echo "</details>\n";
 	}
+	echo "</table>\n";
+	echo "</details>\n";
 }
 
 include 'tpl.footer.php';
