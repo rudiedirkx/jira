@@ -334,10 +334,20 @@ class User extends db_generic_record {
 		$url or $url = JIRA_URL;
 		$username or $username = JIRA_USER;
 
-		return $db->select('users', array(
+		$user = $db->select('users', array(
 			'jira_url' => $url,
 			'jira_user' => $username,
 		), null, 'User')->first();
+		if ( $user ) {
+			return $user;
+		}
+
+		$db->insert('users', array(
+			'jira_url' => $url,
+			'jira_user' => $username,
+		));
+
+		return self::load($url, $username);
 	}
 
 }

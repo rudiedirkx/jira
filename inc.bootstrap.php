@@ -53,7 +53,7 @@ if ( isset($_COOKIE['JIRA_URL'], $_COOKIE['JIRA_AUTH']) && ($accounts = get_acco
 	define('JIRA_ORIGIN', $url['scheme'] . '://' . $url['host']);
 
 	$user = User::load();
-	if ( $user->jira_timezone ) {
+	if ( $user && $user->jira_timezone ) {
 		date_default_timezone_set($user->jira_timezone);
 	}
 }
