@@ -1,5 +1,11 @@
 <?php
 
+function do_time($minutes) {
+	$hours = floor($minutes / 60);
+	$minutes -= $hours * 60;
+	return $hours . 'h ' . round($minutes) . 'm';
+}
+
 function do_tokencheck() {
 	if ( !defined('XSRF_TOKEN') || (string)@$_GET['token'] !== XSRF_TOKEN ) {
 		exit("Access denied\n");

@@ -18,6 +18,8 @@ if ( !empty($filterDate) || !empty($filterUser) ) {
 	$table .= '<h2>' . implode(' - ', $header) . '</h2>';
 }
 
+$perUser = array();
+
 $table .= '<table>';
 $minutes = 0;
 $lastDate = null;
@@ -27,6 +29,8 @@ foreach ( $worklogs AS $worklog ) {
 	$created = strtotime($worklog->created);
 	$ymdDate = date('Y-m-d', $started);
 
+	@$perUser[$worklog->author->name] += $worklog->timeSpentSeconds / 60;
+
 	$dateMatch = empty($filterDate) || $filterDate == $ymdDate;
 	$userMatch = empty($filterUser) || $filterUser == $worklog->author->name;
 
@@ -35,7 +39,7 @@ foreach ( $worklogs AS $worklog ) {
 
 		$table .= '<tr class="' . $newSection . '">';
 		$table .= '<td title="Created: ' . date(FORMAT_DATETIME, $created) . '">' . date(FORMAT_DATE, $started) . '</td>';
-		$table .= '<td>' . $worklog->timeSpent . '</td>';
+		$table .= '<td>' . do_time($worklog->timeSpentSeconds / 60) . '</td>';
 		$table .= '<td>' . html(@$worklog->author->displayName ?: @$worklog->author->name ?: '??') . '</td>';
 		$table .= '<td>' . html(@$worklog->comment ?: '') . '</td>';
 		$table .= '<td class="actions">';
@@ -50,8 +54,23 @@ foreach ( $worklogs AS $worklog ) {
 $table .= '</table>';
 $table .= '</div>';
 
-$hours = floor($minutes / 60);
-$minutes -= $hours * 60;
-echo '<p>' . $hours . 'h ' . round($minutes) . 'm spent on this issue.</p>';
+arsort($perUser);
 
-echo $table;
+$userTable = '';
+if (count($perUser) > 1) {
+	$userTable .= '<div class="table worklogs striping">';
+	$userTable .= '<table>';
+	foreach ($perUser as $username => $userMinutes) {
+		$userTable .= '<tr class="new-section">';
+		$userTable .= '<td>' . html($username ?: '??') . '</td>';
+		$userTable .= '<td>' . do_time($userMinutes) . '</td>';
+		$userTable .= '</tr>';
+	}
+	$userTable .= '</table>';
+	$userTable .= '</div>';
+	$userTable .= '<br />';
+}
+
+echo '<p>' . do_time($minutes) . ' spent on this issue.</p>';
+
+echo "$userTable $table";
