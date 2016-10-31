@@ -126,9 +126,9 @@ foreach ($dated as $date => $workedIssues) {
 
 		echo '<tr class="hide-summary">';
 		echo '<td class="key">';
-		echo '<a class="issue-key" href="issue.php?key=' . $key . '">' . $key . '</a> ';
+		echo '<a class="issue-key" href="issue.php?key=' . $key . '">' . html($key) . '</a> ';
 		echo '&nbsp; <a href="logwork.php?key=' . $key . '">+</a>';
-		echo '<div class="issue-summary">' . $issue->summary . '</div>';
+		echo '<div class="issue-summary">' . html($issue->summary) . '</div>';
 		echo '</td>';
 		echo '<td class="time actions"><a href="worklogs.php?key=' . $key . '&summary=' . urlencode($issue->summary) . '&date=' . $date . '&user=' . JIRA_USER . '">' . $time . '</a></td>';
 		echo '</tr>';
