@@ -18,29 +18,38 @@ if ( !empty($filterDate) || !empty($filterUser) ) {
 	$table .= '<h2>' . implode(' - ', $header) . '</h2>';
 }
 
-$perUser = array();
+$perUser = $perPeriod = $perUserPeriod = array();
 
 $table .= '<table>';
-$minutes = 0;
+$totalMinutes = 0;
 $lastDate = null;
 foreach ( $worklogs AS $worklog ) {
-	$minutes += $worklog->timeSpentSeconds / 60;
+	$minutes = $worklog->timeSpentSeconds / 60;
+	$totalMinutes += $minutes;
 	$started = strtotime($worklog->started);
 	$created = strtotime($worklog->created);
 	$ymdDate = date('Y-m-d', $started);
+	$user = $worklog->author->name;
 
-	@$perUser[$worklog->author->name] += $worklog->timeSpentSeconds / 60;
+	@$perUser[$user] += $minutes;
+
+	$month = date('Y-m', $started);
+	$week = date('Y-m-d', strtotime('monday this week', $started));
+	@$perPeriod['month'][$month] += $minutes;
+	@$perPeriod['week'][$week] += $minutes;
+	@$perUserPeriod[$user]['month'][$month] += $minutes;
+	@$perUserPeriod[$user]['week'][$week] += $minutes;
 
 	$dateMatch = empty($filterDate) || $filterDate == $ymdDate;
-	$userMatch = empty($filterUser) || $filterUser == $worklog->author->name;
+	$userMatch = empty($filterUser) || $filterUser == $user;
 
 	if ( $dateMatch && $userMatch ) {
 		$newSection = $lastDate != $ymdDate ? 'new-section' : '';
 
 		$table .= '<tr class="' . $newSection . '">';
-		$table .= '<td title="Created: ' . date(FORMAT_DATETIME, $created) . '">' . date(FORMAT_DATE, $started) . '</td>';
-		$table .= '<td>' . do_time($worklog->timeSpentSeconds / 60) . '</td>';
-		$table .= '<td>' . html(@$worklog->author->displayName ?: @$worklog->author->name ?: '??') . '</td>';
+		$table .= '<td title="Created: ' . date(FORMAT_DATETIME, $created) . '">' . date('D ' . FORMAT_DATE, $started) . '</td>';
+		$table .= '<td>' . do_time($minutes) . '</td>';
+		$table .= '<td>' . html(@$worklog->author->displayName ?: $user ?: '??') . '</td>';
 		$table .= '<td>' . html(@$worklog->comment ?: '') . '</td>';
 		$table .= '<td class="actions">';
 		$table .= '  <a href="logwork.php?key=' . $key . '&summary=' . urlencode($summary) . '&id=' . $worklog->id . '">e</a> |';
@@ -71,6 +80,19 @@ if (count($perUser) > 1) {
 	$userTable .= '<br />';
 }
 
-echo '<p>' . do_time($minutes) . ' spent on this issue.</p>';
+$periodGraphScale = count($perPeriod['week']) > 10 ? 'month' : 'week';
+$periodGraphMax = array_reduce($perPeriod[$periodGraphScale], function($max, $minutes) {
+	return max($max, $minutes);
+}, 0);
+$periodGraph = '<div class="table">';
+$periodGraph .= '<div class="period-graph">';
+foreach ($perPeriod[$periodGraphScale] as $scale => $minutes) {
+	$periodGraph .= '<div tabindex="0" title="' . $scale . ': ' . do_time($minutes) . '" style="height: ' . round($minutes / $periodGraphMax * 100) . '%"></div>';
+}
+$periodGraph .= '</div>';
+$periodGraph .= '</div>';
+$periodGraph .= '<br />';
 
-echo "$userTable $table";
+echo '<p>' . do_time($totalMinutes) . ' spent on this issue.</p>';
+
+echo "$userTable $periodGraph $table";

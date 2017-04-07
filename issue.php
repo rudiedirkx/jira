@@ -299,19 +299,22 @@ if ( $issue->worklogs->total || !$fields->issuetype->subtask ) {
 			$total .= '+';
 		}
 	}
-	echo '<h2 class="pre-menu">' . $total . ' worklogs</h2> (<a href="' . $actions['Log work'] . '">add</a>)';
+
+	$storypoints = $issue->story_points ? ' (' . $issue->story_points . ' pt)' : '';
+	$summary = $fields->summary . $storypoints;
+	$allWorklogsUri = 'worklogs.php?key=' . $key . '&subtasks=' . implode(',', $issue->subkeys) . '&summary=' . urlencode($summary);
+
+	echo '<h2 class="pre-menu">' . $total . ' worklogs</h2> (<a href="' . $actions['Log work'] . '">add</a> | <a href="' . $allWorklogsUri . '">see all</a>)';
 
 	$minutes = 0;
 	foreach ( $issue->worklogs->worklogs as $worklog ) {
 		$minutes += $worklog->timeSpentSeconds / 60;
 	}
 
-	$storypoints = $issue->story_points ? ' (' . $issue->story_points . ' pt)' : '';
-	$summary = $fields->summary . $storypoints;
 
 	// Show link to combined list
 	if ( !$minutes ) {
-		echo '<p><a href="worklogs.php?key=' . $key . '&subtasks=' . implode(',', $issue->subkeys) . '&summary=' . urlencode($summary) . '">See ALL worklogs, incl subtasks.</a></p>';
+		echo '<p><a href="' . $allWorklogsUri . '">See ALL worklogs, incl subtasks.</a></p>';
 	}
 	// Summarize and link
 	else if ( $issue->subtasks || $fields->worklog->total > count($issue->worklogs->worklogs) ) {
