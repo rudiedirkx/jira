@@ -205,8 +205,9 @@ function jira_test( $url, $user, $pass, &$info = null ) {
 		'JIRA_URL' => $url,
 		'JIRA_AUTH' => $user . ':' . $pass,
 	);
-	$account = jira_get('user', array('username' => $user), $error, $info);
-	$info['account'] = $account;
+	$session = jira_get('/rest/auth/1/session', array(), $error, $info);
+
+	$info['session'] = $session;
 
 	// Invalid URL
 	if ( $error == 404 ) {
@@ -214,7 +215,7 @@ function jira_test( $url, $user, $pass, &$info = null ) {
 		return false;
 	}
 	// Invalid credentials
-	else if ( $error || empty($account->active) || empty($account->name) || $account->name !== $user ) {
+	elseif ( $error ) {
 		$info['error2'] = 'Invalid login (HTTP ' . $error . ')';
 		return false;
 	}

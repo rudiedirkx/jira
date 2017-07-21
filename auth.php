@@ -38,7 +38,7 @@ if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
 	if ( !jira_test($url, $username, $_POST['pass'], $info) ) {
 		exit($info['error2']);
 	}
-	$jiraAccount = $info['account'];
+	$jiraUsername = $info['session'];
 
 	// Save user to local db for preferences
 	try {
@@ -58,7 +58,7 @@ if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
 
 	$user = User::load($url, $username);
 	$user->unsync();
-	$db->update('users', array('jira_timezone' => $jiraAccount->timeZone), array('id' => $user->id));
+	// $db->update('users', array('jira_timezone' => $jiraUsername->timeZone), array('id' => $user->id));
 
 	// Save credentials to cookie
 	do_login($url, $info['JIRA_AUTH']);
