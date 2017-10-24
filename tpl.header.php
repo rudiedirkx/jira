@@ -19,7 +19,7 @@
 		<p class="top-menu">
 			<a href="index.php">&lt; index</a> |
 			<a href="new.php">+Issue</a> |
-			<a href="auth.php">You (<?= $user->jira_user ?>)</a> |
+			<a href="auth.php">You (<?= $user->jira_user_short ?>)</a> |
 			<a href="filters.php">Filters</a> |
 			<a href="accounts.php">Accounts</a> |
 			<a href="variables.php">Vars</a> |

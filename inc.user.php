@@ -152,6 +152,11 @@ class User extends db_generic_record {
 		return $db->select_fields('options', 'name, value', array('user_id' => $this->id));
 	}
 
+	function get_jira_user_short() {
+		$x = explode('@', $this->jira_user);
+		return $x[0];
+	}
+
 	function get_jira_domain() {
 		$url = parse_url($this->jira_url);
 		return $url['host'];

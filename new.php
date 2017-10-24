@@ -140,7 +140,7 @@ $defaultPriority = $priorityKeys[ floor((count($priorities) - 1) / 2) ];
 	<p>Summary: <input name="summary" /></p>
 	<p>Description: <textarea name="description" rows="8"></textarea></p>
 	<p>Priority: <select name="priority"><?= html_options($priorities, $defaultPriority) ?></select></p>
-	<p>Assignee: <input name="assignee" value="<?= JIRA_USER ?>" /></p>
+	<p>Assignee: <input name="assignee" value="<?= $user->jira_user_short ?>" /></p>
 
 	<p><input type="submit" /></p>
 </form>
