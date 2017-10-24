@@ -74,9 +74,9 @@ echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($issue-
 <script>
 $('ss').on('click', 'a', function(e) {
 	e.preventDefault();
-	var label = this.data('label'),
-		ls = $('ls'),
-		curLabels = ls.value;
+	var label = this.data('label');
+	var ls = $('ls');
+	var curLabels = ls.value;
 
 	// Append
 	if ( curLabels.match(/ $/) ) {
@@ -92,15 +92,17 @@ $('ss').on('click', 'a', function(e) {
 
 $('fl').on('click', function(e) {
 	e.preventDefault();
-	var labels = $('ls').value.trim().split(/ /g),
-		label = labels[labels.length-1];
+	var labels = $('ls').value.trim().split(/ /g);
+	var label = labels[labels.length-1];
 
+	document.body.classList.add('loading');
 	$.get('?id=<?= $id ?>&label=' + label).on('done', function(e, rsp) {
 		var html = '';
 		r.each(rsp.labels, function(label) {
 			html += ' [<a data-label="' + label + '" href="#">' + label + '</a>] ';
 		});
-		$('ss').setHTML(html);
+		$('ss').setHTML(html || 'no results');
+		document.body.classList.remove('loading');
 	});
 });
 </script>
