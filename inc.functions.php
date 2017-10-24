@@ -130,17 +130,17 @@ function do_markup( $text ) {
 }
 
 function do_encrypt( $data ) {
-	$iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC);
-	$iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
-	return base64_encode($iv . mcrypt_encrypt(MCRYPT_RIJNDAEL_256, substr(SECRET . SECRET, 0, 24), $data, MCRYPT_MODE_CBC, $iv));
+	$iv_size = openssl_cipher_iv_length('AES-256-CBC');
+	$iv = openssl_random_pseudo_bytes($iv_size);
+	return base64_encode($iv . openssl_encrypt($data, 'AES-256-CBC', SECRET . SECRET, 0, $iv));
 }
 
 function do_decrypt( $data ) {
 	$data = base64_decode($data);
-	$iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC);
+	$iv_size = openssl_cipher_iv_length('AES-256-CBC');
 	$iv = substr($data, 0, $iv_size);
 	$data = substr($data, $iv_size);
-	return rtrim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, substr(SECRET . SECRET, 0, 24), $data, MCRYPT_MODE_CBC, $iv), "\0");
+	return rtrim(openssl_decrypt($data, 'AES-256-CBC', SECRET . SECRET, 0, $iv), "\0");
 }
 
 function do_redirect( $path, $query = null ) {
