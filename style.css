@@ -139,6 +139,13 @@ h1.with-parent-issue {
 
 
 
+/* issue form */
+button[data-preview] {
+	float: right;
+}
+
+
+
 /* issue labels */
 .label {
 	display: inline-block;
@@ -251,6 +258,7 @@ td.wrap {
 
 
 
+/** time graph */
 .period-graph {
 	display: inline-block;
 	outline: solid 1px #000;

@@ -4,6 +4,24 @@ require 'inc.bootstrap.php';
 
 do_logincheck();
 
+if ( isset($_POST['preview']) ) {
+	$rsp = jira_post(JIRA_API_1_PATH . 'render', array(
+		'issueKey' => '',
+		'rendererType' => 'atlassian-wiki-renderer',
+		'unrenderedMarkup' => trim($_POST['preview']),
+	), $error, $info);
+	if ( $error ) {
+		echo '<pre>';
+		var_dump($error);
+		print_r($rsp);
+		print_r($info);
+	}
+	else {
+		echo $rsp;
+	}
+	exit;
+}
+
 if ( isset($_GET['project'], $_GET['issuetype'], $_POST['summary'], $_POST['description'], $_POST['priority'], $_POST['assignee']) ) {
 	$fields = array(
 		'project' => array('id' => $_GET['project']),
@@ -138,7 +156,7 @@ $defaultPriority = $priorityKeys[ floor((count($priorities) - 1) / 2) ];
 		<p>Parent issue: <input readonly disabled value="<?= html($parent . ' ' . $parentsummary) ?>" /></p>
 	<? endif ?>
 	<p>Summary: <input name="summary" /></p>
-	<p>Description: <textarea name="description" rows="8"></textarea></p>
+	<p>Description: <textarea name="description" rows="8"></textarea><br><button type="button" data-preview="textarea[name=description]">Preview</button></p>
 	<p>Priority: <select name="priority"><?= html_options($priorities, $defaultPriority) ?></select></p>
 	<p>Assignee: <input name="assignee" value="<?= $user->jira_user_short ?>" /></p>
 

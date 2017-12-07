@@ -387,7 +387,7 @@ function jira_response( $ch, &$error = null, &$info = null ) {
 		$info['error'] = ($json = @json_decode($body)) ? $json : null;
 	}
 
-	$response = $success ? @json_decode($body) : false;
+	$response = $success ? (strpos($info['content_type'], 'json') !== false ? @json_decode($body) : $body) : false;
 
 	$info['_end'] = microtime(1);
 	$info['_time'] = $info['_end'] - $info['_start'];

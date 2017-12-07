@@ -16,6 +16,20 @@ $$('a[data-confirm]').on('click', function(e) {
 		e.stopImmediatePropagation();
 	}
 });
+
+$$('button[data-preview]').on('click', function(e) {
+	e.preventDefault();
+	var btn = this;
+	var text = $(btn.data('preview'), true).value;
+	document.body.addClass('loading');
+	$.post('new.php', 'preview=' + encodeURIComponent(text)).on('success', function(e, html) {
+		document.el('div', {"class": 'markup', "style": 'position: relative; outline: solid 2px blue'})
+			.setHTML('<button type="button" onclick="return this.parentNode.remove(), false" style="position: absolute; top: 10px; right: 10px">x</button>' + html)
+			.injectAfter(btn.selfOrAncestor('p'));
+		document.body.removeClass('loading');
+	});
+});
+
 $$('a.ajax:not(.ajaxed)').on('click', function(e) {
 	e.preventDefault();
 	document.body.addClass('loading');
