@@ -3,7 +3,7 @@
 
 <head>
 	<meta charset="utf-8" />
-	<title>Mobile Jira</title>
+	<title><?= $_title ? "$_title | " : '' ?>Jira</title>
 	<link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<link rel="stylesheet" href="style.css" />

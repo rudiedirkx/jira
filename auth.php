@@ -4,6 +4,7 @@ require 'inc.bootstrap.php';
 
 // Already logged in
 if ( defined('JIRA_AUTH') ) {
+	$_title = 'Auth';
 	include 'tpl.header.php';
 
 	echo '<p>You are:</p>';
@@ -66,6 +67,7 @@ if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
 	return do_redirect('index');
 }
 
+$_title = 'Auth';
 include 'tpl.header.php';
 
 ?>

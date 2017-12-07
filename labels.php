@@ -57,6 +57,7 @@ else if ( isset($_POST['labels']) ) {
 $issue = jira_get('issue/' . $key);
 $id = $issue->id;
 
+$_title = "Labels $key";
 include 'tpl.header.php';
 
 echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($issue->fields->summary) . '</h1>';

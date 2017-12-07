@@ -42,6 +42,7 @@ if ( isset($_POST['spent'], $_POST['date'], $_POST['time'], $_POST['description'
 	exit;
 }
 
+$_title = "Log work $key";
 include 'tpl.header.php';
 
 $worklog = $id ? jira_get('issue/' . $key . '/worklog/' . $id) : false;

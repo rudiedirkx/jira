@@ -55,6 +55,7 @@ else if ( isset($_POST['id'], $_POST['name'], $_POST['jql']) ) {
 
 $user->unsync();
 
+$_title = 'Filters';
 include 'tpl.header.php';
 
 echo '<h1>Your filters</h1>';

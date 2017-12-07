@@ -4,6 +4,7 @@ require 'inc.bootstrap.php';
 
 do_logincheck();
 
+$_title = 'Sprint';
 include 'tpl.header.php';
 
 $boards = $user->agile_boards;

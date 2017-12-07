@@ -37,6 +37,7 @@ if ( isset($_FILES['file']) ) {
 	exit;
 }
 
+$_title = "Upload $key";
 include 'tpl.header.php';
 
 echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($summary) . '</h1>';

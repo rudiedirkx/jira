@@ -90,6 +90,7 @@ foreach ( $transitions->transitions AS $transition ) {
 	$actions[$transition->id] = $transition->name;
 }
 
+$_title = "Transition $key";
 include 'tpl.header.php';
 
 echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($summary) . '</h1>';

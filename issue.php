@@ -121,10 +121,18 @@ else if ( isset($_GET['transitions']) ) {
 	exit;
 }
 
+$issue = jira_get('issue/' . $key, array('expand' => 'transitions,renderedFields'), $error, $info);
+if ( $issue ) {
+	$issue = new Issue($issue);
+	$_title = "{$issue->key} {$issue->fields->summary}";
+}
+else {
+	$_title = 'Invalid issue';
+}
+
 include 'tpl.header.php';
 include 'tpl.epiccolors.php';
 
-$issue = jira_get('issue/' . $key, array('expand' => 'transitions,renderedFields'), $error, $info);
 if ( !$issue || $error ) {
 	echo '<p>Invalid issue...</p>';
 	echo '<pre>';
@@ -132,7 +140,6 @@ if ( !$issue || $error ) {
 	print_r($info);
 	exit;
 }
-$issue = new Issue($issue);
 
 include 'tpl.issueheader.php';
 

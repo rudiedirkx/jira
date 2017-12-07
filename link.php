@@ -44,6 +44,7 @@ $linkTypeOptions = array_reduce($linkTypes->issueLinkTypes, function($options, $
 	return $options;
 });
 
+$_title = "Link $key";
 include 'tpl.header.php';
 
 echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($summary) . '</h1>';

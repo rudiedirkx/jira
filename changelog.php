@@ -6,6 +6,7 @@ do_logincheck();
 
 $key = $_GET['key'];
 
+$_title = "Changelog $key";
 include 'tpl.header.php';
 include 'tpl.epiccolors.php';
 

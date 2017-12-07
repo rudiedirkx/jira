@@ -14,6 +14,7 @@ foreach (array_merge(array($key), $subtasks) as $lkey) {
 	$worklogs = array_merge($worklogs, $log->worklogs);
 }
 
+$_title = "Worklogs $key";
 include 'tpl.header.php';
 
 echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($summary) . '</h1>';

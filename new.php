@@ -59,6 +59,7 @@ $issuetype = @$_GET['issuetype'];
 $parent = (string)@$_GET['parent'];
 $parentsummary = (string)@$_GET['parentsummary'];
 
+$_title = 'New issue';
 include 'tpl.header.php';
 
 echo '<h1>Create new issue</h1>';

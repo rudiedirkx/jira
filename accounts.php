@@ -90,6 +90,7 @@ else if ( isset($_POST['unsync']) ) {
 // Reset cookies
 do_login('', '');
 
+$_title = 'Accounts';
 include 'tpl.header.php';
 
 ?>

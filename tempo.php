@@ -14,6 +14,7 @@ $tempo = jira_get('/rest/tempo-timesheets/3/worklogs', array(
 ), $error, $info);
 
 if ( $error ) {
+	$_title = 'Tempo';
 	include 'tpl.header.php';
 
 	if ( $error == 404 ) {
@@ -61,6 +62,7 @@ foreach ($dated as $date => &$workedIssues) {
 	unset($workedIssues);
 }
 
+$_title = 'Tempo';
 include 'tpl.header.php';
 
 echo '<h1>Tempo</h1>';

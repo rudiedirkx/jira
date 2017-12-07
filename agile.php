@@ -10,6 +10,7 @@ $boardId = @$_GET['board'] ?: $user->config('agile_view_id');
 $baseParams = array('rapidViewId' => $boardId);
 
 if ( !$boardId || !isset($boards[$boardId]) ) {
+	$_title = 'Agile';
 	include 'tpl.header.php';
 	?>
 	<h1>Plan</h1>
@@ -76,6 +77,7 @@ $groupedIssues['backlog'] = array_values($allIssues);
 // print_r($groupedIssues);
 // exit;
 
+$_title = 'Agile';
 include 'tpl.header.php';
 
 include 'tpl.epiccolors.php';
@@ -232,6 +234,7 @@ exit;
 $error = false;
 $sprints = $boardId ? jira_get('/rest/greenhopper/1.0/sprintquery/' . $boardId, array(), $error, $info) : array();
 if ( !$boardId || !$sprints || $error ) {
+	$_title = 'Agile';
 	include 'tpl.header.php';
 
 	echo '<p>No <strong>Greenhopper</strong> in this house...</p>';

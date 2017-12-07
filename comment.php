@@ -26,6 +26,7 @@ if ( isset($_POST['comment']) ) {
 	exit;
 }
 
+$_title = "Comment $key";
 include 'tpl.header.php';
 
 $comment = jira_get('issue/' . $key . '/comment/' . $id, null, $error, $info);

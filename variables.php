@@ -30,6 +30,7 @@ else if ( isset($_POST['v']) ) {
 	return do_redirect('variables');
 }
 
+$_title = 'Variables';
 include 'tpl.header.php';
 
 ?>

@@ -63,6 +63,7 @@ if ( IS_AJAX ) {
 }
 
 $index = true;
+$_title = '';
 include 'tpl.header.php';
 
 include 'tpl.indextabs.php';
