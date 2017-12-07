@@ -110,7 +110,7 @@ if ( isset($transitionsById[$action]->fields->resolution) ) {
 
 	echo '<p>Resolution: <select name="resolution">' . html_options($resolutions, @$issue->fields->resolution->name ?: 'Fixed') . '</select></p>';
 }
-echo '<p>Comment:<br><textarea name="comment" rows="8"></textarea></p>';
+echo '<p>Comment:<br><textarea name="comment" rows="8"></textarea><br><button type="button" data-preview="textarea[name=comment]">Preview</button></p>';
 
 if ( $action == 'assign' || isset($transitionsById[$action]->fields->assignee) ) {
 	echo '<p>Change assignee?<br />';

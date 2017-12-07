@@ -38,7 +38,7 @@ echo '<h2>Comment # ' . $id . '</h2>';
 ?>
 
 <form autocomplete="off" method="post">
-	<p><textarea name="comment" rows="8"><?= html($comment->body) ?></textarea></p>
+	<p><textarea name="comment" rows="8"><?= html($comment->body) ?></textarea><br><button type="button" data-preview="textarea[name=comment]">Preview</button></p>
 	<p>
 		<input type="submit" />
 		or

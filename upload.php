@@ -47,7 +47,7 @@ echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($summar
 
 <form autocomplete="off" action method="post" enctype="multipart/form-data">
 	<p>File: <input type="file" name="file" /></p>
-	<p>Comment: <textarea name="comment" rows="4"></textarea></p>
+	<p>Comment: <textarea name="comment" rows="4"></textarea><br><button type="button" data-preview="textarea[name=comment]">Preview</button></p>
 	<p><input type="submit" /></p>
 </form>
 
