@@ -21,9 +21,9 @@ if ( isset($_GET['label']) ) {
 }
 
 // Update labels
-else if ( isset($_POST['labels']) ) {
-	$old_labels = (array)@$_GET['labels'];
-	$new_labels = array_filter(explode(' ', $_POST['labels']));
+else if ( isset($_POST['old_labels'], $_POST['new_labels']) ) {
+	$old_labels = array_filter(explode(' ', $_POST['old_labels']));
+	$new_labels = array_filter(explode(' ', $_POST['new_labels']));
 
 	$all_labels = array_unique(array_merge($old_labels, $new_labels));
 
@@ -39,9 +39,11 @@ else if ( isset($_POST['labels']) ) {
 		}
 	}
 
-	$response = jira_put('issue/' . $key, compact('update'), $error, $info);
+	if ( $update ) {
+		$response = jira_put('issue/' . $key, compact('update'), $error, $info);
+	}
 
-	if ( !$error ) {
+	if ( !$update || !$error ) {
 		return do_redirect('issue', array('key' => $key));
 	}
 
@@ -66,7 +68,8 @@ echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($issue-
 <h2>Labels</h2>
 
 <form autocomplete="off" method="post">
-	<p><input id="ls" name="labels" value="<?= implode(' ', $issue->fields->labels) ?>" size="60" /></p>
+	<input type="hidden" name="old_labels" value="<?= html(implode(' ', $issue->fields->labels)) ?>" />
+	<p><input id="ls" name="new_labels" value="<?= $issue->fields->labels ? html(implode(' ', $issue->fields->labels)) . ' ' : '' ?>" size="60" /></p>
 	<p>(<a id="fl" href="#">fetch</a>) <input type="submit" /></p>
 </form>
 
