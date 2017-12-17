@@ -49,12 +49,13 @@ include 'tpl.issueheader.php';
 </style>
 <?php
 
-echo '<h2>' . count($issue->changelog->histories) . ' changelog items</h2>';
+echo '<h2>' . $issue->changelog->total . ' changelog items</h2>';
 echo '<table class="changelog">';
-foreach ($issue->changelog->histories as $i => $log) {
+$i = $issue->changelog->total;
+foreach ( $issue->changelog->histories as $log ) {
 	echo '<tr class="log">';
 	echo '<th colspan="3">';
-	echo '<span class="index">' . ($i+1) . '.</span>';
+	echo '<span class="index">' . ($i--) . '.</span>';
 	echo ' ';
 	echo '<span class="author">' . html($log->author->displayName) . '</span>';
 	echo ' on ';
