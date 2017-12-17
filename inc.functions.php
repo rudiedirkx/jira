@@ -12,6 +12,13 @@ function do_tokencheck() {
 	}
 }
 
+function html_labels( $labels ) {
+	return implode(' ', array_map(function($label) {
+		$query = urlencode("labels = '$label'");
+		return '<a class="label" href="index.php?query=' . html($query) . '">' . html($label) . '</a>';
+	}, $labels));
+}
+
 function html_icon( $icon, $type = '' ) {
 	$url = @$icon->{$type . 'Url'} ?: $icon->iconUrl;
 	$name = @$icon->{$type . 'Name'} ?: $icon->name;

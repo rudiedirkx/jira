@@ -18,10 +18,10 @@ foreach ( $issues->issues AS $issue ) {
 	echo '<p class="short-meta">';
 	echo '	<span class="left">' . html_icon($fields->issuetype, 'issuetype') . ' ' . html($fields->issuetype->name) . '</span>';
 	echo '	<span class="center">' . ( @$fields->priority ? html_icon($fields->priority, 'priority') . ' ' . html($fields->priority->name) : '&nbsp;' ) . '</span>';
-	echo '	<span class="right"><strong>' . html($status) . '</strong></span>';
+	echo '	<span class="right"><strong>' . html_icon($fields->status) . ' ' . html($status) . '</strong></span>';
 	echo '</p>';
 	if ( $fields->labels ) {
-		echo '<p class="labels">Labels: <span class="label">' . implode('</span> <span class="label">', array_map('html', $fields->labels)) . '</span></p>';
+		echo '<p class="labels">Labels: ' . html_labels($fields->labels) . '</p>';
 	}
 	echo '<p class="dates">';
 	echo '	<span class="left">' . date(FORMAT_DATETIME, $issue->created) . '</span>';

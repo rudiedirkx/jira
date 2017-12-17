@@ -150,6 +150,7 @@ button[data-preview] {
 .label {
 	display: inline-block;
 	background: #e0f0ff;
+	color: #000;
 	padding: 1px 5px;
 	border-radius: 4px;
 }
@@ -175,6 +176,9 @@ button[data-preview] {
 }
 .markup > p:first-child {
 	margin-top: 0;
+}
+.markup > p:last-child {
+	margin-bottom: 0;
 }
 .markup .code.panel,
 .markup tt {

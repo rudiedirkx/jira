@@ -51,7 +51,7 @@ $meta[] = html($fields->reporter->displayName) . ' (' . date(FORMAT_DATETIME, $i
 $meta[] = html_icon($fields->status, 'status') . ' <strong>' . html($fields->status->name) . $resolution . '</strong>';
 $meta[] = '<em>' . ( html(@$fields->assignee->displayName) ?: 'No assignee' ) . '</em>';
 if ( $fields->labels ) {
-	$meta[] = '<span class="label">' . implode('</span> <span class="label">', array_map('html', $fields->labels)) . '</span>';
+	$meta[] = html_labels($fields->labels);
 }
 if ( !empty($fields->watches) ) {
 	$watches = $fields->watches->isWatching ? 'active' : '';
