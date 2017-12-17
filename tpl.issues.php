@@ -14,7 +14,7 @@ foreach ( $issues->issues AS $issue ) {
 
 	$storypoints = $issue->story_points ? ' (' . $issue->story_points . ' pt)' : '';
 
-	echo '<h2><a href="issue.php?key=' . $issue->key . '">' . $issue->key . ' ' . html($fields->summary) . '</a>' . $storypoints . '</h2>';
+	echo '<h2><a href="issue.php?key=' . $issue->key . '">' . $issue->key . ' ' . html(trim($fields->summary)) . '</a>' . $storypoints . '</h2>';
 	echo '<p class="short-meta">';
 	echo '	<span class="left">' . html_icon($fields->issuetype, 'issuetype') . ' ' . html($fields->issuetype->name) . '</span>';
 	echo '	<span class="center">' . ( @$fields->priority ? html_icon($fields->priority, 'priority') . ' ' . html($fields->priority->name) : '&nbsp;' ) . '</span>';

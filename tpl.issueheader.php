@@ -2,7 +2,7 @@
 
 $fields = $issue->fields;
 
-$actionPath = 'transition.php?key=' . $key . '&summary=' . urlencode($fields->summary) . '&transition=';
+$actionPath = 'transition.php?key=' . $key . '&summary=' . urlencode(trim($fields->summary)) . '&transition=';
 
 $actions = array();
 $actions['Edit'] = 'issue.php?key=' . $key . '&edit';
@@ -11,11 +11,11 @@ foreach ( $issue->transitions AS $transition ) {
 	$actions[$transition->name] = $actionPath . $transition->id;
 }
 $actions['Labels'] = 'labels.php?key=' . $key;
-$actions['Log work'] = 'logwork.php?key=' . $key . '&summary=' . urlencode($fields->summary);
-$actions['Upload'] = 'upload.php?key=' . $key . '&summary=' . urlencode($fields->summary);
-$actions['Link'] = 'link.php?key=' . $key . '&summary=' . urlencode($fields->summary);
+$actions['Log work'] = 'logwork.php?key=' . $key . '&summary=' . urlencode(trim($fields->summary));
+$actions['Upload'] = 'upload.php?key=' . $key . '&summary=' . urlencode(trim($fields->summary));
+$actions['Link'] = 'link.php?key=' . $key . '&summary=' . urlencode(trim($fields->summary));
 if ( !$fields->issuetype->subtask ) {
-	$actions['+Subtask'] = 'new.php?project=' . $fields->project->id . '&parent=' . $key . '&parentsummary=' . urlencode($fields->summary);
+	$actions['+Subtask'] = 'new.php?project=' . $fields->project->id . '&parent=' . $key . '&parentsummary=' . urlencode(trim($fields->summary));
 }
 $actions['Changelog'] = 'changelog.php?key=' . $key;
 $actions['➔ View in Jira'] = JIRA_URL . '/browse/' . $key;
@@ -28,17 +28,17 @@ if ( $fields->resolution ) {
 $h1Class = $issue->parent || $issue->parent_epic_key ? ' class="with-parent-issue"' : '';
 if ( $issue->parent_epic_key ) {
 	if ( $issue->parent_epic ) {
-		echo '<p class="parent-epic">&gt; <span class="epic ' . html($issue->parent_epic->self_epic->color) . '"><a href="issue.php?key=' . $issue->parent_epic_key . '">' . html(trim($issue->parent_epic->self_epic->name)) . '</a></span> ' . html($issue->parent_epic->fields->summary) . '</p>';
+		echo '<p class="parent-epic">&gt; <span class="epic ' . html($issue->parent_epic->self_epic->color) . '"><a href="issue.php?key=' . $issue->parent_epic_key . '">' . html(trim($issue->parent_epic->self_epic->name)) . '</a></span> ' . html(trim($issue->parent_epic->fields->summary)) . '</p>';
 	}
 	else {
 		echo '<p class="parent-epic">&gt; <span class="epic"><a href="issue.php?key=' . $issue->parent_epic_key . '">EPIC</a></span> ' . html($issue->parent_epic_key) . '</p>';
 	}
 }
 else if ( $issue->parent ) {
-	echo '<p class="parent-issue">&gt; <a href="issue.php?key=' . $issue->parent->key . '">' . $issue->parent->key . '</a> ' . html($issue->parent->fields->summary) . '</p>';
+	echo '<p class="parent-issue">&gt; <a href="issue.php?key=' . $issue->parent->key . '">' . $issue->parent->key . '</a> ' . html(trim($issue->parent->fields->summary)) . '</p>';
 }
 $storypoints = $issue->story_points ? ' (' . $issue->story_points . ' pt)' : '';
-echo '<h1' . $h1Class . '><a href="issue.php?key=' . $issue->key . '">' . $issue->key . '</a> ' . html($fields->summary) . $storypoints . '</h1>';
+echo '<h1' . $h1Class . '><a href="issue.php?key=' . $issue->key . '">' . $issue->key . '</a> ' . html(trim($fields->summary)) . $storypoints . '</h1>';
 echo '<p class="menu">' . html_links($actions) . '</p>' . "\n";
 
 $meta = array();

@@ -163,9 +163,9 @@ if ( isset($_GET['edit']) ) {
 	}
 
 	echo '<form autocomplete="off" action method="post">';
-	echo '	<p>Summary: <input name="summary" value="' . html($fields->summary) . '" /></p>';
+	echo '	<p>Summary: <input name="summary" value="' . html(trim($fields->summary)) . '" /></p>';
 
-	echo '	<p>Description: <textarea name="description" rows="20">' . html($fields->description) . '</textarea><br><button type="button" data-preview="textarea[name=description]">Preview</button></p>';
+	echo '	<p>Description: <textarea name="description" rows="20">' . html(trim($fields->description)) . '</textarea><br><button type="button" data-preview="textarea[name=description]">Preview</button></p>';
 
 	echo '	<p>Issue type: <select name="issuetype">' . html_options($issuetypes, $fields->issuetype->id) . '</select></p>';
 	echo '	<p>Priority: <select name="priority">' . html_options($priorities, @$fields->priority->id, '?') . '</select></p>';
@@ -226,7 +226,7 @@ if ( $issue->self_epic_issues ) {
 		echo html_icon($task->fields->issuetype, 'issuetype') . ' ';
 		echo '<a href="issue.php?key=' . $task->key . '">' . $task->key . '</a> ';
 		echo html_icon($task->fields->status, 'status') . ' ';
-		echo html($task->fields->summary) . ' ';
+		echo html(trim($task->fields->summary)) . ' ';
 		echo '</li>';
 	}
 	echo '</ol>';
@@ -240,7 +240,7 @@ if ( $issue->subtasks ) {
 		echo html_icon($task->fields->issuetype, 'issuetype') . ' ';
 		echo '<a href="issue.php?key=' . $task->key . '">' . $task->key . '</a> ';
 		echo html_icon($task->fields->status, 'status') . ' ';
-		echo html($task->fields->summary) . ' ';
+		echo html(trim($task->fields->summary)) . ' ';
 		echo '</li>';
 	}
 	echo '</ol>';
@@ -290,7 +290,7 @@ if ( $issue->links ) {
 			echo '<td rowspan="' . count($issue->links) . '">This issue</td>';
 		}
 		echo '<td>' . html($linkTitle) . '</td>';
-		echo '<td>' . html_icon($linkedIssue->fields->issuetype, 'issuetype') . ' <a href="issue.php?key=' . $linkedIssue->key . '">' . $linkedIssue->key . '</a> ' . html_icon($linkedIssue->fields->status, 'status') . ' ' . html($linkedIssue->fields->summary) . '</td>';
+		echo '<td>' . html_icon($linkedIssue->fields->issuetype, 'issuetype') . ' <a href="issue.php?key=' . $linkedIssue->key . '">' . $linkedIssue->key . '</a> ' . html_icon($linkedIssue->fields->status, 'status') . ' ' . html(trim($linkedIssue->fields->summary)) . '</td>';
 		echo '<td><a class="ajax" data-confirm="Unlink this issue from ' . $linkedIssue->key . '? Re-linking is easy." href="?key=' . $key . '&delete_link=' . $link->id . '&token=' . XSRF_TOKEN . '">x</a></td>';
 		echo '</tr>';
 	}
@@ -308,7 +308,7 @@ if ( $issue->worklogs->total || !$fields->issuetype->subtask ) {
 	}
 
 	$storypoints = $issue->story_points ? ' (' . $issue->story_points . ' pt)' : '';
-	$summary = $fields->summary . $storypoints;
+	$summary = trim($fields->summary) . $storypoints;
 	$allWorklogsUri = 'worklogs.php?key=' . $key . '&subtasks=' . implode(',', $issue->subkeys) . '&summary=' . urlencode($summary);
 
 	echo '<h2 class="pre-menu">' . $total . ' worklogs</h2> (<a href="' . $actions['Log work'] . '">add</a> | <a href="' . $allWorklogsUri . '">see all</a>)';
@@ -343,7 +343,7 @@ foreach ( $issue->comments AS $i => $comment ) {
 	echo '<p class="meta">';
 	echo '  [' . date(FORMAT_DATETIME, $created) . ']';
 	echo '  by <strong>' . html($comment->author->displayName) . '</strong>';
-	echo '  [ <a href="comment.php?key=' . $key . '&id=' . $comment->id . '&summary=' . urlencode($fields->summary) . '">e</a> |';
+	echo '  [ <a href="comment.php?key=' . $key . '&id=' . $comment->id . '&summary=' . urlencode(trim($fields->summary)) . '">e</a> |';
 	echo '  <a class="ajax" data-confirm="DELETE this COMMENT for ever and ever?" href="?key=' . $key . '&delete_comment=' . $comment->id . '&token=' . XSRF_TOKEN . '">x</a> ]';
 	echo '</p>';
 	echo '<div class="comment-body markup">' . do_remarkup($issue->renderedFields->comment->comments[$i]->body) . '</div>';

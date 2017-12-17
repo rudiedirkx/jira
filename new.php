@@ -26,8 +26,8 @@ if ( isset($_GET['project'], $_GET['issuetype'], $_POST['summary'], $_POST['desc
 	$fields = array(
 		'project' => array('id' => $_GET['project']),
 		'issuetype' => array('id' => $_GET['issuetype']),
-		'summary' => $_POST['summary'],
-		'description' => $_POST['description'],
+		'summary' => trim($_POST['summary']),
+		'description' => trim($_POST['description']),
 		'priority' => array('id' => $_POST['priority']),
 	);
 	if ( !empty($_POST['assignee']) ) {
