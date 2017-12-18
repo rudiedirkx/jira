@@ -9,6 +9,23 @@
 <pre><?= number_format(microtime(1) - $_start, 3) ?> s</pre>
 
 <script>
+function makeUpKey(field) {
+	var key = field.value.trim(); // issue 17 | issue17
+	key = key.replace(/\s+/, '-').toUpperCase(); // ISSUE-17 | ISSUE17
+	key = key.replace(/^([A-Z_]+)(\d+)$/, '$1-$2'); // ISSUE-17
+
+	// Jira's keys are very simple. If it's not that, no need to redirect.
+	if ( !/^[A-Z_]+\-\d+$/.test(key) ) {
+		alert('Invalid key: ' + key);
+		setTimeout(function() {
+			field.focus();
+		}, 1);
+		return;
+	}
+
+	return key;
+}
+
 $$('a[data-confirm]').on('click', function(e) {
 	if ( !confirm(this.data('confirm')) ) {
 		e.preventDefault();

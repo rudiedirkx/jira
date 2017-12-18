@@ -17,7 +17,7 @@ if ( isset($_POST['type'], $_POST['issue']) ) {
 	$data = array(
 		'type' => array('name' => $type[0]),
 		$thisIssueXward . 'Issue' => array('key' => $key),
-		$otherIssueXward . 'Issue' => array('key' => $_POST['issue']),
+		$otherIssueXward . 'Issue' => array('key' => trim($_POST['issue'])),
 	);
 
 	$response = jira_post('issueLink', $data, $error, $info);
@@ -57,6 +57,15 @@ echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($summar
 	<p>That issue: <input name="issue" placeholder="ABC-123" /></p>
 	<p><input type="submit" /></p>
 </form>
+
+<script>
+$$('input[name="issue"]').on('change', function(e) {
+	var key = makeUpKey(this);
+	if ( key ) {
+		this.value = key;
+	}
+});
+</script>
 
 <?php
 
