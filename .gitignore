@@ -1,3 +1,4 @@
-env.php
-db
-debug-*.json
+/env.php
+/db/
+/debug-*.json
+/vendor/

@@ -1,0 +1,15 @@
+{
+    "name": "rdx/jira",
+    "description": "Mobile Jira",
+    "type": "project",
+    "require": {
+        "rdx/db": "^1.4"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Rudie Dirkx",
+            "email": "github@hotblocks.nl"
+        }
+    ]
+}

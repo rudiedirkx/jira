@@ -14,10 +14,10 @@ define('WORKLOG_DATETIME', 'Y-m-d\\TH:i:s.000O');
 
 // Context
 require 'env.php';
+require 'vendor/autoload.php';
 require 'inc.functions.php';
 
 // Database
-require DB_INC_PATH . '/db_sqlite.php';
 $db = db_sqlite::open(array('database' => DB_PATH));
 
 $schema = require 'inc.schema.php';

@@ -14,7 +14,7 @@ function do_tokencheck() {
 
 function html_labels( $labels ) {
 	return implode(' ', array_map(function($label) {
-		$query = urlencode("labels = '$label'");
+		$query = urlencode("labels = '$label' and status not in (Resolved, Closed)");
 		return '<a class="label" href="index.php?query=' . html($query) . '">' . html($label) . '</a>';
 	}, $labels));
 }
