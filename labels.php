@@ -69,7 +69,7 @@ echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($issue-
 
 <form autocomplete="off" method="post">
 	<input type="hidden" name="old_labels" value="<?= html(implode(' ', $issue->fields->labels)) ?>" />
-	<p><input id="ls" name="new_labels" value="<?= $issue->fields->labels ? html(implode(' ', $issue->fields->labels)) . ' ' : '' ?>" size="60" /></p>
+	<p><input id="ls" name="new_labels" value="<?= html(implode(' ', $issue->fields->labels)) ?> " size="60" /></p>
 	<p>(<a id="fl" href="#">fetch</a>) <input type="submit" /></p>
 </form>
 
