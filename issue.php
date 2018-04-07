@@ -14,19 +14,20 @@ if ( isset($_POST['summary'], $_POST['description'], $_POST['reporter'], $_POST[
 	$priority = trim($_POST['priority']);
 	$comment = trim($_POST['comment']);
 
-	$update = array(
-		'summary' => array(array('set' => $summary)),
-		'description' => array(array('set' => $description)),
-		'issuetype' => array(array('set' => $issuetype)),
-		'priority' => array(array('set' => array('id' => $priority))),
+	$update = [];
+	$fields = array(
+		'summary' => $summary,
+		'description' => $description,
+		'issuetype' => ['id' => $issuetype],
+		'priority' => ['id' => $priority],
 	);
 	if ( $reporter ) {
-		$update['reporter'] = array(array('set' => array('name' => $reporter)));
+		$fields['reporter'] = ['name' => $reporter];
 	}
 	if ( $comment ) {
-		$update['comment'] = array(array('add' => array('body' => $comment)));
+		$update['comment'] = [['add' => ['body' => $comment]]];
 	}
-	$response = jira_put('issue/' . $key, compact('update'), $error, $info);
+	$response = jira_put('issue/' . $key, array_filter(compact('fields', 'update')), $error, $info);
 
 	if ( !$error ) {
 		return do_redirect('issue', compact('key'));
@@ -34,6 +35,7 @@ if ( isset($_POST['summary'], $_POST['description'], $_POST['reporter'], $_POST[
 
 	echo '<pre>';
 	print_r($update);
+	print_r($fields);
 	var_dump($error);
 	print_r($response);
 	print_r($info);
