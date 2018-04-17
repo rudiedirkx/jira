@@ -20,8 +20,7 @@ require 'inc.functions.php';
 // Database
 $db = db_sqlite::open(array('database' => DB_PATH));
 
-$schema = require 'inc.schema.php';
-$db->schema($schema);
+$db->ensureSchema(require 'inc.schema.php');
 
 // Classes
 require 'inc.user.php';

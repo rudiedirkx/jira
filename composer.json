@@ -3,7 +3,7 @@
     "description": "Mobile Jira",
     "type": "project",
     "require": {
-        "rdx/db": "^1.4"
+        "rdx/db": "^1.7"
     },
     "license": "MIT",
     "authors": [

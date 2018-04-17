@@ -19,6 +19,7 @@ if ( $error ) {
 
 	if ( $error == 404 ) {
 		echo '<p>No <strong>Tempo</strong> in this house...</p>';
+		$user->update(['has_tempo' => 0]);
 	}
 	else {
 		echo '<pre>';

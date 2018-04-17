@@ -1,6 +1,7 @@
 <?php
 
 return array(
+	'version' => 2,
 	'tables' => array(
 		'users' => array(
 			'columns' => array(
@@ -12,6 +13,7 @@ return array(
 				'index_filter' => array('unsigned' => true),
 				'last_sync' => array('unsigned' => true),
 				'jira_timezone' => array('type' => 'text'),
+				'has_tempo' => array('unsigned' => true, 'default' => 1),
 				'created' => array('unsigned' => true, 'default' => 0),
 				'cache__custom_field_ids' => array('type' => 'blob'),
 				'cache__agile_boards' => array('type' => 'blob'),

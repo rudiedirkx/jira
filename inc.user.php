@@ -42,6 +42,12 @@ class User extends db_generic_record {
 		$this->syncOverdueVars();
 	}
 
+	function update( array $data ) {
+		global $db;
+
+		return $db->update('users', $data, ['id' => $this->id]);
+	}
+
 	function getActiveSprint( $boardId = null ) {
 		$boardId or $boardId = $this->config('agile_view_id');
 		if ( !$boardId ) {

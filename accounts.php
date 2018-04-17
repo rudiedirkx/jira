@@ -152,6 +152,10 @@ label:after {
 				</td>
 			</tr>
 		<? endforeach ?>
+		<tr>
+			<th>Tempo</th>
+			<td><a href="tempo.php">probably <?= $user->has_tempo ? '' : 'not' ?></a></td>
+		</tr>
 		<tr valign="top">
 			<th align="right">Agile boards</th>
 			<td style="white-space: normal">

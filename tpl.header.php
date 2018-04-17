@@ -22,8 +22,10 @@
 			<a href="auth.php">You (<?= $user->jira_user_short ?>)</a> |
 			<a href="filters.php">Filters</a> |
 			<a href="accounts.php">Accounts</a> |
-			<a href="variables.php">Vars</a> |
-			<a href="tempo.php">Tempo</a>
+			<a href="variables.php">Vars</a>
+			<?if ($user->has_tempo):?>
+				| <a href="tempo.php">Tempo</a>
+			<?endif?>
 			<?if ($user->config('agile_view_id')):?>
 				| <a href="sprint.php">Sprint</a>
 				| <a href="agile.php">Agile</a>
