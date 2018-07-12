@@ -8,7 +8,7 @@ use rdx\jira\Client;
 use rdx\jira\Api2Request;
 use rdx\jira\Auth1Request;
 
-$config = new Config('https://jira.ezcompany.nl/jira');
+$config = new Config(RDX_JIRA_LIB_TEST_URL);
 $auth = new NoAuth;
 $client = new Client($config, $auth);
 

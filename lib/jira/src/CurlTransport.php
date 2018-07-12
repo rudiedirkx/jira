@@ -123,7 +123,7 @@ class CurlTransport extends Transport {
 		$headers = array();
 		foreach ( explode("\n", $header) AS $n => $line ) {
 			if ( $n == 0 ) {
-				list(, , $status) = explode(' ', trim($line), 3);
+				list(, , $status) = explode(' ', trim($line) . ' ', 3);
 				$this->response['status'] = $status;
 			}
 			else {

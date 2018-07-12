@@ -7,7 +7,7 @@ use rdx\jira\BasicAuth;
 use rdx\jira\Client;
 use rdx\jira\Auth1Request;
 
-$config = new Config('https://jira.ezcompany.nl/jira', array(
+$config = new Config(RDX_JIRA_LIB_TEST_URL, array(
 	'User' => 'MySuperUser', // @see classes.php
 ));
 $auth = new BasicAuth(RDX_JIRA_LIB_TEST_USER, RDX_JIRA_LIB_TEST_PASS);
