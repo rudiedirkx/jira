@@ -43,7 +43,7 @@ if ( isset($_POST['status'], $_POST['comment']) ) {
 		// Only move forward if that worked, since this action requires 2 API calls =(
 		if ( !$error ) {
 			// Change assignee
-			$update['name'] = $assignee;
+			$update['name'] = $assignee === null ? null : explode('@', $assignee)[0];
 			$response = jira_put('issue/' . $key . '/assignee', $update, $error, $info);
 		}
 	}
