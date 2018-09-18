@@ -188,20 +188,20 @@ echo '<div class="issue-description markup">' . ( do_remarkup($issue->renderedFi
 $customs = array();
 foreach ( $user->custom_field_ids as $cfName => $cfKey ) {
 	if ( $value = @$issue->renderedFields->$cfKey ) {
-		$customs[$cfName] = $issue->renderedFields->$cfKey;
+		$customs[$cfName] = print_r($value, 1);
 	}
 	else if ( $value = @$fields->$cfKey ) {
-		$customs[$cfName] = nl2br(html(trim(implode("\n", (array)$value))));
+		$customs[$cfName] = print_r($value, 1);
 	}
 }
 
 if ( $customs ) {
 	echo '<h2 class="visiblity-toggle-header open"><a id="custom-fields-toggler" href="#">' . count($customs) . ' custom fields</a></h2>';
 	echo '<div class="custom-fields">';
-	foreach ($customs as $cfName => $html) {
+	foreach ($customs as $cfName => $text) {
 		echo '<div class="custom-field">';
 		echo '<h3 class="custom-field-title">' . html($cfName) . '</h3>';
-		echo '<div class="custom-field-value">' . $html . '</div>';
+		echo '<div class="custom-field-value"><pre style="margin: 0">' . html(trim($text)) . '</pre></div>';
 		echo '</div>';
 	}
 	echo '</div>';
