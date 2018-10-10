@@ -14,7 +14,7 @@ if ( isset($_POST['comment']) ) {
 	$response = jira_put('issue/' . $key . '/comment/' . $id, $update, $error, $info);
 
 	if ( !$error ) {
-		return do_redirect('issue', array('key' => $key));
+		return do_redirect('issue#comment-' . $id, array('key' => $key));
 	}
 
 	echo '<pre>';

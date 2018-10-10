@@ -343,10 +343,10 @@ foreach ( $issue->comments AS $i => $comment ) {
 	$created = strtotime($comment->created);
 	echo '<div id="comment-' . $comment->id . '">';
 	echo '<p class="meta">';
-	echo '  [' . date(FORMAT_DATETIME, $created) . ']';
-	echo '  by <strong>' . html($comment->author->displayName) . '</strong>';
-	echo '  [ <a href="comment.php?key=' . $key . '&id=' . $comment->id . '&summary=' . urlencode(trim($fields->summary)) . '">e</a> |';
-	echo '  <a class="ajax" data-confirm="DELETE this COMMENT for ever and ever?" href="?key=' . $key . '&delete_comment=' . $comment->id . '&token=' . XSRF_TOKEN . '">x</a> ]';
+	echo '  [<a href="#comment-' . $comment->id . '">' . date(FORMAT_DATETIME, $created) . '</a>]';
+	echo '  by <strong style="white-space: nowrap">' . html($comment->author->displayName) . '</strong>';
+	echo '  <span style="white-space: nowrap">[ <a href="comment.php?key=' . $key . '&id=' . $comment->id . '&summary=' . urlencode(trim($fields->summary)) . '">e</a> |';
+	echo '  <a class="ajax" data-confirm="DELETE this COMMENT for ever and ever?" href="?key=' . $key . '&delete_comment=' . $comment->id . '&token=' . XSRF_TOKEN . '">x</a> ]</span>';
 	echo '</p>';
 	echo '<div class="comment-body markup">' . do_remarkup($issue->renderedFields->comment->comments[$i]->body) . '</div>';
 	echo '</div>';
