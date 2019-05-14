@@ -75,4 +75,4 @@ include 'tpl.header.php';
 
 <? include 'tpl.login.php' ?>
 
-<p>In case you understand PHP, <a href="https://github.com/rudiedirkx/Jira">read the code on Github</a>. This service/software comes with NO WARRANTY.</p>
+<p>Make a <em>Personal API token</em> on <a href="https://id.atlassian.com/manage/api-tokens">https://id.atlassian.com/manage/api-tokens</a>.</p>
