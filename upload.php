@@ -20,11 +20,16 @@ if ( isset($_FILES['file']) ) {
 	$filename = basename($file['name']);
 
 	$insert = array(
-		'file' => '@' . $filepath . ';filename=' . urlencode($filename),
+		'file' => curl_file_create($filepath, null, $filename),
 	);
 	$response = jira_upload('issue/' . $key . '/attachments', $insert, $error, $info);
 
 	if ( !$error ) {
+		$comment = trim($_POST['comment'] ?? '');
+		if ( strlen($comment) ) {
+			$response2 = jira_post('issue/' . $key . '/comment', array('body' => $comment), $error2, $info2);
+		}
+
 		return do_redirect('issue', array('key' => $key));
 	}
 
