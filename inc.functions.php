@@ -299,6 +299,21 @@ function jira_upload( $resource, $data, &$error = null, &$info = null ) {
 	return $response;
 }
 
+function jira_download( $url ) {
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL, $url);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+	curl_setopt($ch, CURLOPT_MAXREDIRS, 2);
+	curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+	curl_setopt($ch, CURLOPT_USERPWD, JIRA_AUTH);
+
+	$data = curl_exec($ch);
+	curl_close($ch);
+
+	return $data;
+}
+
 function jira_get( $resource, $query = null, &$error = null, &$info = null ) {
 	$_start = microtime(1);
 

@@ -18,10 +18,7 @@ if ( $thumbnail ) {
 	$url = $attachment->thumbnail;
 }
 
-$context = stream_context_create(array('http' => array(
-	'header' => 'Authorization: Basic ' . base64_encode(JIRA_AUTH),
-)));
-$data = file_get_contents($url, FALSE, $context);
+$data = jira_download($url);
 
 header('Content-type: ' . $attachment->mimeType);
 header('Content-disposition: inline; filename=' . basename($attachment->filename));
