@@ -1,0 +1,19 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Copy privkey
+      env:
+        PRIVKEY: ${{ secrets.PRIVKEY }}
+      run: echo "$PRIVKEY" > ~/privkey && chmod 0600 ~/privkey
+    - name: Deploy to hoblox
+      env:
+        SSH_HOST: ${{ secrets.SSH_HOST }}
+        SSH_TARGET_DIR: ${{ secrets.SSH_TARGET_DIR }}
+      run: ssh -i ~/privkey -o "StrictHostKeyChecking=no" "$SSH_HOST" -- 'cd "'${SSH_TARGET_DIR}'" && git status && echo "====" && git pull && echo "====" && composer install -o --no-dev'
