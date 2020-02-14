@@ -29,7 +29,7 @@ foreach ( $worklogs AS $worklog ) {
 	$started = strtotime($worklog->started);
 	$created = strtotime($worklog->created);
 	$ymdDate = date('Y-m-d', $started);
-	$user = $worklog->author->name;
+	$user = $worklog->author->name ?? $worklog->author->displayName;
 
 	@$perUser[$user] += $minutes;
 
