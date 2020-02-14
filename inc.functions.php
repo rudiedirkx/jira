@@ -126,8 +126,10 @@ function do_remarkup( $html ) {
 	$html = str_replace('="/', '="' . JIRA_ORIGIN . '/', $html);
 
 	// Images through proxy
-	// $regex = '#src="' . preg_quote(JIRA_URL, '#') . '/secure/attachment/(\d+)/([^"]+)"#';
-	// $html = preg_replace($regex, 'data-attachment="$1" data-context="markup" data-src="attachment.php?id=$1"', $html);
+	$regex = '#src="' . preg_quote(JIRA_URL, '#') . '/secure/(?:attachment|thumbnail)/(\d+)/([^"]+)"#';
+	$html = preg_replace($regex, 'data-attachment="$1" data-context="markup" data-src="attachment.php?thumbnail=1&id=$1"', $html);
+	$regex = '#href="' . preg_quote(JIRA_URL, '#') . '/secure/attachment/(\d+)/([^"]+)"#';
+	$html = preg_replace($regex, 'target="_blank" href="attachment.php?id=$1"', $html);
 
 	return $html;
 }
