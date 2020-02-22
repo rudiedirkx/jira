@@ -6,10 +6,9 @@ do_logincheck();
 
 $key = $_GET['key'];
 
-if ( isset($_POST['summary'], $_POST['description'], $_POST['reporter'], $_POST['issuetype'], $_POST['priority'], $_POST['comment']) ) {
+if ( isset($_POST['summary'], $_POST['description'], $_POST['issuetype'], $_POST['priority'], $_POST['comment']) ) {
 	$summary = trim($_POST['summary']);
 	$description = trim($_POST['description']);
-	$reporter = trim($_POST['reporter']);
 	$issuetype = trim($_POST['issuetype']);
 	$priority = trim($_POST['priority']);
 	$comment = trim($_POST['comment']);
@@ -21,9 +20,6 @@ if ( isset($_POST['summary'], $_POST['description'], $_POST['reporter'], $_POST[
 		'issuetype' => ['id' => $issuetype],
 		'priority' => ['id' => $priority],
 	);
-	if ( $reporter ) {
-		$fields['reporter'] = ['name' => $reporter];
-	}
 	if ( $comment ) {
 		$update['comment'] = [['add' => ['body' => $comment]]];
 	}
@@ -150,7 +146,6 @@ if ( isset($_GET['edit']) ) {
 	// Description
 	// Issue type
 	// Priority
-	// Reporter
 
 	$meta = jira_get('issue/' . $key . '/editmeta', array('expand' => 'projects.issuetypes.fields'), $error, $info);
 
@@ -171,8 +166,6 @@ if ( isset($_GET['edit']) ) {
 
 	echo '	<p>Issue type: <select name="issuetype">' . html_options($issuetypes, $fields->issuetype->id) . '</select></p>';
 	echo '	<p>Priority: <select name="priority">' . html_options($priorities, @$fields->priority->id, '?') . '</select></p>';
-
-	echo '	<p>Reporter (' . $fields->reporter->name . '): <input name="reporter" /></p>';
 
 	echo '	<p>Add comment: <textarea name="comment" rows="4"></textarea><br><button type="button" data-preview="textarea[name=comment]">Preview</button></p>';
 

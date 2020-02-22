@@ -14,57 +14,19 @@ if ( isset($_POST['status'], $_POST['comment']) ) {
 	$resolution = trim(@$_POST['resolution']);
 	$comment = trim($_POST['comment']);
 
-	$assigneetype = trim(@$_POST['assigneetype']);
-	$assignee = trim(@$_POST['assignee']);
-	if ( $assigneetype == 'unassign' ) {
-		$assignee = null;
-	}
-	else if ( $assigneetype == 'me' ) {
-		$assignee = JIRA_USER;
-	}
-
 	$update = array();
 
-	// ASSIGN
-	if ( $status == 'assign' ) {
-		if ( $assignee === '' ) {
-			echo "Must enter assignee username.";
-			exit;
-		}
-
-		// Add comment
-		if ( $comment ) {
-			$response = jira_post('issue/' . $key . '/comment', array('body' => $comment), $error, $info);
-		}
-		else {
-			$error = false;
-		}
-
-		// Only move forward if that worked, since this action requires 2 API calls =(
-		if ( !$error ) {
-			// Change assignee
-			$update['name'] = $assignee === null ? null : explode('@', $assignee)[0];
-			$response = jira_put('issue/' . $key . '/assignee', $update, $error, $info);
-		}
+	if ( $comment ) {
+		$update['update']['comment'][0]['add']['body'] = $comment;
+	}
+	if ( $resolution ) {
+		$update['fields']['resolution']['name'] = $resolution;
+	}
+	if ( $status ) {
+		$update['transition']['id'] = $status;
 	}
 
-	// TRANSITION
-	else {
-		if ( $comment ) {
-			$update['update']['comment'][0]['add']['body'] = $comment;
-		}
-		if ( $assignee !== '' ) {
-			$update['fields']['assignee']['name'] = $assignee;
-		}
-		if ( $resolution ) {
-			$update['fields']['resolution']['name'] = $resolution;
-		}
-		if ( $status ) {
-			$update['transition']['id'] = $status;
-		}
-
-		$response = jira_post('issue/' . $key . '/transitions', $update, $error, $info);
-	}
+	$response = jira_post('issue/' . $key . '/transitions', $update, $error, $info);
 
 	if ( !$error ) {
 		return do_redirect('issue', array('key' => $key));
@@ -84,7 +46,6 @@ $transitions = jira_get('issue/' . $key . '/transitions', array('expand' => 'tra
 
 $actions = $transitionsById = array();
 $actions[''] = '-- No change';
-$actions['assign'] = 'Assign';
 foreach ( $transitions->transitions AS $transition ) {
 	$transitionsById[$transition->id] = $transition;
 	$actions[$transition->id] = $transition->name;
@@ -111,14 +72,6 @@ if ( isset($transitionsById[$action]->fields->resolution) ) {
 	echo '<p>Resolution: <select name="resolution">' . html_options($resolutions, @$issue->fields->resolution->name ?: 'Fixed') . '</select></p>';
 }
 echo '<p>Comment:<br><textarea name="comment" rows="8"></textarea><br><button type="button" data-preview="textarea[name=comment]">Preview</button></p>';
-
-if ( $action == 'assign' || isset($transitionsById[$action]->fields->assignee) ) {
-	echo '<p>Change assignee?<br />';
-	echo '<input type="radio" name="assigneetype" value="unassign" /> Unassign<br />';
-	echo '<input type="radio" name="assigneetype" value="me" /> Assign to me<br />';
-	echo '<input type="radio" name="assigneetype" value="other" checked /> No change, or assign to: <input name="assignee" style="width: 7em" placeholder="username" />';
-	echo '</p>';
-}
 
 echo '<p><input type="submit" /></p>';
 echo '</form>';

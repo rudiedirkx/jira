@@ -6,7 +6,6 @@ $actionPath = 'transition.php?key=' . $key . '&summary=' . urlencode(trim($field
 
 $actions = array();
 $actions['Edit'] = 'issue.php?key=' . $key . '&edit';
-$actions['Assign'] = $actionPath . 'assign';
 foreach ( $issue->transitions AS $transition ) {
 	$actions[$transition->name] = $actionPath . $transition->id;
 }
@@ -49,7 +48,7 @@ if ($fields->priority) {
 }
 $meta[] = html($fields->reporter->displayName) . ' (' . date(FORMAT_DATETIME, $issue->created) . ')';
 $meta[] = html_icon($fields->status, 'status') . ' <strong>' . html($fields->status->name) . $resolution . '</strong>';
-$meta[] = '<em>' . ( html(@$fields->assignee->displayName) ?: 'No assignee' ) . '</em>';
+$meta[] = '<em>' . html($fields->assignee->displayName ?? 'No assignee') . '</em>';
 if ( $fields->labels ) {
 	$meta[] = html_labels($fields->labels);
 }
