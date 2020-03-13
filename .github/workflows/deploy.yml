@@ -16,4 +16,4 @@ jobs:
       env:
         SSH_HOST: ${{ secrets.SSH_HOST }}
         SSH_TARGET_DIR: ${{ secrets.SSH_TARGET_DIR }}
-      run: ssh -i ~/privkey -o "StrictHostKeyChecking=no" "$SSH_HOST" -- 'cd "'${SSH_TARGET_DIR}'" && git status && echo "====" && git pull && echo "====" && composer install -o --no-dev'
+      run: ssh -q -i ~/privkey -o "StrictHostKeyChecking=no" "$SSH_HOST" -- 'cd "'${SSH_TARGET_DIR}'" && git status && echo "====" && git pull && echo "====" && composer install -o --no-dev'
