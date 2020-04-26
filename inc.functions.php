@@ -126,8 +126,13 @@ function do_remarkup( $html ) {
 	$html = str_replace('="/', '="' . JIRA_ORIGIN . '/', $html);
 
 	// Images through proxy
-	$regex = '#src="' . preg_quote(JIRA_URL, '#') . '/secure/(?:attachment|thumbnail)/(\d+)/([^"]+)"#';
-	$html = preg_replace($regex, 'data-attachment="$1" data-context="markup" data-src="attachment.php?thumbnail=1&id=$1"', $html);
+	$html = preg_replace('# (width|height)="\d+"#', '', $html);
+	$regex = '#src="' . preg_quote(JIRA_URL, '#') . '/secure/(attachment|thumbnail)/(\d+)/([^"]+)"#';
+	$html = preg_replace_callback($regex, function($match) {
+		[, $size, $id, $name] = $match;
+		$thumb = (int) ($size == 'thumbnail');
+		return 'data-attachment="' . $id . '" data-context="markup" data-src="attachment.php?thumbnail=' . $thumb . '&id=' . $id . '"';
+	}, $html);
 	$regex = '#href="' . preg_quote(JIRA_URL, '#') . '/secure/attachment/(\d+)/([^"]+)"#';
 	$html = preg_replace($regex, 'target="_blank" href="attachment.php?id=$1"', $html);
 

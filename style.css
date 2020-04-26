@@ -194,6 +194,9 @@ button[data-preview] {
 	display: inline-block;
 	padding: 0 2px;
 }
+.markup img {
+	max-width: 100%;
+}
 
 .jira-issue-macro {
 	display: inline-block;

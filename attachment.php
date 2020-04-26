@@ -5,7 +5,7 @@ require 'inc.bootstrap.php';
 do_logincheck();
 
 $id = $_GET['id'];
-$thumbnail = isset($_GET['thumbnail']);
+$thumbnail = (bool) ($_GET['thumbnail'] ?? 0);
 
 $attachment = jira_get('attachment/' . $id);
 
