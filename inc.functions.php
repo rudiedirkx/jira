@@ -1,5 +1,10 @@
 <?php
 
+function html_asset( $src ) {
+	$buster = '?_' . filemtime($src);
+	return $src . $buster;
+}
+
 function do_time($minutes) {
 	$hours = floor($minutes / 60);
 	$minutes -= $hours * 60;
