@@ -22,7 +22,7 @@ if ( isset($_POST['preview']) ) {
 	exit;
 }
 
-if ( isset($_GET['project'], $_GET['issuetype'], $_POST['summary'], $_POST['description'], $_POST['priority'], $_POST['assignee']) ) {
+if ( isset($_GET['project'], $_GET['issuetype'], $_POST['summary'], $_POST['description'], $_POST['priority']) ) {
 	$fields = array(
 		'project' => array('id' => $_GET['project']),
 		'issuetype' => array('id' => $_GET['issuetype']),
@@ -30,9 +30,6 @@ if ( isset($_GET['project'], $_GET['issuetype'], $_POST['summary'], $_POST['desc
 		'description' => trim($_POST['description']),
 		'priority' => array('id' => $_POST['priority']),
 	);
-	if ( !empty($_POST['assignee']) ) {
-		$fields['assignee'] = array('name' => $_POST['assignee']);
-	}
 	if ( !empty($_POST['parent']) ) {
 		$fields['parent'] = array('key' => $_POST['parent']);
 	}
@@ -159,7 +156,6 @@ $defaultPriority = $priorityKeys[ floor((count($priorities) - 1) / 2) ];
 	<p>Summary: <input name="summary" /></p>
 	<p>Description: <textarea name="description" rows="8"></textarea><br><button type="button" data-preview="textarea[name=description]">Preview</button></p>
 	<p>Priority: <select name="priority"><?= html_options($priorities, $defaultPriority) ?></select></p>
-	<p>Assignee: <input name="assignee" value="<?= $user->jira_user_short ?>" /></p>
 
 	<p><input type="submit" /></p>
 </form>
