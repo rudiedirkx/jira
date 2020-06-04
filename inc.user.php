@@ -32,6 +32,7 @@ class User extends db_generic_record {
 			'required' => false,
 		),
 		'agile_view_ids' => FALSE,
+		'show_custom_fields' => FALSE,
 	);
 
 	function __construct() {
@@ -191,6 +192,7 @@ class User extends db_generic_record {
 				$fields[mb_strtolower($field->name)] = $field->id;
 			}
 
+			ksort($fields);
 			$this->cache__custom_field_ids = serialize($fields);
 			$this->save(array('cache__custom_field_ids' => $this->cache__custom_field_ids));
 		}
@@ -200,6 +202,12 @@ class User extends db_generic_record {
 
 	function get_selected_agile_boards() {
 		$ids = $this->config('agile_view_ids', '');
+		$ids = array_filter(explode(',', $ids));
+		return $ids;
+	}
+
+	function get_selected_show_custom_fields() {
+		$ids = $this->config('show_custom_fields', '');
 		$ids = array_filter(explode(',', $ids));
 		return $ids;
 	}

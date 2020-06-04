@@ -153,7 +153,7 @@ label:after {
 			</tr>
 		<? endforeach ?>
 		<tr>
-			<th>Tempo</th>
+			<th align="right">Tempo</th>
 			<td><a href="tempo.php">probably <?= $user->has_tempo ? '' : 'not' ?></a></td>
 		</tr>
 		<tr valign="top">
@@ -164,6 +164,20 @@ label:after {
 					?>
 					<label>
 						<input type="checkbox" name="config[agile_view_ids][]" value="<?= $id ?>" <?= $checked ?> />
+						<span class="board-id">(<?= $id ?>)</span>
+						<?= html($name) ?>
+					</label>
+				<? endforeach ?>
+			</td>
+		</tr>
+		<tr valign="top">
+			<th align="right">Show custom fields</th>
+			<td>
+				<? foreach ($user->custom_field_ids as $name => $id):
+					$checked = in_array($id, $user->selected_show_custom_fields) ? 'checked' : '';
+					?>
+					<label>
+						<input type="checkbox" name="config[show_custom_fields][]" value="<?= $id ?>" <?= $checked ?> />
 						<span class="board-id">(<?= $id ?>)</span>
 						<?= html($name) ?>
 					</label>

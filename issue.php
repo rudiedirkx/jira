@@ -179,7 +179,8 @@ if ( isset($_GET['edit']) ) {
 echo '<div class="issue-description markup">' . ( do_remarkup($issue->renderedFields->description) ?: '<em>No description</em>' ) . '</div>';
 
 $customs = array();
-foreach ( $user->custom_field_ids as $cfName => $cfKey ) {
+foreach ( $user->selected_show_custom_fields as $cfKey ) {
+	$cfName = array_search($cfKey, $user->custom_field_ids);
 	if ( $value = @$issue->renderedFields->$cfKey ) {
 		$customs[$cfName] = print_r($value, 1);
 	}
@@ -188,7 +189,7 @@ foreach ( $user->custom_field_ids as $cfName => $cfKey ) {
 	}
 }
 
-if ( $customs ) {
+if ( count($customs) ) {
 	echo '<h2 class="visiblity-toggle-header open"><a id="custom-fields-toggler" href="#">' . count($customs) . ' custom fields</a></h2>';
 	echo '<div class="custom-fields">';
 	foreach ($customs as $cfName => $text) {
@@ -202,7 +203,7 @@ if ( $customs ) {
 	?>
 	<script>
 	(function(a) {
-		a.parentNode.classList.remove('open');
+		// a.parentNode.classList.remove('open');
 		a.addEventListener('click', function(e) {
 			e.preventDefault();
 			var h2 = this.parentNode;
