@@ -136,7 +136,7 @@ function do_remarkup( $html ) {
 	$html = preg_replace_callback($regex, function($match) {
 		[, $size, $id, $name] = $match;
 		$thumb = (int) ($size == 'thumbnail');
-		return 'data-attachment="' . $id . '" data-context="markup" data-src="attachment.php?thumbnail=' . $thumb . '&id=' . $id . '"';
+		return 'src="attachment.php?thumbnail=' . $thumb . '&id=' . $id . '"';
 	}, $html);
 	$regex = '#href="' . preg_quote(JIRA_URL, '#') . '/secure/attachment/(\d+)/([^"]+)"#';
 	$html = preg_replace($regex, 'target="_blank" href="attachment.php?id=$1"', $html);
