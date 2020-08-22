@@ -91,16 +91,6 @@ else if ( isset($_GET['delete_comment']) ) {
 	exit(IS_AJAX ? 'OK' : do_redirect('issue', compact('key')));
 }
 
-else if ( isset($_GET['watch']) ) {
-	do_tokencheck();
-
-	$method = !empty($_GET['watch']) ? 'jira_post' : 'jira_delete';
-	$data = !empty($_GET['watch']) ? JIRA_USER : array('username' => JIRA_USER);
-	$response = $method('issue/' . $key . '/watchers', $data, $error, $info);
-
-	exit(IS_AJAX ? 'OK' : do_redirect('issue', compact('key')));
-}
-
 else if ( isset($_GET['vote']) ) {
 	do_tokencheck();
 

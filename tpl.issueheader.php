@@ -52,9 +52,8 @@ $meta[] = '<em>' . html($fields->assignee->displayName ?? 'No assignee') . '</em
 if ( $fields->labels ) {
 	$meta[] = html_labels($fields->labels);
 }
-if ( !empty($fields->watches) ) {
-	$watches = $fields->watches->isWatching ? 'active' : '';
-	$meta[] = '<a href="issue.php?key=' . $key . '&watch=' . (int)!$watches . '&token=' . XSRF_TOKEN . '" class="ajax active-state ' . $watches . '">★</a> (watch)';
+if ( !empty($fields->watches->watchCount) ) {
+	$meta[] = $fields->watches->watchCount . ' watchers';
 }
 if ( !empty($fields->votes) ) {
 	$voted = $fields->votes->hasVoted ? 'active' : '';
