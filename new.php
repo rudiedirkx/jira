@@ -6,7 +6,7 @@ do_logincheck();
 
 if ( isset($_POST['preview']) ) {
 	$rsp = jira_post(JIRA_API_1_PATH . 'render', array(
-		'issueKey' => '',
+		'issueKey' => $_POST['issue'] ?? '',
 		'rendererType' => 'atlassian-wiki-renderer',
 		'unrenderedMarkup' => trim($_POST['preview']),
 	), $error, $info);
@@ -17,7 +17,7 @@ if ( isset($_POST['preview']) ) {
 		print_r($info);
 	}
 	else {
-		echo $rsp;
+		echo do_remarkup($rsp);
 	}
 	exit;
 }
