@@ -1,6 +1,8 @@
 <?php
 
-class User extends db_generic_record {
+class User extends db_generic_model {
+
+	static public $_table = 'users';
 
 	public static $_config = array(
 		'index_page_size' => array(
@@ -35,18 +37,14 @@ class User extends db_generic_record {
 		'show_custom_fields' => FALSE,
 	);
 
-	function __construct() {
+	public function __construct( array $data = [] ) {
+		parent::__construct($data);
+
 		if ( !$this->last_sync || $this->last_sync + FORCE_JIRA_USER_SYNC < time() ) {
 			// $this->unsync();
 		}
 
 		$this->syncOverdueVars();
-	}
-
-	function update( array $data ) {
-		global $db;
-
-		return $db->update('users', $data, ['id' => $this->id]);
 	}
 
 	function getActiveSprint( $boardId = null ) {
@@ -194,7 +192,7 @@ class User extends db_generic_record {
 
 			ksort($fields);
 			$this->cache__custom_field_ids = serialize($fields);
-			$this->save(array('cache__custom_field_ids' => $this->cache__custom_field_ids));
+			$this->update(array('cache__custom_field_ids' => $this->cache__custom_field_ids));
 		}
 
 		return unserialize($this->cache__custom_field_ids);
@@ -220,7 +218,7 @@ class User extends db_generic_record {
 			}, array());
 
 			$this->cache__agile_boards = serialize($boardOptions);
-			$this->save(array('cache__agile_boards' => $this->cache__agile_boards));
+			$this->update(array('cache__agile_boards' => $this->cache__agile_boards));
 		}
 
 		return unserialize($this->cache__agile_boards);
@@ -252,7 +250,7 @@ class User extends db_generic_record {
 		$db->delete('filters', array('user_id' => $this->id));
 		unset($this->filters, $this->filter_query_options);
 
-		$this->save(array(
+		$this->update(array(
 			'cache__custom_field_ids' => $this->cache__custom_field_ids = '',
 			'cache__agile_boards' => $this->cache__agile_boards = '',
 		));
@@ -342,31 +340,19 @@ class User extends db_generic_record {
 		return false;
 	}
 
-	function save( $updates ) {
-		global $db;
-		return $db->update('users', $updates, array('id' => $this->id));
-	}
-
-	static function load( $url = null, $username = null ) {
-		global $db;
-
-		$url or $url = JIRA_URL;
-		$username or $username = JIRA_USER;
-
-		$user = $db->select('users', array(
+	static function load( string $url, string $username ) {
+		$user = self::first(array(
 			'jira_url' => $url,
 			'jira_user' => $username,
-		), null, 'User')->first();
+		));
 		if ( $user ) {
 			return $user;
 		}
 
-		$db->insert('users', array(
+		return self::create(array(
 			'jira_url' => $url,
 			'jira_user' => $username,
 		));
-
-		return self::load($url, $username);
 	}
 
 }

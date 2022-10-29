@@ -5,7 +5,7 @@ require 'inc.bootstrap.php';
 do_logincheck();
 
 if ( isset($_POST['index_filter'], $_POST['index_query'], $_POST['index_project']) ) {
-	$user->save(array(
+	$user->update(array(
 		'index_filter' => trim($_POST['index_filter']),
 		'index_query' => trim($_POST['index_query']),
 		'index_project' => trim($_POST['index_project']),

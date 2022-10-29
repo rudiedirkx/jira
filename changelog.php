@@ -75,7 +75,7 @@ foreach ( $issue->changelog->histories as $log ) {
 echo '</table>';
 
 if ( isset($_GET['debug']) ) {
-	$issue->__unget();
+	$issue->clear();
 	echo '<pre>' . print_r($issue, 1) . '</pre>';
 }
 

@@ -10,19 +10,16 @@ if ( defined('JIRA_AUTH') ) {
 	echo '<p>You are:</p>';
 	echo '<pre>';
 
-	// $account = jira_get('user', array('username' => JIRA_USER), $error, $info);
-	// print_r($account);
-
-	$session = jira_get(JIRA_AUTH_PATH . 'session', null, $error, $info);
-	print_r($session);
-
-	$account = jira_get($session->self, null, $error, $info);
+	$account = jira_get('/rest/api/3/myself', null, $error, $info);
 	print_r($account);
+	$error and print_r($info['error']);
 
 	print_r($user);
 
 	// Update timezone from Jira
-	$user->save(array('jira_timezone' => $account->timeZone));
+	if ( $account ) {
+		$user->update(array('jira_timezone' => $account->timeZone));
+	}
 
 	print_r($user->custom_field_ids);
 

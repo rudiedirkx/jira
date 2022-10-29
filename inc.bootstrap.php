@@ -26,8 +26,9 @@ $db->ensureSchema(require 'inc.schema.php');
 require 'inc.user.php';
 require 'inc.issue.php';
 
+db_generic_model::$_db = $db;
+
 // Jira API resource prefixes
-define('JIRA_AUTH_PATH', '/rest/auth/1/');
 define('JIRA_API_PATH', '/rest/api/2/');
 define('JIRA_API_1_PATH', '/rest/api/1.0/');
 
@@ -51,7 +52,7 @@ if ( isset($_COOKIE['JIRA_URL'], $_COOKIE['JIRA_AUTH']) && ($accounts = get_acco
 	$url = parse_url(JIRA_URL);
 	define('JIRA_ORIGIN', $url['scheme'] . '://' . $url['host']);
 
-	$user = User::load();
+	$user = User::load(JIRA_URL, JIRA_USER);
 	if ( $user && $user->jira_timezone ) {
 		date_default_timezone_set($user->jira_timezone);
 	}

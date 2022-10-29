@@ -1,31 +1,32 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fa0baec046f1c831d10a8ebd2aac6fe1",
+    "content-hash": "c56b18e52ecc808fcad8f7a43bd1071c",
     "packages": [
         {
             "name": "rdx/db",
-            "version": "1.7",
+            "version": "1.25",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rudiedirkx/db_generic.git",
-                "reference": "1066a4d8fd72c427b297c44446360b15fb2fcabd"
+                "reference": "e4dd4b6026b5baf643c71e6d54038af03654d80d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rudiedirkx/db_generic/zipball/1066a4d8fd72c427b297c44446360b15fb2fcabd",
-                "reference": "1066a4d8fd72c427b297c44446360b15fb2fcabd",
+                "url": "https://api.github.com/repos/rudiedirkx/db_generic/zipball/e4dd4b6026b5baf643c71e6d54038af03654d80d",
+                "reference": "e4dd4b6026b5baf643c71e6d54038af03654d80d",
                 "shasum": ""
             },
             "type": "library",
             "autoload": {
                 "classmap": [
-                    "db_generic.php",
-                    "db_mysql.php",
-                    "db_sqlite.php"
+                    "./"
+                ],
+                "exclude-from-classmap": [
+                    "/test/"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -39,7 +40,11 @@
                 }
             ],
             "description": "Simple MySQL/SQLite wrapper",
-            "time": "2018-04-11T10:51:25+00:00"
+            "support": {
+                "issues": "https://github.com/rudiedirkx/db_generic/issues",
+                "source": "https://github.com/rudiedirkx/db_generic/tree/1.25"
+            },
+            "time": "2022-09-21T21:49:08+00:00"
         }
     ],
     "packages-dev": [],
@@ -49,5 +54,6 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
-    "platform-dev": []
+    "platform-dev": [],
+    "plugin-api-version": "2.3.0"
 }

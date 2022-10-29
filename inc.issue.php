@@ -4,16 +4,8 @@ class Issue extends db_generic_record {
 
 	public static function map( $issues ) {
 		return array_map(function($issue) {
-			return new Issue($issue);
+			return new Issue((array) $issue);
 		}, $issues);
-	}
-
-	protected $_got = array();
-
-	public function __construct( $issue ) {
-		foreach ( get_object_vars($issue) as $name => $value ) {
-			$this->$name = $value;
-		}
 	}
 
 
@@ -160,23 +152,6 @@ class Issue extends db_generic_record {
 	public function get_story_points() {
 		global $user;
 		return $user->cf_story_points ? (float) @$this->fields->{$user->cf_story_points} : 0;
-	}
-
-
-
-	/**
-	 * Util
-	 */
-
-	public function __unget() {
-		foreach ( $this->_got as $name ) {
-			unset($this->$name);
-		}
-	}
-
-	public function &__get( $name ) {
-		$this->_got[] = $name;
-		return parent::__get($name);
 	}
 
 }

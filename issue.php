@@ -111,7 +111,7 @@ else if ( isset($_GET['transitions']) ) {
 
 $issue = jira_get('issue/' . $key, array('expand' => 'transitions,renderedFields'), $error, $info);
 if ( $issue ) {
-	$issue = new Issue($issue);
+	$issue = new Issue((array) $issue);
 	$_title = "{$issue->key} {$issue->fields->summary}";
 }
 else {
@@ -354,7 +354,7 @@ echo '</div>';
 <?php
 
 if ( isset($_GET['debug']) ) {
-	$issue->__unget();
+	$issue->clear();
 	echo '<pre>' . print_r($issue, 1) . '</pre>';
 }
 
