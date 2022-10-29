@@ -1,4 +1,3 @@
-
 * {
 	box-sizing: border-box;
 	-webkit-box-sizing: border-box;
@@ -15,6 +14,8 @@ html {
 body {
 	padding: 10px;
 	line-height: 1.4;
+	background-color: #fff;
+	color: #000;
 }
 input:not([type="submit"]):not([type="button"]):not([type="radio"]):not([type="checkbox"]),
 select,
@@ -391,6 +392,16 @@ body.loading > .hor-loader {
     height: 10px;
 	-webkit-animation-name: horLoader;
 	-webkit-animation-delay: .15s;
+}
+
+@media (prefers-color-scheme: dark) {
+	body, .tab-links, .tab-pages, input, select, option, textarea {
+		background-color: #000 !important;
+		color: #ccc !important;
+	}
+	.markup {
+		background-color: #222;
+	}
 }
 
 @-webkit-keyframes verLoader {
