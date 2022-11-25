@@ -31,7 +31,7 @@ class Account {
 	}
 
 	static public function fromLogin( string $apiUrl, string $auth, string $username, string $server ) : self {
-		return new static($apiUrl, $auth, $username, $server);
+		return new static($apiUrl, $auth, $username, $server, false);
 	}
 
 	static public function unpackOne( array $info, bool $active ) : self {
