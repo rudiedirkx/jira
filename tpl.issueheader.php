@@ -17,7 +17,7 @@ if ( !$fields->issuetype->subtask ) {
 	$actions['+Subtask'] = 'new.php?project=' . $fields->project->id . '&parent=' . $key . '&parentsummary=' . urlencode(trim($fields->summary));
 }
 $actions['Changelog'] = 'changelog.php?key=' . $key;
-$actions['➔ View in Jira'] = JIRA_URL . '/browse/' . $key;
+$actions['➔ View in Jira'] = JIRA_ORIGIN . '/browse/' . $key;
 
 $resolution = '';
 if ( $fields->resolution ) {

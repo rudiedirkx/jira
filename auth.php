@@ -10,9 +10,14 @@ if ( defined('JIRA_AUTH') ) {
 	echo '<p>You are:</p>';
 	echo '<pre>';
 
+	$info = ['unauth_ok' => true];
 	$account = jira_get('/rest/api/3/myself', null, $error, $info);
 	print_r($account);
-	$error and print_r($info['error']);
+	if ($error) {
+		echo $info['response'] . "\n";
+		print_r($info);
+		exit;
+	}
 
 	print_r($user);
 
@@ -59,7 +64,7 @@ if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
 	// $db->update('users', array('jira_timezone' => $jiraUsername->timeZone), array('id' => $user->id));
 
 	// Save credentials to cookie
-	do_login($url, $info['JIRA_AUTH']);
+	do_login($url, $info['JIRA_AUTH'], $username);
 
 	return do_redirect('index');
 }
@@ -73,3 +78,5 @@ include 'tpl.header.php';
 <? include 'tpl.login.php' ?>
 
 <p>Make a <em>Personal API token</em> on <a href="https://id.atlassian.com/manage/api-tokens">https://id.atlassian.com/manage/api-tokens</a>.</p>
+
+<p><a href="oauth2-start.php">Or try the brandnew Cloud OAuth2 experience!</a></p>

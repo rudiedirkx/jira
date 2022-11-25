@@ -168,7 +168,7 @@ class User extends db_generic_model {
 	}
 
 	function get_jira_id() {
-		return $this->jira_user . '@' . $this->jira_domain;
+		return $this->jira_user . ' @ ' . $this->jira_domain;
 	}
 
 	function get_variables() {

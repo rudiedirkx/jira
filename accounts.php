@@ -15,8 +15,8 @@ if ( isset($_POST['url'], $_POST['user'], $_POST['pass']) ) {
 	}
 
 	// Save credentials to cookie
-	$auth = $username . ':' . $_POST['pass'];
-	do_login($url, $auth);
+	$auth = 'Basic ' . base64_encode($username . ':' . $_POST['pass']);
+	do_login($url, $auth, $username);
 
 	// Save user to local db for preferences
 	try {
@@ -45,7 +45,7 @@ else if ( isset($_GET['switch']) ) {
 	unset($accounts[$index]);
 	array_unshift($accounts, $account);
 
-	do_login('', '', $accounts);
+	do_session($accounts);
 
 	return do_redirect('accounts');
 }
@@ -59,7 +59,7 @@ else if ( isset($_GET['unlink']) ) {
 	}
 
 	unset($accounts[$index]);
-	do_login('', '', $accounts);
+	do_session($accounts);
 
 	return do_redirect('accounts');
 }
@@ -88,7 +88,7 @@ else if ( isset($_POST['unsync']) ) {
 }
 
 // Reset cookies
-do_login('', '');
+do_session(get_accounts());
 
 $_title = 'Accounts';
 include 'tpl.header.php';
@@ -108,10 +108,9 @@ label:after {
 
 <ul>
 	<?foreach ($accounts as $i => $account):
-		$_url = parse_url($account->url);
 		?>
 		<li class="<?if ($account->active):?>active-account<?endif?>">
-			<?= $account->user ?> @ <?= $_url['host'] ?>
+			<?= html($account->getLabel()) ?>
 			<?if (!$account->active):?>
 				(<a href="?switch=<?= $i ?>">switch</a>)
 				(<a href="?unlink=<?= $i ?>">x</a>)
@@ -191,7 +190,6 @@ label:after {
 <h2>Add account</h2>
 
 <?php
-$_COOKIE['JIRA_URL'] = '';
 include 'tpl.login.php';
 ?>
 

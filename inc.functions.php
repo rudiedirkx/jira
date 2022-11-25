@@ -37,91 +37,55 @@ function html_icon( $icon, $type = '' ) {
 	return $html;
 }
 
-function get_urls( $accounts = null ) {
-	if ( $accounts ) {
-		return array_map(function($acc) {
-			return $acc->url;
-		}, $accounts);
-	}
+function get_accounts() : array {
+	$cookie = $_COOKIE[JIRA_COOKIE_NAME] ?? null;
+	if (!$cookie) return [];
 
-	$urls = @$_COOKIE['JIRA_URL'] ? explode(',', $_COOKIE['JIRA_URL']) : array();
-	return $urls;
-}
+	$infos = json_decode(do_decrypt($cookie), true);
 
-function get_auths( $accounts = null ) {
-	if ( $accounts ) {
-		return array_map(function($acc) {
-			return $acc->auth;
-		}, $accounts);
-	}
-
-	$auths = @$_COOKIE['JIRA_AUTH'] ? explode(',', $_COOKIE['JIRA_AUTH']) : array();
-	return array_map('do_decrypt', $auths);
-}
-
-function get_accounts() {
-	$urls = get_urls();
-	$auths = get_auths();
-
-	$accounts = array();
-	foreach ( $auths AS $i => $auth ) {
-		list($user) = explode(':', $auth, 2);
-		$accounts[] = (object)array(
-			'url' => $urls[$i],
-			'auth' => $auth,
-			'user' => $user,
-			'active' => !$i,
-		);
-	}
+	$accounts = Account::unpackAll($infos);
 
 	return $accounts;
 }
 
-function do_logout( $layered = false ) {
+function do_logout( $one = false ) : void {
 	$accounts = get_accounts();
 
-	// Peel off first layer (active account)
-	if ( $layered && isset($accounts[1]) ) {
-		unset($accounts[0]);
-		do_login('', '', $accounts);
+	if ( $one ) {
+		array_shift($accounts);
 	}
-	// Log out completely
 	else {
-		// Unset AUTH
-		setcookie('JIRA_AUTH', '', 1);
-		unset($_COOKIE['JIRA_AUTH']);
+		$accounts = [];
+	}
+	do_session($accounts);
+}
 
-		// Reset URL
-		if ( $accounts && $_COOKIE['JIRA_URL'] != $accounts[0]->url ) {
-			$expire = strtotime('+6 months');
-			$_COOKIE['JIRA_URL'] = $accounts[0]->url;
-			setcookie('JIRA_URL', $_COOKIE['JIRA_URL'], $expire);
-		}
+function do_session( array $accounts ) : void {
+	$accounts = array_values(array_map(fn($account) => $account->pack(), $accounts));
+
+	if (count($accounts)) {
+		$cookie = do_encrypt(json_encode($accounts));
+
+		$_COOKIE[JIRA_COOKIE_NAME] = $cookie;
+		setcookie(JIRA_COOKIE_NAME, $cookie, strtotime('+6 months'));
+	}
+	else {
+		$_COOKIE[JIRA_COOKIE_NAME] = '';
+		setcookie(JIRA_COOKIE_NAME, '', 1);
 	}
 }
 
-function do_login( $url, $auth, $accounts = null ) {
-	$accounts or $accounts = get_accounts();
-
-	if ($url && $auth) {
-		$accounts[] = (object)compact('url', 'auth');
-	}
-
-	$urls = get_urls($accounts);
-	$auths = array_map('do_encrypt', get_auths($accounts));
-
-	$expire = strtotime('+6 months');
-	$_COOKIE['JIRA_URL'] = implode(',', $urls);
-	setcookie('JIRA_URL', $_COOKIE['JIRA_URL'], $expire);
-	$_COOKIE['JIRA_AUTH'] = implode(',', $auths);
-	setcookie('JIRA_AUTH', $_COOKIE['JIRA_AUTH'], $expire);
+function do_login( string $url, string $auth, string $username, ?string $server = null ) : void {
+	$accounts = get_accounts();
+	$accounts[] = Account::fromLogin($url, $auth, $username, $server ?? $url);
+	do_session($accounts);
 }
 
 function do_remarkup( $html ) {
 	$html = trim($html);
 
 	// Links to other issues
-	$regex = preg_quote(JIRA_URL, '#') . '/browse/([A-Z][A-Z\d]+\-\d+)';
+	$regex = preg_quote(JIRA_ORIGIN, '#') . '/browse/([A-Z][A-Z\d]+\-\d+)';
 	$html = preg_replace_callback('#' . $regex . '#', function($match) {
 		$key = $match[1];
 		return 'issue.php?key=' . $key;
@@ -132,13 +96,13 @@ function do_remarkup( $html ) {
 
 	// Images through proxy
 	$html = preg_replace('# (width|height)="\d+"#', '', $html);
-	$regex = '#src="' . preg_quote(JIRA_URL, '#') . '/secure/(attachment|thumbnail)/(\d+)/([^"]+)"#';
+	$regex = '#src="' . preg_quote(JIRA_ORIGIN, '#') . '/secure/(attachment|thumbnail)/(\d+)/([^"]+)"#';
 	$html = preg_replace_callback($regex, function($match) {
 		[, $size, $id, $name] = $match;
 		$thumb = (int) ($size == 'thumbnail');
 		return 'src="attachment.php?thumbnail=' . $thumb . '&id=' . $id . '"';
 	}, $html);
-	$regex = '#href="' . preg_quote(JIRA_URL, '#') . '/secure/attachment/(\d+)/([^"]+)"#';
+	$regex = '#href="' . preg_quote(JIRA_ORIGIN, '#') . '/secure/attachment/(\d+)/([^"]+)"#';
 	$html = preg_replace($regex, 'target="_blank" href="attachment.php?id=$1"', $html);
 
 	return $html;
@@ -148,13 +112,13 @@ function do_markup( $text ) {
 	return nl2br(html(trim($text)));
 }
 
-function do_encrypt( $data ) {
+function do_encrypt( string $data ) {
 	$iv_size = openssl_cipher_iv_length('AES-256-CBC');
 	$iv = openssl_random_pseudo_bytes($iv_size);
 	return base64_encode($iv . openssl_encrypt($data, 'AES-256-CBC', SECRET . SECRET, 0, $iv));
 }
 
-function do_decrypt( $data ) {
+function do_decrypt( string $data ) {
 	$data = base64_decode($data);
 	$iv_size = openssl_cipher_iv_length('AES-256-CBC');
 	$iv = substr($data, 0, $iv_size);
@@ -222,7 +186,7 @@ function jira_test( $url, $user, $pass, &$info = null ) {
 	$info = array(
 		'unauth_ok' => 1,
 		'JIRA_URL' => $url,
-		'JIRA_AUTH' => $user . ':' . $pass,
+		'JIRA_AUTH' => 'Basic ' . base64_encode("$user:$pass"),
 	);
 	$session = jira_get('/rest/auth/1/session', array(), $error, $info);
 
@@ -247,7 +211,7 @@ function jira_url( $resource, $query = null, $info = null ) {
 		$url = $resource;
 	}
 	else {
-		$baseUrl = $info && @$info['JIRA_URL'] ? $info['JIRA_URL'] : JIRA_URL;
+		$baseUrl = $info['JIRA_URL'] ?? JIRA_URL;
 		$path = '/' == $resource[0] ? '' : JIRA_API_PATH;
 		$url = $baseUrl . $path . $resource;
 	}
@@ -259,17 +223,22 @@ function jira_curl( $url, $method = '', &$info = null ) {
 	empty($GLOBALS['jira_requests']) && $GLOBALS['jira_requests'] = array();
 	$GLOBALS['jira_requests'][] = $method . ' ' . $url;
 
-	$auth = $info && @$info['JIRA_AUTH'] ? $info['JIRA_AUTH'] : JIRA_AUTH;
-
 	$info['_start'] = microtime(1);
 
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, $url);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($ch, CURLOPT_HEADER, 1);
-	curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-	curl_setopt($ch, CURLOPT_USERPWD, $auth);
 	return $ch;
+}
+
+function jira_curl_headers( $ch, ?array &$info, array $headers ) {
+	$auth = $info['JIRA_AUTH'] ?? JIRA_AUTH;
+	if ($auth) {
+		$headers[] = 'Authorization: ' . $auth;
+	}
+	curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+	$info['headers_out'] = $headers;
 }
 
 function jira_post( $resource, $data, &$error = null, &$info = null ) {
@@ -281,7 +250,7 @@ function jira_post( $resource, $data, &$error = null, &$info = null ) {
 	$ch = jira_curl($url, 'POST', $info);
 	curl_setopt($ch, CURLOPT_POST, true);
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
-	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/json', 'User-agent: Jira Mobile'));
+	jira_curl_headers($ch, $info, array('Content-type: application/json', 'User-agent: Jira Mobile'));
 
 	$response = jira_response($ch, $error, $info);
 	$info['request'] = $body;
@@ -300,7 +269,7 @@ function jira_upload( $resource, $data, &$error = null, &$info = null ) {
 	$ch = jira_curl($url, 'POST', $info);
 	curl_setopt($ch, CURLOPT_POST, true);
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-	curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-Atlassian-Token: nocheck', 'User-agent: Jira Mobile'));
+	jira_curl_headers($ch, $info, array('X-Atlassian-Token: nocheck', 'User-agent: Jira Mobile'));
 
 	$response = jira_response($ch, $error, $info);
 	$info['request'] = $data;
@@ -332,7 +301,7 @@ function jira_get( $resource, $query = null, &$error = null, &$info = null ) {
 	$url = jira_url($resource, $query, $info);
 
 	$ch = jira_curl($url, 'GET', $info);
-	curl_setopt($ch, CURLOPT_HTTPHEADER, array('User-agent: Jira Mobile'));
+	jira_curl_headers($ch, $info, array('User-agent: Jira Mobile'));
 
 	$response = jira_response($ch, $error, $info);
 
@@ -357,7 +326,7 @@ function jira_put( $resource, $data, &$error = null, &$info = null ) {
 	curl_setopt($ch, CURLOPT_PUT, true);
 	curl_setopt($ch, CURLOPT_INFILE, $fp);
 	curl_setopt($ch, CURLOPT_INFILESIZE, strlen($body));
-	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/json', 'User-agent: Jira Mobile'));
+	jira_curl_headers($ch, $info, array('Content-type: application/json', 'User-agent: Jira Mobile'));
 
 	$response = jira_response($ch, $error, $info);
 	$info['request'] = $body;
@@ -375,7 +344,7 @@ function jira_delete( $resource, $query = null, &$error = null, &$info = null ) 
 
 	$ch = jira_curl($url, 'DELETE', $info);
 	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
-	curl_setopt($ch, CURLOPT_HTTPHEADER, array('User-agent: Jira Mobile'));
+	jira_curl_headers($ch, $info, array('User-agent: Jira Mobile'));
 
 	$response = jira_response($ch, $error, $info);
 
