@@ -40,7 +40,7 @@ class Issue extends db_generic_record {
 
 	public function get_parent() {
 		$parent = @$this->fields->parent;
-		return $parent ? new Issue($parent) : null;
+		return $parent ? new Issue((array) $parent) : null;
 	}
 
 	/**
@@ -96,7 +96,7 @@ class Issue extends db_generic_record {
 		if ( $this->parent_epic_key && $user->config('load_epics') ) {
 			$parentEpic = jira_get('issue/' . $this->parent_epic_key);
 			if ( $parentEpic ) {
-				return new Issue($parentEpic);
+				return new Issue((array) $parentEpic);
 			}
 		}
 	}

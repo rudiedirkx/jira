@@ -18,7 +18,7 @@ if ( !$issue || $error ) {
 	print_r($info);
 	exit;
 }
-$issue = new Issue($issue);
+$issue = new Issue((array) $issue);
 
 include 'tpl.issueheader.php';
 
