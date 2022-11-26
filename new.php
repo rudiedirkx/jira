@@ -157,7 +157,7 @@ $defaultPriority = $priorityKeys[ floor((count($priorities) - 1) / 2) ];
 	<p>Description: <textarea name="description" rows="8"></textarea><br><button type="button" data-preview="textarea[name=description]">Preview</button></p>
 	<p>Priority: <select name="priority"><?= html_options($priorities, $defaultPriority) ?></select></p>
 
-	<p><input type="submit" /></p>
+	<p><button>Save</button></p>
 </form>
 <?php
 

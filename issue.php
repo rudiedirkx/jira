@@ -159,7 +159,7 @@ if ( isset($_GET['edit']) ) {
 
 	echo '	<p>Add comment: <textarea name="comment" rows="4"></textarea><br><button type="button" data-preview="textarea[name=comment]">Preview</button></p>';
 
-	echo '	<p><input type="submit" /></p>';
+	echo '	<p><button>Save</button></p>';
 	echo '</form>';
 
 	include 'tpl.footer.php';
@@ -347,7 +347,7 @@ echo '</div>';
 			<textarea name="comment" rows="8"></textarea><br>
 			<button type="button" data-preview="textarea[name=comment]">Preview</button>
 		</p>
-		<p><input type="submit" /></p>
+		<p><button>Save</button></p>
 	</form>
 </div>
 

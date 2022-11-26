@@ -55,7 +55,7 @@ echo '<h1><a href="issue.php?key=' . $key . '">' . $key . '</a> ' . html($summar
 <form autocomplete="off" method="post">
 	<p>This issue <select name="type"><?= html_options($linkTypeOptions, 'Relates:inward') ?></select></p>
 	<p>That issue: <input name="issue" placeholder="ABC-123" /></p>
-	<p><input type="submit" /></p>
+	<p><button>Save</button></p>
 </form>
 
 <script>

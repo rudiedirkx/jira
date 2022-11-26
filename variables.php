@@ -83,7 +83,7 @@ body:not(.show-editables) .editable { display: none; }
 	</table>
 	<p>
 		(<a class="toggle-editables" href>edit</a>)
-		<input type="submit" />
+		<button>Save</button>
 	</p>
 </form>
 
@@ -94,7 +94,7 @@ body:not(.show-editables) .editable { display: none; }
 	<p>Regex: <input name="regex" placeholder="sprint = \d+" /></p>
 	<p>Replacement: <input name="replacement" placeholder="sprint = XXX" /></p>
 
-	<p><input type="submit" /></p>
+	<p><button>Save</button></p>
 </form>
 
 <script>

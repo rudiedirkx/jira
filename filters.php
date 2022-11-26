@@ -68,7 +68,7 @@ echo '<h1>Your filters</h1>';
 	<p>2. Index query: <input name="index_query" value="<?= html($user->index_query) ?>" /></p>
 	<p>3. Index project: <input name="index_project" value="<?= html($user->index_project) ?>" /></p>
 
-	<p><input type="submit" /></p>
+	<p><button>Save</button></p>
 </form>
 
 <h2>Add / edit filter</h2>
@@ -78,7 +78,7 @@ echo '<h1>Your filters</h1>';
 	<p>Name: <input name="name" /></p>
 	<p>Query: <input name="jql" /></p>
 
-	<p><input type="submit" /></p>
+	<p><button>Save</button></p>
 </form>
 
 <script>

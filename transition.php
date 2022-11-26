@@ -73,7 +73,7 @@ if ( isset($transitionsById[$action]->fields->resolution) ) {
 }
 echo '<p>Comment:<br><textarea name="comment" rows="8"></textarea><br><button type="button" data-preview="textarea[name=comment]">Preview</button></p>';
 
-echo '<p><input type="submit" /></p>';
+echo '<p><button>Save</button></p>';
 echo '</form>';
 echo '</div>';
 

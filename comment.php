@@ -40,7 +40,7 @@ echo '<h2>Comment # ' . $id . '</h2>';
 <form autocomplete="off" method="post">
 	<p><textarea name="comment" rows="8"><?= html($comment->body) ?></textarea><br><button type="button" data-preview="textarea[name=comment]">Preview</button></p>
 	<p>
-		<input type="submit" />
+		<button>Save</button>
 		or
 		<a data-confirm="DELETE this COMMENT for ever and ever?" href="issue.php?key=<?= $key ?>&delete_comment=<?= $id ?>">delete</a>
 	</p>

@@ -1,3 +1,8 @@
+:root {
+	--jira-dark-blue: #326ca6;
+	--jira-light-blue: #e0f0ff;
+}
+
 * {
 	box-sizing: border-box;
 	-webkit-box-sizing: border-box;
@@ -7,31 +12,37 @@ html, body {
 	margin: 0;
 	padding: 0;
 	font-family: sans-serif;
+	font-size: 16px;
+	line-height: 1.6;
 }
 html {
 	height: 100%;
 }
 body {
 	padding: 10px;
-	line-height: 1.4;
 	background-color: #fff;
 	color: #000;
 }
-input:not([type="submit"]):not([type="button"]):not([type="radio"]):not([type="checkbox"]),
+input,
 select,
-textarea {
-	background: #e0f0ff;
+textarea,
+button {
+	background: var(--jira-light-blue);
 	border: solid 1px #999;
 	padding: 11px;
 }
-input:not([type="submit"]):not([type="button"]):not([type="radio"]):not([type="checkbox"]):not(.manual-width),
+input:not([type="radio"]):not([type="checkbox"]):not(.manual-width),
 select:not(.manual-width),
 textarea:not(.manual-width) {
 	width: 100%;
 }
-.filter input:not([type="submit"]):not([type="button"]):not([type="radio"]):not([type="checkbox"]),
-.filter select {
-	background: #fff;
+button {
+	cursor: pointer;
+}
+.filter input,
+.filter select,
+.filter button {
+	background-color: #fff;
 }
 .required {
 	color: red;
@@ -50,7 +61,7 @@ h2 + a + p {
 a,
 h1, h1 a,
 h2, h2 a {
-	color: #326ca6;
+	color: var(--jira-dark-blue);
 }
 .epic a {
 	color: inherit;
@@ -98,7 +109,7 @@ a.active {
 /* issue details */
 .parent-issue,
 .parent-epic {
-	color: #326ca6;
+	color: var(--jira-dark-blue);
 	margin-bottom: 0;
 }
 h1.with-parent-issue {
@@ -150,7 +161,7 @@ button[data-preview] {
 /* issue labels */
 .label {
 	display: inline-block;
-	background: #e0f0ff;
+	background: var(--jira-light-blue);
 	color: #000;
 	padding: 1px 5px;
 	border-radius: 4px;
@@ -171,7 +182,7 @@ button[data-preview] {
 
 /* markup fields */
 .markup {
-	background: #e0f0ff;
+	background: var(--jira-light-blue);
 	padding: 10px;
 	word-wrap: break-word;
 }
@@ -395,12 +406,30 @@ body.loading > .hor-loader {
 }
 
 @media (prefers-color-scheme: dark) {
-	body, .tab-links, .tab-pages, input, select, option, textarea {
+	body {
 		background-color: #000 !important;
 		color: #ccc !important;
 	}
+	input, select, option, textarea, button {
+		background-color: #111 !important;
+		color: #ccc !important;
+		border: solid 1px #666 !important;
+	}
+	.tab-links, .tab-pages {
+		background-color: #111 !important;
+		color: #ccc !important;
+	}
 	.markup {
-		background-color: #222;
+		background-color: #111;
+	}
+	.markup .code.panel,
+	.markup tt {
+		background-color: #000;
+		outline-color: #666;
+	}
+	.label {
+		background-color: var(--jira-dark-blue);
+		color: #ccc;
 	}
 }
 

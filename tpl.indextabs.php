@@ -12,7 +12,7 @@
 			<input class="project-side manual-width" name="project" value="<?= html(@$_GET['project']) ?>" placeholder="Project..." />
 			<select class="manual-width" name="query"><?= html_options($filterOptions, $selectedQuery, '-- Filter') ?></select>
 		</div>
-		<input type="submit" />
+		<button>Filter</button>
 		<a href="filters.php">Your filters</a>
 	</form>
 	<form autocomplete="off" action class="filter tab-page" id="tab-page-query">
@@ -20,26 +20,26 @@
 			<input class="project-side manual-width" name="project" value="<?= html(@$_GET['project']) ?>" placeholder="Project..." />
 			<input class="manual-width" name="query" value="<?= html(@$selectedQuery) ?>" />
 		</div>
-		<input type="submit" />
+		<button>Filter</button>
 	</form>
 	<form autocomplete="off" action class="filter tab-page" id="tab-page-project">
 		<div class="input">
 			<input name="project" value="<?= html(@$_GET['project'] ?: $user->index_project) ?>" placeholder="Project key..." />
 		</div>
-		<input type="submit" />
+		<button>Filter</button>
 	</form>
 	<form autocomplete="off" action class="filter tab-page" id="tab-page-search">
 		<div class="input">
 			<input class="project-side manual-width" name="project" value="<?= html(@$_GET['project']) ?>" placeholder="Project..." />
 			<input class="manual-width" name="search" value="<?= html(@$_GET['search']) ?>" placeholder="Fulltext search tokens..." />
 		</div>
-		<input type="submit" />
+		<button>Filter</button>
 	</form>
 	<form autocomplete="off" action class="filter tab-page" id="tab-page-goto">
 		<div class="input">
 			<input name="goto" value="" placeholder="Issue key, like ABCD-123..." />
 		</div>
-		<input type="submit" />
+		<button>Filter</button>
 	</form>
 </div>
 
