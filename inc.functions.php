@@ -286,8 +286,7 @@ function jira_download( $url ) {
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 	curl_setopt($ch, CURLOPT_MAXREDIRS, 2);
-	curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-	curl_setopt($ch, CURLOPT_USERPWD, JIRA_AUTH);
+	jira_curl_headers($ch, $info, []);
 
 	$data = curl_exec($ch);
 	curl_close($ch);
