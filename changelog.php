@@ -63,7 +63,7 @@ foreach ( $issue->changelog->histories as $log ) {
 	echo '</th>';
 	echo '</tr>';
 	foreach ($log->items as $item) {
-		$big = mb_strlen($item->fromString) > 100 || mb_strlen($item->toString) > 100;
+		$big = mb_strlen($item->fromString ?? '') > 100 || mb_strlen($item->toString ?? '') > 100;
 
 		echo '<tr class="item">';
 		echo '<th class="field">' .ucfirst(html($item->field)) . '</th>';

@@ -6,11 +6,12 @@ do_logincheck();
 
 $key = $_GET['key'];
 
-if ( isset($_POST['summary'], $_POST['description'], $_POST['issuetype'], $_POST['priority'], $_POST['comment']) ) {
+if ( isset($_POST['summary'], $_POST['description'], $_POST['issuetype'], $_POST['priority'], $_POST['assignee'], $_POST['comment']) ) {
 	$summary = trim($_POST['summary']);
 	$description = trim($_POST['description']);
 	$issuetype = trim($_POST['issuetype']);
 	$priority = trim($_POST['priority']);
+	$assignee = trim($_POST['assignee']);
 	$comment = trim($_POST['comment']);
 
 	$update = [];
@@ -19,6 +20,7 @@ if ( isset($_POST['summary'], $_POST['description'], $_POST['issuetype'], $_POST
 		'description' => $description,
 		'issuetype' => ['id' => $issuetype],
 		'priority' => ['id' => $priority],
+		'assignee' => ['accountId' => $assignee],
 	);
 	if ( $comment ) {
 		$update['comment'] = [['add' => ['body' => $comment]]];
@@ -136,8 +138,15 @@ if ( isset($_GET['edit']) ) {
 	// Description
 	// Issue type
 	// Priority
+	// Assignee
 
 	$meta = jira_get('issue/' . $key . '/editmeta', array('expand' => 'projects.issuetypes.fields'), $error, $info);
+
+	$users = [];
+	if ( !empty($meta->fields->assignee->autoCompleteUrl)) {
+		$response = jira_get($meta->fields->assignee->autoCompleteUrl, [], $error, $info);
+		$users = array_column($response, 'displayName', 'accountId');
+	}
 
 	$issuetypes = array();
 	foreach ( $meta->fields->issuetype->allowedValues AS $issuetype ) {
@@ -156,6 +165,8 @@ if ( isset($_GET['edit']) ) {
 
 	echo '	<p>Issue type: <select name="issuetype">' . html_options($issuetypes, $fields->issuetype->id) . '</select></p>';
 	echo '	<p>Priority: <select name="priority">' . html_options($priorities, @$fields->priority->id, '?') . '</select></p>';
+
+	echo '	<p>Assignee: <select name="assignee">' . html_options($users, $fields->assignee->accountId ?? '', '-- Unassigned') . '</select></p>';
 
 	echo '	<p>Add comment: <textarea name="comment" rows="4"></textarea><br><button type="button" data-preview="textarea[name=comment]">Preview</button></p>';
 
