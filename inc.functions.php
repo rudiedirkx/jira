@@ -151,7 +151,7 @@ function do_logincheck() {
 }
 
 function html( $text ) {
-	return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+	return htmlspecialchars($text ?? '', ENT_QUOTES, 'UTF-8');
 }
 
 function html_q( $change, $stringify = true, $source = null ) {
@@ -370,7 +370,6 @@ function jira_response( $ch, &$error = null, &$info = null ) {
 	$jira_history[] = $info['url'];
 
 	$info['headers'] = jira_http_headers($header);
-
 	$code = $info['http_code'];
 	$success = $code >= 200 && $code < 300;
 	$invalid_url = $code == 404 && is_int(strpos($info['content_type'], 'text/html'));
@@ -401,7 +400,7 @@ function jira_http_headers( $header ) {
 	$headers = array();
 	foreach ( explode("\n", $header) AS $line ) {
 		@list($name, $value) = explode(':', $line, 2);
-		if ( ($name = trim($name)) && ($value = trim($value)) ) {
+		if ( ($name = trim($name ?? '')) && ($value = trim($value ?? '')) ) {
 			$headers[strtolower($name)][] = urldecode($value);
 		}
 	}

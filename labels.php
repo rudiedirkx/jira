@@ -9,10 +9,11 @@ $id = @$_GET['id'];
 
 // Fetch labels autocomplete
 if ( isset($_GET['label']) ) {
-	$suggestions = jira_get(JIRA_API_1_PATH . 'labels/' . $id . '/suggest.json', array('query' => $_GET['label']), $error, $info);
-	$labels = array_map(function($label) {
-		return $label->label;
-	}, $suggestions->suggestions);
+	$searched = strtolower(trim($_GET['label']));
+	$rsp = jira_get('label', array(), $error, $info);
+	$labels = array_values(array_filter($rsp->values, function(string $found) use ($searched) {
+		return strpos($found, $searched) === 0;
+	}));
 	natcasesort($labels);
 
 	header('Content-type: text/json; charset=utf-8');

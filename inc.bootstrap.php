@@ -36,7 +36,7 @@ define('JIRA_API_PATH', '/rest/api/2/');
 define('JIRA_API_1_PATH', '/rest/api/1.0/');
 
 // Request constants
-define('IS_AJAX', strtolower(@$_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
+define('IS_AJAX', strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'xmlhttprequest');
 
 define('OAUTH_REDIRECT_URL', 'https://' . $_SERVER['HTTP_HOST'] . '/oauth2-callback.php');
 
