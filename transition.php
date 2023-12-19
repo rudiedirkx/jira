@@ -11,7 +11,7 @@ $action = @$_GET['transition'];
 
 if ( isset($_POST['status'], $_POST['comment']) ) {
 	$status = trim($_POST['status']);
-	$resolution = trim(@$_POST['resolution']);
+	$resolution = trim($_POST['resolution'] ?? '');
 	$comment = trim($_POST['comment']);
 
 	$update = array();
