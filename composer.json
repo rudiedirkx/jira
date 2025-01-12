@@ -2,17 +2,24 @@
     "name": "rdx/jira",
     "description": "Mobile Jira",
     "type": "project",
+    "license": "MIT",
     "require": {
         "rdx/db": "^1.25"
     },
-    "license": "MIT",
+    "require-dev": {
+        "symfony/var-dumper": "^6.4"
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "platform": {
+            "php": "8.1.1"
+        }
+    },
     "authors": [
         {
             "name": "Rudie Dirkx",
             "email": "github@hotblocks.nl"
         }
-    ],
-    "require-dev": {
-        "symfony/var-dumper": "^6.2"
-    }
+    ]
 }

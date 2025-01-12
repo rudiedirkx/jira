@@ -96,12 +96,17 @@ function do_remarkup( $html ) {
 
 	// Images through proxy
 	$html = preg_replace('# (width|height)="\d+"#', '', $html);
+	// API v3 <img>
+	$regex = '#src="' . preg_quote(JIRA_ORIGIN, '#') . '/rest/api/3/attachment/content/(\d+)"#';
+	$html = preg_replace($regex, 'src="attachment.php?id=$1"', $html);
+	// API v2? <img>
 	$regex = '#src="' . preg_quote(JIRA_ORIGIN, '#') . '/secure/(attachment|thumbnail)/(\d+)/([^"]+)"#';
 	$html = preg_replace_callback($regex, function($match) {
 		[, $size, $id, $name] = $match;
 		$thumb = (int) ($size == 'thumbnail');
 		return 'src="attachment.php?thumbnail=' . $thumb . '&id=' . $id . '"';
 	}, $html);
+	// API v2? <a> to attachment
 	$regex = '#href="' . preg_quote(JIRA_ORIGIN, '#') . '/secure/attachment/(\d+)/([^"]+)"#';
 	$html = preg_replace($regex, 'target="_blank" href="attachment.php?id=$1"', $html);
 
