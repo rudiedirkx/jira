@@ -37,9 +37,7 @@ class User extends db_generic_model {
 		'show_custom_fields' => FALSE,
 	);
 
-	public function __construct( array $data = [] ) {
-		parent::__construct($data);
-
+	public function init() {
 		if ( !$this->last_sync || $this->last_sync + FORCE_JIRA_USER_SYNC < time() ) {
 			// $this->unsync();
 		}

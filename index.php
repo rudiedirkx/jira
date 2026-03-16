@@ -51,7 +51,12 @@ list($activeTab) = explode(':', $querySource);
 
 // Execute
 $page = max(0, (int)@$_GET['page']);
-$issues = jira_get('search', array('maxResults' => $perPage, 'startAt' => $page * $perPage, 'jql' => $query), $error, $info);
+$issues = jira_get('/rest/api/3/search/jql', array(
+	'nextPageToken' => $_GET['nextPageToken'] ?? null,
+	'maxResults' => $perPage,
+	'jql' => $query,
+	'fields' => '*all',
+), $error, $info);
 if ($issues) {
 	$issues->issues = Issue::map($issues->issues);
 }
