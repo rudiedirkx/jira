@@ -12,6 +12,7 @@ $rsp = jira_post('https://auth.atlassian.com/oauth/token', [
 	'code' => $_GET['code'],
 	'redirect_uri' => OAUTH_REDIRECT_URL,
 ], $error, $info);
+// dd($rsp, $error, $info);
 if ($error) {
 	echo '<pre>';
 	var_dump($error);
@@ -26,6 +27,7 @@ $info = [
 	'unauth_ok' => true,
 ];
 $rsp = jira_get('https://api.atlassian.com/oauth/token/accessible-resources', [], $error, $info);
+// dd($rsp, $error, $info);
 if ($error) {
 	echo '<pre>';
 	var_dump($error);
@@ -43,6 +45,7 @@ $info = [
 ];
 $rsp = jira_get("$url/rest/api/3/myself", [], $error, $info);
 // $rsp = jira_get("$url/rest/auth/1/session", [], $error, $info);
+// dd($rsp, $error, $info);
 if ($error) {
 	echo '<pre>';
 	var_dump($error);

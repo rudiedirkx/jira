@@ -41,7 +41,10 @@ function get_accounts() : array {
 	$cookie = $_COOKIE[JIRA_COOKIE_NAME] ?? null;
 	if (!$cookie) return [];
 
-	$infos = json_decode(do_decrypt($cookie), true);
+	if ( ENCRYPT_COOKIE ) {
+		$cookie = do_decrypt($cookie);
+	}
+	$infos = json_decode($cookie, true);
 
 	$accounts = Account::unpackAll($infos);
 
@@ -64,7 +67,10 @@ function do_session( array $accounts ) : void {
 	$accounts = array_values(array_map(fn($account) => $account->pack(), $accounts));
 
 	if (count($accounts)) {
-		$cookie = do_encrypt(json_encode($accounts));
+		$cookie = json_encode($accounts);
+		if ( ENCRYPT_COOKIE ) {
+			$cookie = do_encrypt($cookie);
+		}
 
 		$_COOKIE[JIRA_COOKIE_NAME] = $cookie;
 		setcookie(JIRA_COOKIE_NAME, $cookie, strtotime('+6 months'));
@@ -78,6 +84,7 @@ function do_session( array $accounts ) : void {
 function do_login( string $url, string $auth, string $username, ?string $server = null ) : void {
 	$accounts = get_accounts();
 	$accounts[] = Account::fromLogin($url, $auth, $username, $server ?? $url);
+// dd($accounts);
 	do_session($accounts);
 }
 
@@ -140,8 +147,7 @@ function do_redirect( $path, $query = null ) {
 
 	$query = $query ? '?' . http_build_query($query) : '';
 	$location = $path . '.php' . $query . $fragment;
-// var_dump($location);
-// exit;
+// dd($location);
 	header('Location: ' . $location);
 	exit;
 }

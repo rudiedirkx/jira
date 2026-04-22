@@ -38,7 +38,13 @@ define('JIRA_API_1_PATH', '/rest/api/1.0/');
 // Request constants
 define('IS_AJAX', strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'xmlhttprequest');
 
-define('OAUTH_REDIRECT_URL', 'https://' . $_SERVER['HTTP_HOST'] . '/oauth2-callback.php');
+if ( !defined('ENCRYPT_COOKIE') ) {
+	define('ENCRYPT_COOKIE', true);
+}
+
+if ( !defined('OAUTH_REDIRECT_URL') ) {
+	define('OAUTH_REDIRECT_URL', 'https://' . $_SERVER['HTTP_HOST'] . '/oauth2-callback.php');
+}
 
 // Init Jira request history
 $jira_history = array();
